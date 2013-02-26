@@ -23,12 +23,24 @@ package com.google.android.uidriver;
  */
 public interface UiElement extends SearchContext {
   /**
-   * Gets the text of this specific element.
+   * Gets the text of this element.
    */
   String getText();
 
   /**
-   * Clicks the center of visible element.
+   * Sets the text of this element.
+   * @param text The text to enter.
+   */
+  // TODO: Should this clear the text before setting?
+  void setText(String text);
+
+  /**
+   * Gets the content description of this element.
+   */
+  String getContentDescription();
+
+  /**
+   * Clicks this element.  The click will be at the center of the visible element.
    */
   void click();
 }
