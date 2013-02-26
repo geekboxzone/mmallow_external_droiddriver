@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 /**
  * Convenience methods to create commonly used matchers.
  */
-public abstract class By {
+public class By {
 
   /**
    * @param text The exact text to match against
@@ -30,6 +30,15 @@ public abstract class By {
   public static final ByText text(String text) {
     Preconditions.checkNotNull(text);
     return new ByText(text);
+  }
+
+  /**
+   * @param contentDescription The exact content description to match against
+   * @return a matcher to find an element by content description
+   */
+  public static final ByContentDescription contentDescription(String contentDescription) {
+    Preconditions.checkNotNull(contentDescription);
+    return new ByContentDescription(contentDescription);
   }
 
   public static class ByText implements Matcher {
@@ -48,4 +57,23 @@ public abstract class By {
       return "ByText: " + text;
     }
   }
+
+  public static class ByContentDescription implements Matcher {
+    private final String contentDescription;
+    public ByContentDescription(String contentDescription) {
+      this.contentDescription = contentDescription;
+    }
+
+    @Override
+    public boolean matches(UiElement element) {
+      return contentDescription.equals(element.getContentDescription());
+    }
+
+    @Override
+    public String toString() {
+      return "ByContentDescription: " + contentDescription;
+    }
+  }
+
+  private By() {}
 }

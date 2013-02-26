@@ -47,6 +47,16 @@ public class UiAutomationElement implements UiElement {
   }
 
   @Override
+  public void setText(String text) {
+    Interactions.sendText(uiAutomation, text);
+  }
+
+  @Override
+  public String getContentDescription() {
+    return node.getContentDescription() == null ? null : node.getContentDescription().toString();
+  }
+
+  @Override
   public UiElement findElement(Matcher matcher) {
     int childCount = node.getChildCount();
     Log.d(TAG, "Looping through number of childs " + childCount);
@@ -78,5 +88,4 @@ public class UiAutomationElement implements UiElement {
     node.getBoundsInScreen(nodeRect);
     Interactions.click(uiAutomation, nodeRect.centerX(), nodeRect.centerY());
   }
-
 }
