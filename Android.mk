@@ -3,8 +3,9 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := libandroid-support \
-    libguava
+#libguava is defined in robotium, so append 13 to make a new name
+LOCAL_JAVA_LIBRARIES := \
+    libguava13
 
 LOCAL_MODULE := uidriver
 LOCAL_MODULE_TAGS := optional
@@ -17,7 +18,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
-    libandroid-support:libs/android-support-v4.jar \
-    libguava:libs/guava-13.0.jar
+    libguava13:libs/guava-13.0.jar
 
 include $(BUILD_MULTI_PREBUILT)
