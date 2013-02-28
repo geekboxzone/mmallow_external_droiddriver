@@ -28,7 +28,6 @@ public class By {
    * @return a matcher to find an element by text
    */
   public static final ByText text(String text) {
-    Preconditions.checkNotNull(text);
     return new ByText(text);
   }
 
@@ -37,13 +36,13 @@ public class By {
    * @return a matcher to find an element by content description
    */
   public static final ByContentDescription contentDescription(String contentDescription) {
-    Preconditions.checkNotNull(contentDescription);
     return new ByContentDescription(contentDescription);
   }
 
   public static class ByText implements Matcher {
     private final String text;
     public ByText(String text) {
+      Preconditions.checkNotNull(text);
       this.text = text;
     }
 
@@ -61,6 +60,7 @@ public class By {
   public static class ByContentDescription implements Matcher {
     private final String contentDescription;
     public ByContentDescription(String contentDescription) {
+      Preconditions.checkNotNull(contentDescription);
       this.contentDescription = contentDescription;
     }
 

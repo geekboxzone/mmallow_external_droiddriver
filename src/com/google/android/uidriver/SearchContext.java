@@ -17,6 +17,7 @@
 package com.google.android.uidriver;
 
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
+import com.google.android.uidriver.exceptions.TimeoutException;
 
 public interface SearchContext {
   /**
@@ -27,4 +28,14 @@ public interface SearchContext {
    * @throws ElementNotFoundException If no matching elements are found
    */
   UiElement findElement(Matcher matcher);
+
+  /**
+   * Polls until the first {@link UiElement} that matches the given matcher.  This method will poll
+   * until a match is found, or the timeout is reached.
+   *
+   * @param matcher The matching mechanism
+   * @return The first matching element on the current context
+   * @throws TimeoutException If no matching elements are found within the allowed time
+   */
+  UiElement waitForElement(Matcher matcher);
 }

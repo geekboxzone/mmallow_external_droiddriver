@@ -43,6 +43,12 @@ public class UiAutomationDriver implements UiDriver {
     return element.findElement(matcher);
   }
 
+  @Override
+  public UiElement waitForElement(Matcher matcher) {
+    UiElement element = new UiAutomationElement(uiAutomation, getRootNode());
+    return element.waitForElement(matcher);
+  }
+
   private AccessibilityNodeInfo getRootNode() {
     for (int i = 0; i < 3; i++) {
       AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();

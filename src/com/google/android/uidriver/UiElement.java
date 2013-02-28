@@ -43,4 +43,9 @@ public interface UiElement extends SearchContext {
    * Clicks this element.  The click will be at the center of the visible element.
    */
   void click();
+
+  /**
+   * @returns whether or not this element is visible on the device's display.
+   */
+  boolean isVisible();
 }

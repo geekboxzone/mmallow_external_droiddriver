@@ -25,15 +25,16 @@ import android.view.MotionEvent;
  */
 public class Events {
   public static MotionEvent newTouchDownEvent(int x, int y) {
-    long mDownTime = SystemClock.uptimeMillis();
-    MotionEvent event = MotionEvent.obtain(mDownTime, mDownTime, MotionEvent.ACTION_DOWN, x, y, 1);
+    long downTime = SystemClock.uptimeMillis();
+    MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
     return event;
   }
 
   public static MotionEvent newTouchUpEvent(int x, int y) {
-    long mDownTime = SystemClock.uptimeMillis();
-    MotionEvent event = MotionEvent.obtain(mDownTime, mDownTime, MotionEvent.ACTION_UP, x, y, 1);
+    long downTime = SystemClock.uptimeMillis();
+    // TODO: The first downtime param here needs to the actual time of the down event.
+    MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_UP, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
     return event;
   }
