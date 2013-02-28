@@ -19,6 +19,7 @@ package com.google.android.uidriver.uiautomation;
 import com.google.android.uidriver.Matcher;
 import com.google.android.uidriver.UiElement;
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
+import com.google.android.uidriver.exceptions.ElementNotVisibleException;
 import com.google.android.uidriver.exceptions.TimeoutException;
 import com.google.common.base.Preconditions;
 
@@ -50,6 +51,7 @@ public class UiAutomationElement implements UiElement {
 
   @Override
   public void setText(String text) {
+    checkVisible();
     Interactions.sendText(uiAutomation, text);
   }
 
@@ -63,7 +65,12 @@ public class UiAutomationElement implements UiElement {
     int childCount = node.getChildCount();
     Log.d(TAG, "Looping through number of childs " + childCount);
     for (int i = 0; i < childCount; i++) {
-      UiElement element = new UiAutomationElement(uiAutomation, node.getChild(i));
+      AccessibilityNodeInfo childNode = node.getChild(i);
+      if (childNode == null) {
+        Log.w(TAG, "Found null child node for node: " + node);
+        continue;
+      }
+      UiElement element = new UiAutomationElement(uiAutomation, childNode);
       if (matcher.matches(element)) {
         Log.d(TAG, "Found match: " + node.getChild(i));
         return element;
@@ -107,8 +114,8 @@ public class UiAutomationElement implements UiElement {
 
   @Override
   public void click() {
-    // TODO(thanhle): need to find visible bounds.
-
+    checkVisible();
+    // TODO: need to find visible bounds.
     Rect nodeRect = new Rect();
     node.getBoundsInScreen(nodeRect);
     Interactions.click(uiAutomation, nodeRect.centerX(), nodeRect.centerY());
@@ -117,5 +124,11 @@ public class UiAutomationElement implements UiElement {
   @Override
   public boolean isVisible() {
     return node.isVisibleToUser();
+  }
+
+  private void checkVisible() {
+    if (!isVisible()) {
+      throw new ElementNotVisibleException("Element is not visible on screen");
+    }
   }
 }

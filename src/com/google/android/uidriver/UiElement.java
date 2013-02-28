@@ -16,6 +16,8 @@
 
 package com.google.android.uidriver;
 
+import com.google.android.uidriver.exceptions.ElementNotVisibleException;
+
 /**
  * Represents an UI element within an Android App.
  *
@@ -30,6 +32,7 @@ public interface UiElement extends SearchContext {
   /**
    * Sets the text of this element.
    * @param text The text to enter.
+   * @throws ElementNotVisibleException when the element is not visible
    */
   // TODO: Should this clear the text before setting?
   void setText(String text);
@@ -41,6 +44,7 @@ public interface UiElement extends SearchContext {
 
   /**
    * Clicks this element.  The click will be at the center of the visible element.
+   * @throws ElementNotVisibleException when the element is not visible
    */
   void click();
 

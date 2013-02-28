@@ -41,9 +41,9 @@ public class By {
 
   public static class ByText implements Matcher {
     private final String text;
+
     public ByText(String text) {
-      Preconditions.checkNotNull(text);
-      this.text = text;
+      this.text = Preconditions.checkNotNull(text);
     }
 
     @Override
@@ -59,9 +59,9 @@ public class By {
 
   public static class ByContentDescription implements Matcher {
     private final String contentDescription;
+
     public ByContentDescription(String contentDescription) {
-      Preconditions.checkNotNull(contentDescription);
-      this.contentDescription = contentDescription;
+      this.contentDescription = Preconditions.checkNotNull(contentDescription);
     }
 
     @Override
