@@ -60,6 +60,8 @@ public interface UiElement extends SearchContext {
 
   /**
    * Scrolls in the given direction.  Scrolling down means swiping upwards.
+   * @returns true if we can continue to scroll, otherwise false if we are at the beginning or
+   *          end of a scrollable view or the element is not scrollable.
    */
   boolean scroll(ScrollDirection direction);
 }

@@ -135,6 +135,7 @@ public class UiAutomationElement implements UiElement {
 
   @Override
   public boolean scroll(ScrollDirection direction) {
+    checkVisible();
     Rect nodeRect = getNodeRect();
 
     // TODO: Should the margin be configurable?
@@ -143,27 +144,21 @@ public class UiAutomationElement implements UiElement {
 
     switch (direction) {
       case DOWN:
-        interactions.swipe(nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust,
+        return interactions.swipe(nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust,
             nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust, 50, false /* drag */);
-        break;
       case UP:
-        interactions.swipe(nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust,
+        return interactions.swipe(nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust,
             nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust, 50, false /* drag */);
-        break;
       case LEFT:
-        interactions.swipe(nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(),
+        return interactions.swipe(nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(),
             nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
-        break;
       case RIGHT:
-        interactions.swipe(nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(),
+        return interactions.swipe(nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(),
             nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
-        break;
       default:
         throw new UiDriverException("Unknown scroll direction: " + direction);
 
     }
-    // TODO: Need to return false only when we reach the end.
-    return true;
   }
 
   private void checkVisible() {
