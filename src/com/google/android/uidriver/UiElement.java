@@ -43,6 +43,11 @@ public interface UiElement extends SearchContext {
   String getContentDescription();
 
   /**
+   * Gets the class name of the underlying view.
+   */
+  String getClassName();
+
+  /**
    * Clicks this element.  The click will be at the center of the visible element.
    * @throws ElementNotVisibleException when the element is not visible
    */
@@ -52,4 +57,9 @@ public interface UiElement extends SearchContext {
    * @returns whether or not this element is visible on the device's display.
    */
   boolean isVisible();
+
+  /**
+   * Scrolls in the given direction.  Scrolling down means swiping upwards.
+   */
+  boolean scroll(ScrollDirection direction);
 }

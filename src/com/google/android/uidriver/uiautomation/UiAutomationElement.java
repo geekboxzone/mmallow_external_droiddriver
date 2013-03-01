@@ -17,10 +17,12 @@
 package com.google.android.uidriver.uiautomation;
 
 import com.google.android.uidriver.Matcher;
+import com.google.android.uidriver.ScrollDirection;
 import com.google.android.uidriver.UiElement;
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
 import com.google.android.uidriver.exceptions.ElementNotVisibleException;
 import com.google.android.uidriver.exceptions.TimeoutException;
+import com.google.android.uidriver.exceptions.UiDriverException;
 import com.google.common.base.Preconditions;
 
 import android.app.UiAutomation;
@@ -38,26 +40,33 @@ public class UiAutomationElement implements UiElement {
 
   private final UiAutomation uiAutomation;
   private final AccessibilityNodeInfo node;
+  private final Interactions interactions;
 
   public UiAutomationElement(UiAutomation uiAutomation, AccessibilityNodeInfo node) {
     this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
     this.node = Preconditions.checkNotNull(node);
+    this.interactions = new Interactions(this.uiAutomation);
   }
 
   @Override
   public String getText() {
-    return node.getText() == null ? null : node.getText().toString();
+    return charSequenceToString(node.getText());
   }
 
   @Override
   public void setText(String text) {
     checkVisible();
-    Interactions.sendText(uiAutomation, text);
+    interactions.sendText(text);
   }
 
   @Override
   public String getContentDescription() {
-    return node.getContentDescription() == null ? null : node.getContentDescription().toString();
+    return charSequenceToString(node.getContentDescription());
+  }
+
+  @Override
+  public String getClassName() {
+    return charSequenceToString(node.getClassName());
   }
 
   @Override
@@ -115,10 +124,8 @@ public class UiAutomationElement implements UiElement {
   @Override
   public void click() {
     checkVisible();
-    // TODO: need to find visible bounds.
-    Rect nodeRect = new Rect();
-    node.getBoundsInScreen(nodeRect);
-    Interactions.click(uiAutomation, nodeRect.centerX(), nodeRect.centerY());
+    Rect nodeRect = getNodeRect();
+    interactions.click(nodeRect.centerX(), nodeRect.centerY());
   }
 
   @Override
@@ -126,9 +133,53 @@ public class UiAutomationElement implements UiElement {
     return node.isVisibleToUser();
   }
 
+  @Override
+  public boolean scroll(ScrollDirection direction) {
+    Rect nodeRect = getNodeRect();
+
+    // TODO: Should the margin be configurable?
+    int swipeAreaHeightAdjust = (int)(nodeRect.height() * 0.1);
+    int swipeAreaWidthAdjust = (int)(nodeRect.width() * 0.1);
+
+    switch (direction) {
+      case DOWN:
+        interactions.swipe(nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust,
+            nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust, 50, false /* drag */);
+        break;
+      case UP:
+        interactions.swipe(nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust,
+            nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust, 50, false /* drag */);
+        break;
+      case LEFT:
+        interactions.swipe(nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(),
+            nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
+        break;
+      case RIGHT:
+        interactions.swipe(nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(),
+            nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
+        break;
+      default:
+        throw new UiDriverException("Unknown scroll direction: " + direction);
+
+    }
+    // TODO: Need to return false only when we reach the end.
+    return true;
+  }
+
   private void checkVisible() {
     if (!isVisible()) {
       throw new ElementNotVisibleException("Element is not visible on screen");
     }
+  }
+
+  private String charSequenceToString(CharSequence input) {
+    return input == null ? null : input.toString();
+  }
+
+  // TODO: need to find visible bounds.
+  private Rect getNodeRect() {
+    Rect rect = new Rect();
+    node.getBoundsInScreen(rect);
+    return rect;
   }
 }

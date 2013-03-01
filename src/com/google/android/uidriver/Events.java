@@ -24,6 +24,9 @@ import android.view.MotionEvent;
  * Helper methods to create InputEvents.
  */
 public class Events {
+  /**
+   * @return a touch down event at the specified coordinates
+   */
   public static MotionEvent newTouchDownEvent(int x, int y) {
     long downTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 1);
@@ -31,10 +34,22 @@ public class Events {
     return event;
   }
 
-  public static MotionEvent newTouchUpEvent(int x, int y) {
-    long downTime = SystemClock.uptimeMillis();
-    // TODO: The first downtime param here needs to the actual time of the down event.
-    MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_UP, x, y, 1);
+  /**
+   * @return a touch up event at the specified coordinates
+   */
+  public static MotionEvent newTouchUpEvent(long downTime, int x, int y) {
+    long eventTime = SystemClock.uptimeMillis();
+    MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 1);
+    event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    return event;
+  }
+
+  /**
+   * @return a touch move event at the specified coordinates
+   */
+  public static MotionEvent newTouchMoveEvent(long downTime, int x, int y) {
+    long eventTime = SystemClock.uptimeMillis();
+    MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
     return event;
   }

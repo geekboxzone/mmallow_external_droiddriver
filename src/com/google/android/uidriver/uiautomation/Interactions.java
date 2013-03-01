@@ -18,11 +18,14 @@ package com.google.android.uidriver.uiautomation;
 
 import com.google.android.uidriver.Events;
 import com.google.android.uidriver.exceptions.UiDriverException;
+import com.google.common.base.Preconditions;
 
 import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.ViewConfiguration;
 
 /**
  * Helper methods to inject input interactions with the device.
@@ -32,14 +35,22 @@ public class Interactions {
   private static final KeyCharacterMap KEY_CHAR_MAP =
       KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
-  public static void click(UiAutomation uiAutomation, int x, int y) {
-    uiAutomation.injectInputEvent(Events.newTouchDownEvent(x, y), true /* sync */);
-    //TODO: Make sleep configurable.
-    SystemClock.sleep(250);
-    uiAutomation.injectInputEvent(Events.newTouchUpEvent(x, y), true /* sync */);
+  private final UiAutomation uiAutomation;
+
+  public Interactions(UiAutomation uiAutomation) {
+    this.uiAutomation = uiAutomation;
   }
 
-  public static void sendText(UiAutomation uiAutomation, String text) {
+  public void click(int x, int y) {
+    MotionEvent downEvent = Events.newTouchDownEvent(x, y);
+    uiAutomation.injectInputEvent(downEvent, true /* sync */);
+    //TODO: Make sleep configurable.
+    SystemClock.sleep(100);
+    uiAutomation.injectInputEvent(
+        Events.newTouchUpEvent(downEvent.getDownTime(), x, y), true /* sync */);
+  }
+
+  public void sendText(String text) {
     KeyEvent[] events = KEY_CHAR_MAP.getEvents(text.toCharArray());
 
     if (events != null) {
@@ -55,5 +66,37 @@ public class Interactions {
     } else {
       throw new UiDriverException("The given text is not supported: " + text);
     }
+  }
+
+  /**
+   * Handle swipes/drags in any direction.
+   */
+  public void swipe(int startX, int startY, int endX, int endY, int steps, boolean drag) {
+    Preconditions.checkArgument(startX >= 0);
+    Preconditions.checkArgument(startY >= 0);
+    Preconditions.checkArgument(endX >= 0);
+    Preconditions.checkArgument(endY >= 0);
+    Preconditions.checkArgument(steps > 0);
+    double xStep = ((double)(endX - startX)) / steps;
+    double yStep = ((double)(endY - startY)) / steps;
+
+    // first touch starts exactly at the point requested
+    MotionEvent downEvent = Events.newTouchDownEvent(startX, startY);
+    uiAutomation.injectInputEvent(downEvent, true /* sync */);
+    if (drag) {
+      SystemClock.sleep(ViewConfiguration.getLongPressTimeout());
+    }
+    for (int i = 1; i < steps; i++) {
+      uiAutomation.injectInputEvent(Events.newTouchMoveEvent(downEvent.getDownTime(),
+          startX + (int)(xStep * i), startY + (int)(yStep * i)), true /* sync */);
+      SystemClock.sleep(5);
+    }
+    if (drag) {
+      //TODO: Make sleep configurable.
+      // Hold final position for a little bit to simulate drag.
+      SystemClock.sleep(100);
+    }
+    uiAutomation.injectInputEvent(
+        Events.newTouchUpEvent(downEvent.getDownTime(), endX, endY), true /* sync */);
   }
 }

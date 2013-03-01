@@ -39,6 +39,14 @@ public class By {
     return new ByContentDescription(contentDescription);
   }
 
+  /**
+   * @param className The exact class name to match against
+   * @return a matcher to find an element by content description
+   */
+  public static final ByClassName className(String className) {
+    return new ByClassName(className);
+  }
+
   public static class ByText implements Matcher {
     private final String text;
 
@@ -72,6 +80,24 @@ public class By {
     @Override
     public String toString() {
       return "ByContentDescription: " + contentDescription;
+    }
+  }
+
+  public static class ByClassName implements Matcher {
+    private final String className;
+
+    public ByClassName(String className) {
+      this.className = Preconditions.checkNotNull(className);
+    }
+
+    @Override
+    public boolean matches(UiElement element) {
+      return className.equals(element.getClassName());
+    }
+
+    @Override
+    public String toString() {
+      return "ByClassName: " + className;
     }
   }
 
