@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.uidriver.uiautomation;
 
-public interface Matcher {
-  /**
-   * Returns true if the UiElement matches the implemented matcher. The
-   * implemented matcher should return quickly.
-   *
-   * @param element The element to validate against
-   * @return true if the element matches
-   */
-  boolean matches(UiElement element);
+import android.app.UiAutomation;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import com.google.android.uidriver.UiElement;
+import com.google.android.uidriver.util.Logs;
+
+/**
+ * Internal helper for UiAutomationDriver implementation.
+ */
+public class UiAutomationDrivers {
+  public static UiElement newUiAutomationElement(UiAutomation uiAutomation,
+      AccessibilityNodeInfo node) {
+    return Logs.wrap(UiElement.class, new UiAutomationElement(uiAutomation, node));
+  }
+
+  private UiAutomationDrivers() {}
 }

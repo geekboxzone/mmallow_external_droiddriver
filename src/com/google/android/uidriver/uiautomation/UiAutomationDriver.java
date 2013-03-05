@@ -39,13 +39,13 @@ public class UiAutomationDriver implements UiDriver {
 
   @Override
   public UiElement findElement(Matcher matcher) {
-    UiElement element = new UiAutomationElement(uiAutomation, getRootNode());
+    UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
     return element.findElement(matcher);
   }
 
   @Override
   public UiElement waitForElement(Matcher matcher) {
-    UiElement element = new UiAutomationElement(uiAutomation, getRootNode());
+    UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
     return element.waitForElement(matcher);
   }
 

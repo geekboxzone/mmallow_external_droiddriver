@@ -17,6 +17,7 @@
 package com.google.android.uidriver;
 
 import com.google.android.uidriver.exceptions.ElementNotVisibleException;
+import com.google.android.uidriver.util.Logs.Loggable;
 
 /**
  * Represents an UI element within an Android App.
@@ -27,6 +28,7 @@ public interface UiElement extends SearchContext {
   /**
    * Gets the text of this element.
    */
+  @Loggable
   String getText();
 
   /**
@@ -35,27 +37,32 @@ public interface UiElement extends SearchContext {
    * @throws ElementNotVisibleException when the element is not visible
    */
   // TODO: Should this clear the text before setting?
+  @Loggable
   void setText(String text);
 
   /**
    * Gets the content description of this element.
    */
+  @Loggable
   String getContentDescription();
 
   /**
    * Gets the class name of the underlying view.
    */
+  @Loggable
   String getClassName();
 
   /**
    * Clicks this element.  The click will be at the center of the visible element.
    * @throws ElementNotVisibleException when the element is not visible
    */
+  @Loggable
   void click();
 
   /**
    * @returns whether or not this element is visible on the device's display.
    */
+  @Loggable
   boolean isVisible();
 
   /**
@@ -63,5 +70,6 @@ public interface UiElement extends SearchContext {
    * @returns true if we can continue to scroll, otherwise false if we are at the beginning or
    *          end of a scrollable view or the element is not scrollable.
    */
+  @Loggable
   boolean scroll(ScrollDirection direction);
 }

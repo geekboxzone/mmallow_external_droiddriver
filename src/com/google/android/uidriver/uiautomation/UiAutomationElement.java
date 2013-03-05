@@ -79,7 +79,7 @@ public class UiAutomationElement implements UiElement {
         Log.w(TAG, "Found null child node for node: " + node);
         continue;
       }
-      UiElement element = new UiAutomationElement(uiAutomation, childNode);
+      UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, childNode);
       if (matcher.matches(element)) {
         Log.d(TAG, "Found match: " + node.getChild(i));
         return element;
@@ -150,11 +150,11 @@ public class UiAutomationElement implements UiElement {
         return interactions.swipe(nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust,
             nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust, 50, false /* drag */);
       case LEFT:
-        return interactions.swipe(nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(),
-            nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
+        return interactions.swipe(nodeRect.left + swipeAreaWidthAdjust, nodeRect.centerY(),
+            nodeRect.right - swipeAreaWidthAdjust, nodeRect.centerY(), 50, false /* drag */);
       case RIGHT:
-        return interactions.swipe(nodeRect.right - swipeAreaHeightAdjust, nodeRect.centerY(),
-            nodeRect.left + swipeAreaHeightAdjust, nodeRect.centerY(), 50, false /* drag */);
+        return interactions.swipe(nodeRect.right - swipeAreaWidthAdjust, nodeRect.centerY(),
+            nodeRect.left + swipeAreaWidthAdjust, nodeRect.centerY(), 50, false /* drag */);
       default:
         throw new UiDriverException("Unknown scroll direction: " + direction);
 
