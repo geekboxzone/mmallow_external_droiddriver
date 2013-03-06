@@ -16,13 +16,17 @@
 
 package com.google.android.uidriver.uiautomation;
 
+import com.google.android.uidriver.InputInjector;
 import com.google.android.uidriver.Matcher;
 import com.google.android.uidriver.ScrollDirection;
 import com.google.android.uidriver.UiElement;
+import com.google.android.uidriver.actions.Action;
+import com.google.android.uidriver.actions.ClickAction;
+import com.google.android.uidriver.actions.SwipeAction;
+import com.google.android.uidriver.actions.TypeAction;
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
 import com.google.android.uidriver.exceptions.ElementNotVisibleException;
 import com.google.android.uidriver.exceptions.TimeoutException;
-import com.google.android.uidriver.exceptions.UiDriverException;
 import com.google.common.base.Preconditions;
 
 import android.app.UiAutomation;
@@ -40,12 +44,12 @@ public class UiAutomationElement implements UiElement {
 
   private final UiAutomation uiAutomation;
   private final AccessibilityNodeInfo node;
-  private final Interactions interactions;
+  private final InputInjector injector;
 
   public UiAutomationElement(UiAutomation uiAutomation, AccessibilityNodeInfo node) {
     this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
     this.node = Preconditions.checkNotNull(node);
-    this.interactions = new Interactions(this.uiAutomation);
+    this.injector = new UiAutomationInputInjector(uiAutomation);
   }
 
   @Override
@@ -56,7 +60,7 @@ public class UiAutomationElement implements UiElement {
   @Override
   public void setText(String text) {
     checkVisible();
-    interactions.sendText(text);
+    perform(new TypeAction(text));
   }
 
   @Override
@@ -120,12 +124,15 @@ public class UiAutomationElement implements UiElement {
     }
   }
 
+  @Override
+  public boolean perform(Action action) {
+    return action.perform(injector, this);
+  }
 
   @Override
   public void click() {
     checkVisible();
-    Rect nodeRect = getNodeRect();
-    interactions.click(nodeRect.centerX(), nodeRect.centerY());
+    perform(new ClickAction());
   }
 
   @Override
@@ -134,31 +141,9 @@ public class UiAutomationElement implements UiElement {
   }
 
   @Override
-  public boolean scroll(ScrollDirection direction) {
+  public void scroll(ScrollDirection direction) {
     checkVisible();
-    Rect nodeRect = getNodeRect();
-
-    // TODO: Should the margin be configurable?
-    int swipeAreaHeightAdjust = (int)(nodeRect.height() * 0.1);
-    int swipeAreaWidthAdjust = (int)(nodeRect.width() * 0.1);
-
-    switch (direction) {
-      case DOWN:
-        return interactions.swipe(nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust,
-            nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust, 50, false /* drag */);
-      case UP:
-        return interactions.swipe(nodeRect.centerX(), nodeRect.top + swipeAreaHeightAdjust,
-            nodeRect.centerX(), nodeRect.bottom - swipeAreaHeightAdjust, 50, false /* drag */);
-      case LEFT:
-        return interactions.swipe(nodeRect.left + swipeAreaWidthAdjust, nodeRect.centerY(),
-            nodeRect.right - swipeAreaWidthAdjust, nodeRect.centerY(), 50, false /* drag */);
-      case RIGHT:
-        return interactions.swipe(nodeRect.right - swipeAreaWidthAdjust, nodeRect.centerY(),
-            nodeRect.left + swipeAreaWidthAdjust, nodeRect.centerY(), 50, false /* drag */);
-      default:
-        throw new UiDriverException("Unknown scroll direction: " + direction);
-
-    }
+    perform(new SwipeAction(direction, false));
   }
 
   private void checkVisible() {
@@ -171,8 +156,8 @@ public class UiAutomationElement implements UiElement {
     return input == null ? null : input.toString();
   }
 
-  // TODO: need to find visible bounds.
-  private Rect getNodeRect() {
+  @Override
+  public Rect getRect() {
     Rect rect = new Rect();
     node.getBoundsInScreen(rect);
     return rect;

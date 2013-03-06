@@ -16,8 +16,11 @@
 
 package com.google.android.uidriver;
 
+import com.google.android.uidriver.actions.Action;
 import com.google.android.uidriver.exceptions.ElementNotVisibleException;
 import com.google.android.uidriver.util.Logs.Loggable;
+
+import android.graphics.Rect;
 
 /**
  * Represents an UI element within an Android App.
@@ -53,6 +56,14 @@ public interface UiElement extends SearchContext {
   String getClassName();
 
   /**
+   * Executes the given action.
+   * @param action The action to execute
+   * @return true if the action is successful
+   */
+  @Loggable
+  boolean perform(Action action);
+
+  /**
    * Clicks this element.  The click will be at the center of the visible element.
    * @throws ElementNotVisibleException when the element is not visible
    */
@@ -66,10 +77,15 @@ public interface UiElement extends SearchContext {
   boolean isVisible();
 
   /**
-   * Scrolls in the given direction.  Scrolling down means swiping upwards.
-   * @returns true if we can continue to scroll, otherwise false if we are at the beginning or
-   *          end of a scrollable view or the element is not scrollable.
+   * Gets the UiElement bounds in screen coordinates.  The coordinates may not be visible on
+   * screen.
    */
   @Loggable
-  boolean scroll(ScrollDirection direction);
+  Rect getRect();
+
+  /**
+   * Scrolls in the given direction.  Scrolling down means swiping upwards.
+   */
+  @Loggable
+  void scroll(ScrollDirection direction);
 }
