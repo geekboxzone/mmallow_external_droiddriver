@@ -21,3 +21,6 @@ LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
     libguava13:libs/guava-13.0.jar
 
 include $(BUILD_MULTI_PREBUILT)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
+

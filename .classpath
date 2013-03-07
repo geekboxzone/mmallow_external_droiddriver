@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="libs/guava-13.0.jar"/>
 	<!--  TODO: clean up path before open sourcing -->
-	<classpathentry kind="lib" path="../../../prebuilts/sdk/current/android.jar"/>
+	<classpathentry kind="lib" path="../../prebuilts/sdk/current/android.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
