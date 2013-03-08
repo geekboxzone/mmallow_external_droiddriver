@@ -17,3 +17,5 @@ LOCAL_MODULE_TAGS := tests
 LOCAL_SDK_VERSION := 16
 
 include $(BUILD_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
