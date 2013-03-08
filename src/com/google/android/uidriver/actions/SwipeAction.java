@@ -16,11 +16,10 @@
 
 package com.google.android.uidriver.actions;
 
-import com.google.android.uidriver.Events;
 import com.google.android.uidriver.InputInjector;
-import com.google.android.uidriver.ScrollDirection;
 import com.google.android.uidriver.UiElement;
 import com.google.android.uidriver.exceptions.ActionException;
+import com.google.android.uidriver.util.Events;
 
 import android.graphics.Rect;
 import android.os.SystemClock;

@@ -7,8 +7,9 @@ import com.google.android.uidriver.UiDriver;
 import com.google.android.uidriver.uiautomation.UiAutomationDriver;
 
 /**
- * Simple activity used for validating intent sending and UI behavior.
+ * Tests SendActivity.
  */
+// google3/javatests/com/google/android/apps/common/testing/ui/espresso/exampletest/ExampleTest.java
 public class SendActivityTest extends ActivityInstrumentationTestCase2<SendActivity> {
   private UiDriver driver;
 
@@ -25,7 +26,6 @@ public class SendActivityTest extends ActivityInstrumentationTestCase2<SendActiv
 
   public void testClick() {
     driver.waitForElement(By.text("Send")).click();
-    // figure out why fail
-    // assertTrue(driver.waitForElement(By.text("Data from sender")).isVisible());
+    assertTrue(driver.waitForElement(By.text("Data from sender")).isVisible());
   }
 }
