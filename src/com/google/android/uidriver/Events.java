@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.util;
+package com.google.android.uidriver;
 
 import android.os.SystemClock;
 import android.view.InputDevice;

@@ -20,7 +20,6 @@ import com.google.android.uidriver.Matcher;
 import com.google.android.uidriver.UiDriver;
 import com.google.android.uidriver.UiElement;
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.exceptions.TimeoutException;
 import com.google.common.base.Preconditions;
 
 import android.app.UiAutomation;
@@ -39,25 +38,15 @@ public class UiAutomationDriver implements UiDriver {
   }
 
   @Override
-  public UiElement waitForElement(Matcher matcher) {
-    // TODO: Make this configurable
-    final int timeoutMillis = 10000;
-    final int intervalMillis = 500;
-    long end = SystemClock.uptimeMillis() + timeoutMillis;
-    while (true) {
-      UiElement root = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
-      try {
-        return root.findElement(matcher);
-      } catch (ElementNotFoundException e) {
-        // Do nothing.
-      }
+  public UiElement findElement(Matcher matcher) {
+    UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
+    return element.findElement(matcher);
+  }
 
-      if (SystemClock.uptimeMillis() > end) {
-        throw new TimeoutException(String.format(
-            "Timed out after %d milliseconds waiting for element %s", timeoutMillis, matcher));
-      }
-      SystemClock.sleep(intervalMillis);
-    }
+  @Override
+  public UiElement waitForElement(Matcher matcher) {
+    UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
+    return element.waitForElement(matcher);
   }
 
   private AccessibilityNodeInfo getRootNode() {

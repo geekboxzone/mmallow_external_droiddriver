@@ -52,7 +52,6 @@ public class Logs {
 
     public LoggingWrapper(Object wrapped) {
       this.wrapped = Preconditions.checkNotNull(wrapped);
-      assert !(wrapped instanceof LoggingWrapper); // prevent recursion
     }
 
     @Override
@@ -73,9 +72,6 @@ public class Logs {
     }
   }
 
-  /**
-   * Wraps {@code obj} in a {@link LoggingWrapper}.
-   */
   public static <T> T wrap(Class<T> cls, T obj) {
     return Reflection.newProxy(cls, new LoggingWrapper(obj));
   }

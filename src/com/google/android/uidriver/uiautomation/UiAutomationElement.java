@@ -16,28 +16,31 @@
 
 package com.google.android.uidriver.uiautomation;
 
-import android.app.UiAutomation;
-import android.graphics.Rect;
-import android.util.Log;
-import android.view.accessibility.AccessibilityNodeInfo;
-
 import com.google.android.uidriver.InputInjector;
 import com.google.android.uidriver.Matcher;
+import com.google.android.uidriver.ScrollDirection;
 import com.google.android.uidriver.UiElement;
 import com.google.android.uidriver.actions.Action;
 import com.google.android.uidriver.actions.ClickAction;
-import com.google.android.uidriver.actions.ScrollDirection;
 import com.google.android.uidriver.actions.SwipeAction;
 import com.google.android.uidriver.actions.TypeAction;
 import com.google.android.uidriver.exceptions.ElementNotFoundException;
 import com.google.android.uidriver.exceptions.ElementNotVisibleException;
-import com.google.android.uidriver.util.Logs;
+import com.google.android.uidriver.exceptions.TimeoutException;
 import com.google.common.base.Preconditions;
+
+import android.app.UiAutomation;
+import android.graphics.Rect;
+import android.os.SystemClock;
+import android.util.Log;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * A UiElement that is backed by the UiAutomation object.
  */
 public class UiAutomationElement implements UiElement {
+
+  private static final String TAG = UiAutomationDriver.class.getSimpleName();
 
   private final UiAutomation uiAutomation;
   private final AccessibilityNodeInfo node;
@@ -73,27 +76,52 @@ public class UiAutomationElement implements UiElement {
   @Override
   public UiElement findElement(Matcher matcher) {
     int childCount = node.getChildCount();
-    Log.d(Logs.TAG, "Looping through number of childs " + childCount);
+    Log.d(TAG, "Looping through number of childs " + childCount);
     for (int i = 0; i < childCount; i++) {
       AccessibilityNodeInfo childNode = node.getChild(i);
       if (childNode == null) {
-        Log.w(Logs.TAG, "Found null child node for node: " + node);
+        Log.w(TAG, "Found null child node for node: " + node);
         continue;
       }
       UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, childNode);
       if (matcher.matches(element)) {
-        Log.d(Logs.TAG, "Found match: " + node.getChild(i));
+        Log.d(TAG, "Found match: " + node.getChild(i));
         return element;
       } else {
+        //TODO: Remove since this is spammy, or put behind some debug if block.
+        Log.d(TAG, "Not found match: " + node.getChild(i));
         try {
-          return element.findElement(matcher);
+          UiElement foundElement = element.findElement(matcher);
+          return foundElement;
         } catch (ElementNotFoundException enfe) {
-          // Do nothing. Continue searching.
+          // Do nothing.  Continue searching.
         }
       }
     }
-    throw new ElementNotFoundException("Could not find any matching element for selector: "
-        + matcher);
+    throw new ElementNotFoundException(
+        "Could not find any matching element for selector: " + matcher);
+  }
+
+  @Override
+  public UiElement waitForElement(Matcher matcher) {
+    //TODO: Make this configurable
+    final int timeoutMillis = 10000;
+    final int intervalMillis = 500;
+    long end = SystemClock.uptimeMillis() + timeoutMillis;
+    while (true) {
+      try {
+        return findElement(matcher);
+      } catch (ElementNotFoundException e) {
+        // Do nothing.
+      }
+
+      if (SystemClock.uptimeMillis() > end) {
+        throw new TimeoutException(
+            String.format("Timed out after %d milliseconds waiting for element %s",
+                timeoutMillis, matcher));
+      }
+      SystemClock.sleep(intervalMillis);
+    }
   }
 
   @Override
