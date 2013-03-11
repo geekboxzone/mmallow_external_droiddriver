@@ -16,5 +16,17 @@
 
 package com.google.android.uidriver;
 
-public interface UiDriver extends SearchContext {
+import com.google.android.uidriver.exceptions.TimeoutException;
+
+public interface UiDriver {
+  /**
+   * Polls until the first {@link UiElement} that matches the given matcher.
+   * This method will poll until a match is found, or the timeout is reached.
+   *
+   * @param matcher The matching mechanism
+   * @return The first matching element
+   * @throws TimeoutException If no matching elements are found within the
+   *         allowed time
+   */
+  UiElement waitForElement(Matcher matcher);
 }

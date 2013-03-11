@@ -17,7 +17,6 @@
 package com.google.android.uidriver.exceptions;
 
 import com.google.android.uidriver.Matcher;
-import com.google.android.uidriver.SearchContext;
 
 /**
  * Thrown by {@link SearchContext#findElement(Matcher)}.

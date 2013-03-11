@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.uidriver.actions;
 
 /**
  * Scroll directions.
