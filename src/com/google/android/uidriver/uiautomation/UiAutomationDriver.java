@@ -16,16 +16,19 @@
 
 package com.google.android.uidriver.uiautomation;
 
-import com.google.android.uidriver.Matcher;
-import com.google.android.uidriver.UiDriver;
-import com.google.android.uidriver.UiElement;
-import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.exceptions.TimeoutException;
-import com.google.common.base.Preconditions;
-
 import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import com.google.android.uidriver.Matcher;
+import com.google.android.uidriver.Poller;
+import com.google.android.uidriver.UiDriver;
+import com.google.android.uidriver.UiElement;
+import com.google.android.uidriver.exceptions.ElementNotFoundException;
+import com.google.android.uidriver.util.DefaultPoller;
+import com.google.android.uidriver.util.DefaultPoller.ExistsChecker;
+import com.google.android.uidriver.util.DefaultPoller.GoneChecker;
+import com.google.common.base.Preconditions;
 
 /**
  * Implementation of a UiDriver that is driven via the accessibility layer.
@@ -33,31 +36,26 @@ import android.view.accessibility.AccessibilityNodeInfo;
 public class UiAutomationDriver implements UiDriver {
 
   private final UiAutomation uiAutomation;
+  private Poller poller;
 
   public UiAutomationDriver(UiAutomation uiAutomation) {
     this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
+    this.poller = new DefaultPoller();
   }
 
   @Override
   public UiElement waitForElement(Matcher matcher) {
-    // TODO: Make this configurable
-    final int timeoutMillis = 10000;
-    final int intervalMillis = 500;
-    long end = SystemClock.uptimeMillis() + timeoutMillis;
-    while (true) {
-      UiElement root = UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
-      try {
-        return root.findElement(matcher);
-      } catch (ElementNotFoundException e) {
-        // Do nothing.
-      }
+    return getPoller().pollFor(this, matcher, new ExistsChecker());
+  }
 
-      if (SystemClock.uptimeMillis() > end) {
-        throw new TimeoutException(String.format(
-            "Timed out after %d milliseconds waiting for element %s", timeoutMillis, matcher));
-      }
-      SystemClock.sleep(intervalMillis);
-    }
+  @Override
+  public void waitUntilGone(Matcher matcher) {
+    getPoller().pollFor(this, matcher, new GoneChecker());
+  }
+
+  @Override
+  public UiElement getRootElement() {
+    return UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
   }
 
   private AccessibilityNodeInfo getRootNode() {
@@ -69,5 +67,15 @@ public class UiAutomationDriver implements UiDriver {
       SystemClock.sleep(250);
     }
     throw new ElementNotFoundException("Could not find root node!");
+  }
+
+  @Override
+  public Poller getPoller() {
+    return poller;
+  }
+
+  @Override
+  public void setPoller(Poller poller) {
+    this.poller = poller;
   }
 }

@@ -16,10 +16,8 @@
 
 package com.google.android.uidriver.exceptions;
 
-import com.google.android.uidriver.Matcher;
-
 /**
- * Thrown by {@link SearchContext#findElement(Matcher)}.
+ * Thrown when element is not found.
  */
 public class ElementNotFoundException extends UiDriverException {
 

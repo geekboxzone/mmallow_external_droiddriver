@@ -20,6 +20,11 @@ import com.google.android.uidriver.exceptions.TimeoutException;
 
 public interface UiDriver {
   /**
+   * @return The root {@link UiElement}
+   */
+  UiElement getRootElement();
+
+  /**
    * Polls until the first {@link UiElement} that matches the given matcher.
    * This method will poll until a match is found, or the timeout is reached.
    *
@@ -29,4 +34,26 @@ public interface UiDriver {
    *         allowed time
    */
   UiElement waitForElement(Matcher matcher);
+
+
+  /**
+   * Polls until the {@link UiElement} that matches the given matcher is gone.
+   * This method will poll until matching element is gone, or the timeout is
+   * reached.
+   *
+   * @param matcher The matching mechanism
+   * @throws TimeoutException If matching element is not gone within the allowed
+   *         time
+   */
+  void waitUntilGone(Matcher matcher);
+
+  /**
+   * Returns the {@link Poller}.
+   */
+  Poller getPoller();
+
+  /**
+   * Sets the {@link Poller}.
+   */
+  void setPoller(Poller poller);
 }

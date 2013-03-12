@@ -16,21 +16,17 @@
 
 package com.google.android.uidriver.exceptions;
 
+import com.google.android.uidriver.Poller.ConditionChecker;
+
 /**
- * Base exception for UiDriver.
- *
- * <p>All exceptions should extend this.
+ * Thrown to indicate condition not met. Used in {@link ConditionChecker}.
  */
-public class UiDriverException extends RuntimeException {
-  public UiDriverException(String message) {
+public class UnsatisfiedConditionException extends UiDriverException {
+  public UnsatisfiedConditionException(String message) {
     super(message);
   }
 
-  public UiDriverException(Throwable cause) {
-    super(cause);
-  }
-
-  public UiDriverException(String message, Throwable cause) {
+  public UnsatisfiedConditionException(String message, Throwable cause) {
     super(message, cause);
   }
 }
