@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.actions;
+package com.google.android.droiddriver.exceptions;
 
 /**
- * Scroll directions.
+ * Thrown when an exception occurs while performing an Action.
  */
-public enum ScrollDirection {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT
+public class ActionException extends DroidDriverException {
+  public ActionException(String message) {
+    super(message);
+  }
+
+  public ActionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

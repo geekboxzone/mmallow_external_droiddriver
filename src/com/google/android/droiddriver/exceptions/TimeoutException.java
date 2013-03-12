@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.exceptions;
+package com.google.android.droiddriver.exceptions;
 
 /**
- * Thrown when an element is not visible on screen, and cannot be interacted with.
+ * Thrown when an element is not found within the given time.
  */
-public class ElementNotVisibleException extends UiDriverException {
-  public ElementNotVisibleException(String message) {
+public class TimeoutException extends DroidDriverException {
+
+  public TimeoutException(String message) {
     super(message);
   }
 
-  public ElementNotVisibleException(String message, Throwable cause) {
+  public TimeoutException(Throwable cause) {
+    super(cause);
+  }
+
+  public TimeoutException(String message, Throwable cause) {
     super(message, cause);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.util;
+package com.google.android.droiddriver.util;
 
 import android.os.SystemClock;
 
-import com.google.android.uidriver.Matcher;
-import com.google.android.uidriver.Poller;
-import com.google.android.uidriver.UiDriver;
-import com.google.android.uidriver.UiElement;
-import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.exceptions.TimeoutException;
-import com.google.android.uidriver.exceptions.UnsatisfiedConditionException;
+import com.google.android.droiddriver.Matcher;
+import com.google.android.droiddriver.Poller;
+import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
@@ -59,7 +59,7 @@ public class DefaultPoller implements Poller {
   }
 
   @Override
-  public <T> T pollFor(UiDriver driver, Matcher matcher, ConditionChecker<T> checker) {
+  public <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker) {
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
       try {
@@ -106,7 +106,7 @@ public class DefaultPoller implements Poller {
 
   public static class ExistsChecker implements ConditionChecker<UiElement> {
     @Override
-    public UiElement check(UiDriver driver, Matcher matcher) {
+    public UiElement check(DroidDriver driver, Matcher matcher) {
       try {
         return driver.getRootElement().findElement(matcher);
       } catch (ElementNotFoundException e) {
@@ -117,7 +117,7 @@ public class DefaultPoller implements Poller {
 
   public static class GoneChecker implements ConditionChecker<Void> {
     @Override
-    public Void check(UiDriver driver, Matcher matcher) {
+    public Void check(DroidDriver driver, Matcher matcher) {
       try {
         driver.getRootElement().findElement(matcher);
         throw new UnsatisfiedConditionException("");

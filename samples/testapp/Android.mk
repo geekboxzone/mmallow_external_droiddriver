@@ -12,7 +12,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
 
 LOCAL_AAPT_FLAGS += --auto-add-overlay
 
-LOCAL_PACKAGE_NAME := uidriver.samples.testapp
+LOCAL_PACKAGE_NAME := droiddriver.samples.testapp
 LOCAL_MODULE_TAGS := tests optional
 LOCAL_SDK_VERSION := 16
 

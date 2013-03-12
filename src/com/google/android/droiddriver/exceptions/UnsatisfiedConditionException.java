@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.droiddriver.exceptions;
 
-import android.view.InputEvent;
+import com.google.android.droiddriver.Poller.ConditionChecker;
 
 /**
- * Interface for interacting with the UI at via InputEventInjection.
+ * Thrown to indicate condition not met. Used in {@link ConditionChecker}.
  */
-public interface InputInjector {
+public class UnsatisfiedConditionException extends DroidDriverException {
+  public UnsatisfiedConditionException(String message) {
+    super(message);
+  }
 
-  /**
-   * Injects the InputEvent.
-   *
-   * @param event The event to inject.
-   * @return true if the injection succeeded.
-   */
-  boolean injectInputEvent(InputEvent event);
+  public UnsatisfiedConditionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

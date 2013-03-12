@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.uiautomation;
+package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.uidriver.InputInjector;
-import com.google.android.uidriver.Matcher;
-import com.google.android.uidriver.UiElement;
-import com.google.android.uidriver.actions.Action;
-import com.google.android.uidriver.actions.ClickAction;
-import com.google.android.uidriver.actions.ScrollDirection;
-import com.google.android.uidriver.actions.SwipeAction;
-import com.google.android.uidriver.actions.TypeAction;
-import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.exceptions.ElementNotVisibleException;
-import com.google.android.uidriver.util.Logs;
+import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.Matcher;
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.actions.ClickAction;
+import com.google.android.droiddriver.actions.ScrollDirection;
+import com.google.android.droiddriver.actions.SwipeAction;
+import com.google.android.droiddriver.actions.TypeAction;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 
 /**

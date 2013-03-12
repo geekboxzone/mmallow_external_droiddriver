@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.droiddriver;
 
-public interface Matcher {
+import android.view.InputEvent;
+
+/**
+ * Interface for interacting with the UI at via InputEventInjection.
+ */
+public interface InputInjector {
+
   /**
-   * Returns true if the UiElement matches the implemented matcher. The
-   * implemented matcher should return quickly.
+   * Injects the InputEvent.
    *
-   * @param element The element to validate against
-   * @return true if the element matches
+   * @param event The event to inject.
+   * @return true if the injection succeeded.
    */
-  boolean matches(UiElement element);
+  boolean injectInputEvent(InputEvent event);
 }

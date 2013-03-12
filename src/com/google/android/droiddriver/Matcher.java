@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.exceptions;
+package com.google.android.droiddriver;
 
-import com.google.android.uidriver.Poller.ConditionChecker;
-
-/**
- * Thrown to indicate condition not met. Used in {@link ConditionChecker}.
- */
-public class UnsatisfiedConditionException extends UiDriverException {
-  public UnsatisfiedConditionException(String message) {
-    super(message);
-  }
-
-  public UnsatisfiedConditionException(String message, Throwable cause) {
-    super(message, cause);
-  }
+public interface Matcher {
+  /**
+   * Returns true if the UiElement matches the implemented matcher. The
+   * implemented matcher should return quickly.
+   *
+   * @param element The element to validate against
+   * @return true if the element matches
+   */
+  boolean matches(UiElement element);
 }

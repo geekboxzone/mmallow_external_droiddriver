@@ -10,6 +10,6 @@
 	<classpathentry kind="lib"
 		path="../../../../../prebuilts/sdk/current/android.jar" />
 	<classpathentry exported="true" kind="lib"
-		path="../../../../../out/target/common/obj/JAVA_LIBRARIES/uidriver_intermediates/javalib.jar" />
+		path="../../../../../out/target/common/obj/JAVA_LIBRARIES/droiddriver_intermediates/javalib.jar" />
 	<classpathentry kind="output" path="bin/classes" />
 </classpath>

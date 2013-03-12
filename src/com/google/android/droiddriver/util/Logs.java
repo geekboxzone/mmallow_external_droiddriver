@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.util;
+package com.google.android.droiddriver.util;
 
 import android.util.Log;
 
@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  * Internal helper for logging.
  */
 public class Logs {
-  public static final String TAG = "UiDriver";
+  public static final String TAG = "DroidDriver";
 
   // support TYPE as well?
   @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.droiddriver;
 
-import com.google.android.uidriver.actions.Action;
-import com.google.android.uidriver.actions.ScrollDirection;
-import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.exceptions.ElementNotVisibleException;
-import com.google.android.uidriver.util.Logs.Loggable;
+import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.actions.ScrollDirection;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.util.Logs.Loggable;
 
 import android.graphics.Rect;
 
@@ -34,7 +34,7 @@ public interface UiElement {
   /**
    * Finds the first {@link UiElement} that matches the given matcher,
    * traversing from this element. If the elements tree may change, use
-   * {@link UiDriver#waitForElement(Matcher)}.
+   * {@link DroidDriver#waitForElement(Matcher)}.
    *
    * @param matcher The matching mechanism
    * @return The first matching element on the current context

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.uiautomation;
+package com.google.android.droiddriver.uiautomation;
 
-import com.google.android.uidriver.InputInjector;
+import com.google.android.droiddriver.InputInjector;
 import com.google.common.base.Preconditions;
 
 import android.app.UiAutomation;

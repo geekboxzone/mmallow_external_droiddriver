@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.uiautomation;
+package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.uidriver.Matcher;
-import com.google.android.uidriver.Poller;
-import com.google.android.uidriver.UiDriver;
-import com.google.android.uidriver.UiElement;
-import com.google.android.uidriver.exceptions.ElementNotFoundException;
-import com.google.android.uidriver.util.DefaultPoller;
-import com.google.android.uidriver.util.DefaultPoller.ExistsChecker;
-import com.google.android.uidriver.util.DefaultPoller.GoneChecker;
+import com.google.android.droiddriver.Matcher;
+import com.google.android.droiddriver.Poller;
+import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.util.DefaultPoller;
+import com.google.android.droiddriver.util.DefaultPoller.ExistsChecker;
+import com.google.android.droiddriver.util.DefaultPoller.GoneChecker;
 import com.google.common.base.Preconditions;
 
 /**
- * Implementation of a UiDriver that is driven via the accessibility layer.
+ * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
-public class UiAutomationDriver implements UiDriver {
+public class UiAutomationDriver implements DroidDriver {
 
   private final UiAutomation uiAutomation;
   private Poller poller;

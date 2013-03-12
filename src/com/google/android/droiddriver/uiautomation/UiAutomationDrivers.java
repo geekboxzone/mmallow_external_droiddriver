@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.uiautomation;
+package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.uidriver.UiElement;
-import com.google.android.uidriver.util.Logs;
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.util.Logs;
 
 /**
  * Internal helper for UiAutomationDriver implementation.

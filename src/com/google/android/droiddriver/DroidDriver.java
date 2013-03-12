@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.droiddriver;
 
-import com.google.android.uidriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
 
-public interface UiDriver {
+public interface DroidDriver {
   /**
    * @return The root {@link UiElement}
    */

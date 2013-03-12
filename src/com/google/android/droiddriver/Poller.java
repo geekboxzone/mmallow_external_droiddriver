@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver;
+package com.google.android.droiddriver;
 
-import com.google.android.uidriver.exceptions.UnsatisfiedConditionException;
+import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
 
 /**
  * Interface for polling mechanism.
@@ -29,7 +29,7 @@ public interface Poller {
     /**
      * Called when {@link #pollFor} times out.
      */
-    void onTimeout(UiDriver driver, Matcher matcher);
+    void onTimeout(DroidDriver driver, Matcher matcher);
   }
 
   /**
@@ -39,7 +39,7 @@ public interface Poller {
     /**
      * Called when {@link #pollFor} polls.
      */
-    void onPolling(UiDriver driver, Matcher matcher);
+    void onPolling(DroidDriver driver, Matcher matcher);
   }
   /**
    * Interface for removing a listener.
@@ -60,7 +60,7 @@ public interface Poller {
      *
      * @throws UnsatisfiedConditionException If the condition is not met
      */
-    T check(UiDriver driver, Matcher matcher);
+    T check(DroidDriver driver, Matcher matcher);
   }
 
   /**
@@ -69,7 +69,7 @@ public interface Poller {
    *
    * @return An object of type T returned by {@code checker}
    */
-  <T> T pollFor(UiDriver driver, Matcher matcher, ConditionChecker<T> checker);
+  <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker);
 
   /**
    * Adds a {@link TimeoutListener}.

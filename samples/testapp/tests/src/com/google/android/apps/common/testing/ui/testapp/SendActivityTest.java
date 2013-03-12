@@ -2,16 +2,16 @@ package com.google.android.apps.common.testing.ui.testapp;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.google.android.uidriver.By;
-import com.google.android.uidriver.UiDriver;
-import com.google.android.uidriver.uiautomation.UiAutomationDriver;
+import com.google.android.droiddriver.By;
+import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.uiautomation.UiAutomationDriver;
 
 /**
  * Tests SendActivity.
  */
 // google3/javatests/com/google/android/apps/common/testing/ui/espresso/exampletest/ExampleTest.java
 public class SendActivityTest extends ActivityInstrumentationTestCase2<SendActivity> {
-  private UiDriver driver;
+  private DroidDriver driver;
 
   public SendActivityTest() {
     super(SendActivity.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 UiDriver committers
+ * Copyright (C) 2013 DroidDriver committers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.android.uidriver.exceptions;
+package com.google.android.droiddriver.exceptions;
 
 /**
- * Thrown when an element is not found within the given time.
+ * Base exception for DroidDriver.
+ *
+ * <p>All exceptions should extend this.
  */
-public class TimeoutException extends UiDriverException {
-
-  public TimeoutException(String message) {
+public class DroidDriverException extends RuntimeException {
+  public DroidDriverException(String message) {
     super(message);
   }
 
-  public TimeoutException(Throwable cause) {
+  public DroidDriverException(Throwable cause) {
     super(cause);
   }
 
-  public TimeoutException(String message, Throwable cause) {
+  public DroidDriverException(String message, Throwable cause) {
     super(message, cause);
   }
 }
