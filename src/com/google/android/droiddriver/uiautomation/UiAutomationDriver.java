@@ -20,14 +20,13 @@ import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.Poller;
-import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.util.ConditionCheckers;
 import com.google.android.droiddriver.util.DefaultPoller;
-import com.google.android.droiddriver.util.DefaultPoller.ExistsChecker;
-import com.google.android.droiddriver.util.DefaultPoller.GoneChecker;
 import com.google.common.base.Preconditions;
 
 /**
@@ -45,12 +44,12 @@ public class UiAutomationDriver implements DroidDriver {
 
   @Override
   public UiElement waitForElement(Matcher matcher) {
-    return getPoller().pollFor(this, matcher, new ExistsChecker());
+    return getPoller().pollFor(this, matcher, ConditionCheckers.EXISTS_CHECKER);
   }
 
   @Override
   public void waitUntilGone(Matcher matcher) {
-    getPoller().pollFor(this, matcher, new GoneChecker());
+    getPoller().pollFor(this, matcher, ConditionCheckers.GONE_CHECKER);
   }
 
   @Override

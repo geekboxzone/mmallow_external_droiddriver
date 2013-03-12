@@ -18,11 +18,9 @@ package com.google.android.droiddriver.util;
 
 import android.os.SystemClock;
 
+import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.Poller;
-import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
 import com.google.common.collect.Lists;
@@ -102,28 +100,5 @@ public class DefaultPoller implements Poller {
         pollingListeners.remove(pollingListener);
       }
     };
-  }
-
-  public static class ExistsChecker implements ConditionChecker<UiElement> {
-    @Override
-    public UiElement check(DroidDriver driver, Matcher matcher) {
-      try {
-        return driver.getRootElement().findElement(matcher);
-      } catch (ElementNotFoundException e) {
-        throw new UnsatisfiedConditionException("");
-      }
-    }
-  }
-
-  public static class GoneChecker implements ConditionChecker<Void> {
-    @Override
-    public Void check(DroidDriver driver, Matcher matcher) {
-      try {
-        driver.getRootElement().findElement(matcher);
-        throw new UnsatisfiedConditionException("");
-      } catch (ElementNotFoundException e) {
-        return null;
-      }
-    }
   }
 }
