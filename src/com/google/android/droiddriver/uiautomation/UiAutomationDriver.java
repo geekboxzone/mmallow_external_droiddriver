@@ -20,36 +20,20 @@ import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.Matcher;
-import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.android.droiddriver.util.ConditionCheckers;
-import com.google.android.droiddriver.util.DefaultPoller;
 import com.google.common.base.Preconditions;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
-public class UiAutomationDriver implements DroidDriver {
+public class UiAutomationDriver extends AbstractDroidDriver {
 
   private final UiAutomation uiAutomation;
-  private Poller poller;
 
   public UiAutomationDriver(UiAutomation uiAutomation) {
     this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
-    this.poller = new DefaultPoller();
-  }
-
-  @Override
-  public UiElement waitForElement(Matcher matcher) {
-    return getPoller().pollFor(this, matcher, ConditionCheckers.EXISTS_CHECKER);
-  }
-
-  @Override
-  public void waitUntilGone(Matcher matcher) {
-    getPoller().pollFor(this, matcher, ConditionCheckers.GONE_CHECKER);
   }
 
   @Override
@@ -66,15 +50,5 @@ public class UiAutomationDriver implements DroidDriver {
       SystemClock.sleep(250);
     }
     throw new ElementNotFoundException("Could not find root node!");
-  }
-
-  @Override
-  public Poller getPoller() {
-    return poller;
-  }
-
-  @Override
-  public void setPoller(Poller poller) {
-    this.poller = poller;
   }
 }

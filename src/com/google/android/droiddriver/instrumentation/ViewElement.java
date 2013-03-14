@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation;
-
-import android.app.UiAutomation;
-import android.graphics.Rect;
-import android.util.Log;
-import android.view.accessibility.AccessibilityNodeInfo;
+package com.google.android.droiddriver.instrumentation;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.Matcher;
@@ -29,51 +24,44 @@ import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.TextUtils;
-import com.google.common.base.Preconditions;
+
+import android.app.Instrumentation;
+import android.graphics.Rect;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
- * A UiElement that is backed by the UiAutomation object.
+ * A UiElement that is backed by a View.
  */
-public class UiAutomationElement extends AbstractUiElement {
+public class ViewElement extends AbstractUiElement {
 
-  private final UiAutomation uiAutomation;
-  private final AccessibilityNodeInfo node;
+  private final Instrumentation instrumentation;
+  private final View view;
   private final InputInjector injector;
 
-  public UiAutomationElement(UiAutomation uiAutomation, AccessibilityNodeInfo node) {
-    this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
-    this.node = Preconditions.checkNotNull(node);
-    this.injector = new UiAutomationInputInjector(uiAutomation);
-  }
-
-  @Override
-  public String getText() {
-    return TextUtils.charSequenceToString(node.getText());
-  }
-
-  @Override
-  public String getContentDescription() {
-    return TextUtils.charSequenceToString(node.getContentDescription());
-  }
-
-  @Override
-  public String getClassName() {
-    return TextUtils.charSequenceToString(node.getClassName());
+  public ViewElement(Instrumentation instrumentation, View view) {
+    this.instrumentation = instrumentation;
+    this.view = view;
+    this.injector = new InstrumentationInputInjector(instrumentation);
   }
 
   @Override
   public UiElement findElement(Matcher matcher) {
-    int childCount = node.getChildCount();
+    if (!(view instanceof ViewGroup)) {
+      throw new ElementNotFoundException("Could not find any matching element for selector: "
+          + matcher);
+    }
+    ViewGroup viewGroup = (ViewGroup) view;
+    int childCount = viewGroup.getChildCount();
     Log.d(Logs.TAG, "Looping through number of childs " + childCount);
     for (int i = 0; i < childCount; i++) {
-      AccessibilityNodeInfo childNode = node.getChild(i);
-      if (childNode == null) {
-        Log.w(Logs.TAG, "Found null child node for node: " + node);
-        continue;
-      }
-      UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, childNode);
+      View childView = viewGroup.getChildAt(i);
+      UiElement element = new ViewElement(instrumentation, childView);
+      Log.d(Logs.TAG, "Child text " + element.getText());
       if (matcher.matches(element)) {
-        Log.d(Logs.TAG, "Found match: " + node.getChild(i));
+        Log.d(Logs.TAG, "Found match: " + childView);
         return element;
       } else {
         try {
@@ -88,19 +76,39 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
+  public String getText() {
+    if (!(view instanceof TextView)) {
+      return null;
+    }
+    return TextUtils.charSequenceToString(((TextView) view).getText());
+  }
+
+  @Override
+  public String getContentDescription() {
+    return TextUtils.charSequenceToString(view.getContentDescription());
+  }
+
+  @Override
+  public String getClassName() {
+    return view.getClass().getCanonicalName();
+  }
+
+  @Override
   public boolean perform(Action action) {
     return action.perform(injector, this);
   }
 
   @Override
   public boolean isVisible() {
-    return node.isVisibleToUser();
+    return view.getGlobalVisibleRect(new Rect());
   }
 
   @Override
   public Rect getRect() {
     Rect rect = new Rect();
-    node.getBoundsInScreen(rect);
+    int[] xy = new int[2];
+    view.getLocationOnScreen(xy);
+    rect.set(xy[0], xy[1], xy[0] + view.getWidth(), xy[1] + view.getHeight());
     return rect;
   }
 }
