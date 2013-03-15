@@ -19,6 +19,7 @@ package com.google.android.droiddriver.uiautomation;
 import android.graphics.Rect;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.util.TextUtils;
@@ -81,7 +82,7 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  protected UiAutomationElement getChild(int index) {
+  protected UiElement getChild(int index) {
     AccessibilityNodeInfo child = node.getChild(index);
     return child == null ? null : context.getUiElement(child);
   }

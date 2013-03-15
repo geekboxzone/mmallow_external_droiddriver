@@ -21,6 +21,7 @@ import android.view.InputEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 
@@ -50,7 +51,7 @@ public class UiAutomationContext {
   }
 
   // TODO: cache by node?
-  public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {
-    return Logs.wrap(UiAutomationElement.class, new UiAutomationElement(this, node));
+  public UiElement getUiElement(AccessibilityNodeInfo node) {
+    return Logs.wrap(UiElement.class, new UiAutomationElement(this, node));
   }
 }

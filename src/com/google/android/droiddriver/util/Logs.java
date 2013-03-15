@@ -76,8 +76,8 @@ public class Logs {
   /**
    * Wraps {@code obj} in a {@link LoggingWrapper}.
    */
-  public static <T> T wrap(Class<T> cls, T obj) {
-    return Reflection.newProxy(cls, new LoggingWrapper(obj));
+  public static <I> I wrap(Class<I> interfaceType, I obj) {
+    return Reflection.newProxy(interfaceType, new LoggingWrapper(obj));
   }
 
   private Logs() {}

@@ -54,7 +54,7 @@ public abstract class AbstractUiElement implements UiElement {
 
   protected abstract int getChildCount();
 
-  protected abstract AbstractUiElement getChild(int index);
+  protected abstract UiElement getChild(int index);
 
   private void checkVisible() {
     if (!isVisible()) {
@@ -71,7 +71,7 @@ public abstract class AbstractUiElement implements UiElement {
     int childCount = getChildCount();
     Log.d(Logs.TAG, "Looping through number of children " + childCount);
     for (int i = 0; i < childCount; i++) {
-      AbstractUiElement child = getChild(i);
+      UiElement child = getChild(i);
       if (child == null) {
         Log.w(Logs.TAG, "Skip null child for " + toString());
         continue;

@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
@@ -60,7 +61,7 @@ public class InstrumentationContext {
   }
 
   // TODO: cache by view?
-  public ViewElement getUiElement(View view) {
-    return Logs.wrap(ViewElement.class, new ViewElement(this, view));
+  public UiElement getUiElement(View view) {
+    return Logs.wrap(UiElement.class, new ViewElement(this, view));
   }
 }
