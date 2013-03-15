@@ -16,19 +16,13 @@
 
 package com.google.android.droiddriver.uiautomation;
 
-import android.app.UiAutomation;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.Matcher;
-import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.TextUtils;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -36,14 +30,12 @@ import com.google.common.base.Preconditions;
  */
 public class UiAutomationElement extends AbstractUiElement {
 
-  private final UiAutomation uiAutomation;
+  private final UiAutomationContext context;
   private final AccessibilityNodeInfo node;
-  private final InputInjector injector;
 
-  public UiAutomationElement(UiAutomation uiAutomation, AccessibilityNodeInfo node) {
-    this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
+  public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node) {
+    this.context = Preconditions.checkNotNull(context);
     this.node = Preconditions.checkNotNull(node);
-    this.injector = new UiAutomationInputInjector(uiAutomation);
   }
 
   @Override
@@ -62,34 +54,8 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  public UiElement findElement(Matcher matcher) {
-    int childCount = node.getChildCount();
-    Log.d(Logs.TAG, "Looping through number of childs " + childCount);
-    for (int i = 0; i < childCount; i++) {
-      AccessibilityNodeInfo childNode = node.getChild(i);
-      if (childNode == null) {
-        Log.w(Logs.TAG, "Found null child node for node: " + node);
-        continue;
-      }
-      UiElement element = UiAutomationDrivers.newUiAutomationElement(uiAutomation, childNode);
-      if (matcher.matches(element)) {
-        Log.d(Logs.TAG, "Found match: " + node.getChild(i));
-        return element;
-      } else {
-        try {
-          return element.findElement(matcher);
-        } catch (ElementNotFoundException enfe) {
-          // Do nothing. Continue searching.
-        }
-      }
-    }
-    throw new ElementNotFoundException("Could not find any matching element for selector: "
-        + matcher);
-  }
-
-  @Override
   public boolean perform(Action action) {
-    return action.perform(injector, this);
+    return action.perform(context.getInjector(), this);
   }
 
   @Override
@@ -102,5 +68,21 @@ public class UiAutomationElement extends AbstractUiElement {
     Rect rect = new Rect();
     node.getBoundsInScreen(rect);
     return rect;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("node", node).toString();
+  }
+
+  @Override
+  protected int getChildCount() {
+    return node.getChildCount();
+  }
+
+  @Override
+  protected UiAutomationElement getChild(int index) {
+    AccessibilityNodeInfo child = node.getChild(index);
+    return child == null ? null : context.getUiElement(child);
   }
 }

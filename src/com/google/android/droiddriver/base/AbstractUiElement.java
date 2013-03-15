@@ -16,12 +16,17 @@
 
 package com.google.android.droiddriver.base;
 
+import android.util.Log;
+
+import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TypeAction;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.util.Logs;
 
 /**
  * Abstract implementation with common methods already implemented.
@@ -47,9 +52,36 @@ public abstract class AbstractUiElement implements UiElement {
     perform(new SwipeAction(direction, false));
   }
 
+  protected abstract int getChildCount();
+
+  protected abstract AbstractUiElement getChild(int index);
+
   private void checkVisible() {
     if (!isVisible()) {
       throw new ElementNotVisibleException("Element is not visible on screen");
     }
+  }
+
+  @Override
+  public UiElement findElement(Matcher matcher) {
+    if (matcher.matches(this)) {
+      Log.d(Logs.TAG, "Found match: " + toString());
+      return this;
+    }
+    int childCount = getChildCount();
+    Log.d(Logs.TAG, "Looping through number of children " + childCount);
+    for (int i = 0; i < childCount; i++) {
+      AbstractUiElement child = getChild(i);
+      if (child == null) {
+        Log.w(Logs.TAG, "Skip null child for " + toString());
+        continue;
+      }
+      try {
+        return child.findElement(matcher);
+      } catch (ElementNotFoundException enfe) {
+        // Do nothing. Continue searching.
+      }
+    }
+    throw new ElementNotFoundException("Could not find any element matching " + matcher);
   }
 }

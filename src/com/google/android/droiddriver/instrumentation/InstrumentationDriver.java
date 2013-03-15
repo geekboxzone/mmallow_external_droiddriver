@@ -32,25 +32,25 @@ import java.util.List;
  */
 public class InstrumentationDriver extends AbstractDroidDriver {
 
-  private final Instrumentation instrumentation;
+  private final InstrumentationContext context;
 
   public InstrumentationDriver(Instrumentation instrumentation) {
-    this.instrumentation = instrumentation;
+    this.context = new InstrumentationContext(instrumentation);
   }
 
   @Override
   public UiElement getRootElement() {
     View[] views = RootFinder.getRootViews();
     // Need to create a fake root to be able to traverse all the possible views.
-    RootViewGroup root = new RootViewGroup(instrumentation.getTargetContext());
+    RootViewGroup root = new RootViewGroup(context.getInstrumentation().getTargetContext());
     for (View view : views) {
       root.addView(view);
     }
-    return new ViewElement(instrumentation, root);
+    return context.getUiElement(root);
   }
 
   private static class RootViewGroup extends ViewGroup {
-    List<View> children = new ArrayList<View>();
+    private final List<View> children = new ArrayList<View>();
 
     public RootViewGroup(Context context) {
       super(context);
@@ -76,5 +76,4 @@ public class InstrumentationDriver extends AbstractDroidDriver {
       // Do nothing.
     }
   }
-
 }

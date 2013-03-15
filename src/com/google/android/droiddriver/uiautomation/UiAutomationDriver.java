@@ -23,27 +23,26 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.common.base.Preconditions;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
 public class UiAutomationDriver extends AbstractDroidDriver {
 
-  private final UiAutomation uiAutomation;
+  private final UiAutomationContext context;
 
   public UiAutomationDriver(UiAutomation uiAutomation) {
-    this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
+    this.context = new UiAutomationContext(uiAutomation);
   }
 
   @Override
   public UiElement getRootElement() {
-    return UiAutomationDrivers.newUiAutomationElement(uiAutomation, getRootNode());
+    return context.getUiElement(getRootNode());
   }
 
   private AccessibilityNodeInfo getRootNode() {
     for (int i = 0; i < 3; i++) {
-      AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();
+      AccessibilityNodeInfo root = context.getUiAutomation().getRootInActiveWindow();
       if (root != null) {
         return root;
       }

@@ -62,7 +62,7 @@ public class Logs {
             method.getAnnotation(Loggable.class).priority(),
             TAG,
             String.format("Invoking %s.%s(%s)", method.getDeclaringClass().getName(),
-                method.toString(), Joiner.on(",").join(args)));
+                method.getName(), Joiner.on(",").join(args)));
       }
       try {
         return method.invoke(wrapped, args);

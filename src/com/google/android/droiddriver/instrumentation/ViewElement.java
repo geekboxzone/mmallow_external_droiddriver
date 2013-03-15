@@ -16,63 +16,27 @@
 
 package com.google.android.droiddriver.instrumentation;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.Matcher;
-import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.android.droiddriver.util.Logs;
-import com.google.android.droiddriver.util.TextUtils;
-
-import android.app.Instrumentation;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.base.AbstractUiElement;
+import com.google.android.droiddriver.util.TextUtils;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A UiElement that is backed by a View.
  */
 public class ViewElement extends AbstractUiElement {
-
-  private final Instrumentation instrumentation;
+  private final InstrumentationContext context;
   private final View view;
-  private final InputInjector injector;
 
-  public ViewElement(Instrumentation instrumentation, View view) {
-    this.instrumentation = instrumentation;
-    this.view = view;
-    this.injector = new InstrumentationInputInjector(instrumentation);
-  }
-
-  @Override
-  public UiElement findElement(Matcher matcher) {
-    if (!(view instanceof ViewGroup)) {
-      throw new ElementNotFoundException("Could not find any matching element for selector: "
-          + matcher);
-    }
-    ViewGroup viewGroup = (ViewGroup) view;
-    int childCount = viewGroup.getChildCount();
-    Log.d(Logs.TAG, "Looping through number of childs " + childCount);
-    for (int i = 0; i < childCount; i++) {
-      View childView = viewGroup.getChildAt(i);
-      UiElement element = new ViewElement(instrumentation, childView);
-      Log.d(Logs.TAG, "Child text " + element.getText());
-      if (matcher.matches(element)) {
-        Log.d(Logs.TAG, "Found match: " + childView);
-        return element;
-      } else {
-        try {
-          return element.findElement(matcher);
-        } catch (ElementNotFoundException enfe) {
-          // Do nothing. Continue searching.
-        }
-      }
-    }
-    throw new ElementNotFoundException("Could not find any matching element for selector: "
-        + matcher);
+  public ViewElement(InstrumentationContext context, View view) {
+    this.context = Preconditions.checkNotNull(context);
+    this.view = Preconditions.checkNotNull(view);
   }
 
   @Override
@@ -95,7 +59,7 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public boolean perform(Action action) {
-    return action.perform(injector, this);
+    return action.perform(context.getInjector(), this);
   }
 
   @Override
@@ -110,5 +74,27 @@ public class ViewElement extends AbstractUiElement {
     view.getLocationOnScreen(xy);
     rect.set(xy[0], xy[1], xy[0] + view.getWidth(), xy[1] + view.getHeight());
     return rect;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("view", view).toString();
+  }
+
+  @Override
+  protected int getChildCount() {
+    if (!(view instanceof ViewGroup)) {
+      return 0;
+    }
+    return ((ViewGroup) view).getChildCount();
+  }
+
+  @Override
+  protected ViewElement getChild(int index) {
+    if (!(view instanceof ViewGroup)) {
+      return null;
+    }
+    View child = ((ViewGroup) view).getChildAt(index);
+    return child == null ? null : context.getUiElement(child);
   }
 }
