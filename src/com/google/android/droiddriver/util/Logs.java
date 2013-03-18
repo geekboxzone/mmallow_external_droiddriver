@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
  */
 public class Logs {
   public static final String TAG = "DroidDriver";
+  public static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
   // support TYPE as well?
   @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})

@@ -18,6 +18,7 @@ package com.google.android.droiddriver.instrumentation;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
+import com.google.android.droiddriver.util.Logs;
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -46,7 +47,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     for (View view : views) {
       root.addView(view);
     }
-    return context.getUiElement(root);
+    return Logs.wrap(UiElement.class, context.getUiElement(root));
   }
 
   private static class RootViewGroup extends ViewGroup {

@@ -16,7 +16,14 @@
 
 package com.google.android.droiddriver;
 
+import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.common.annotations.Beta;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Convenience methods to create commonly used matchers.
@@ -47,6 +54,19 @@ public class By {
     return new ByClassName(className);
   }
 
+  /**
+   * Matches by XPath. When applied on an non-root element, it will not evaluate
+   * above the context element.
+   *
+   * @param xPath The xpath to use
+   * @return a matcher which locates elements via XPath
+   */
+  // TODO: add UiElement.findElements
+  @Beta
+  public static final ByXPath xpath(String xPath) {
+    return new ByXPath(xPath);
+  }
+
   public static class ByText implements Matcher {
     private final String text;
 
@@ -61,7 +81,7 @@ public class By {
 
     @Override
     public String toString() {
-      return "ByText: " + text;
+      return Objects.toStringHelper(this).addValue(text).toString();
     }
   }
 
@@ -79,7 +99,7 @@ public class By {
 
     @Override
     public String toString() {
-      return "ByContentDescription: " + contentDescription;
+      return Objects.toStringHelper(this).addValue(contentDescription).toString();
     }
   }
 
@@ -97,7 +117,36 @@ public class By {
 
     @Override
     public String toString() {
-      return "ByClassName: " + className;
+      return Objects.toStringHelper(this).addValue(className).toString();
+    }
+  }
+
+  public static class ByXPath implements Matcher {
+    private final String xPath;
+    private final XPathExpression xPathExpression;
+
+    public ByXPath(String xPath) {
+      this.xPath = Preconditions.checkNotNull(xPath);
+      try {
+        xPathExpression = XPathFactory.newInstance().newXPath().compile(xPath);
+      } catch (XPathExpressionException e) {
+        throw new DroidDriverException(e);
+      }
+    }
+
+    @Override
+    public boolean matches(UiElement element) {
+      throw new DroidDriverException("ByXPath.matches() should not be invoked; cyclic calling "
+          + toString());
+    }
+
+    @Override
+    public String toString() {
+      return Objects.toStringHelper(this).addValue(xPath).toString();
+    }
+
+    public XPathExpression getXPathExpression() {
+      return xPathExpression;
     }
   }
 

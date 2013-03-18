@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.util.TextUtils;
@@ -91,7 +90,7 @@ public class ViewElement extends AbstractUiElement {
   }
 
   @Override
-  protected UiElement getChild(int index) {
+  protected ViewElement getChild(int index) {
     if (!(view instanceof ViewGroup)) {
       return null;
     }

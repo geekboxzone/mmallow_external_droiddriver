@@ -16,13 +16,13 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
+
 import android.graphics.Rect;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.android.droiddriver.util.TextUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -41,17 +41,17 @@ public class UiAutomationElement extends AbstractUiElement {
 
   @Override
   public String getText() {
-    return TextUtils.charSequenceToString(node.getText());
+    return charSequenceToString(node.getText());
   }
 
   @Override
   public String getContentDescription() {
-    return TextUtils.charSequenceToString(node.getContentDescription());
+    return charSequenceToString(node.getContentDescription());
   }
 
   @Override
   public String getClassName() {
-    return TextUtils.charSequenceToString(node.getClassName());
+    return charSequenceToString(node.getClassName());
   }
 
   @Override
@@ -82,7 +82,7 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  protected UiElement getChild(int index) {
+  protected UiAutomationElement getChild(int index) {
     AccessibilityNodeInfo child = node.getChild(index);
     return child == null ? null : context.getUiElement(child);
   }
