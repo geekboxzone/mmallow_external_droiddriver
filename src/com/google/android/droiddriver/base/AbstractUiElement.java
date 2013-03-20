@@ -21,6 +21,7 @@ import android.util.Log;
 import com.google.android.droiddriver.By.ByXPath;
 import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
@@ -29,6 +30,7 @@ import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.util.Logs;
+import com.google.android.droiddriver.util.Logs.LogDesired;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -55,6 +57,10 @@ public abstract class AbstractUiElement implements UiElement {
   // on children they are in the same document to be appended to this domNode.
   private static Document document;
   private Element domNode;
+
+  @LogDesired
+  @Override
+  public abstract boolean perform(Action action);
 
   @Override
   public void setText(String text) {
@@ -85,6 +91,7 @@ public abstract class AbstractUiElement implements UiElement {
     }
   }
 
+  @LogDesired
   @Override
   public UiElement findElement(Matcher matcher) {
     return Logs.wrap(UiElement.class, findUnwrappedElement(matcher));
@@ -166,6 +173,7 @@ public abstract class AbstractUiElement implements UiElement {
   // to support searching above context element?
   // TODO: uiautomatorviewer filters out many "insignificant" views. If we want
   // to let users make use of it, we need to do the same filtering
+  @LogDesired
   private Element buildDomNode() {
     String className = getClassName();
     if (className == null) {

@@ -40,12 +40,12 @@ public class Logs {
   // support TYPE as well?
   @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
   @Retention(RetentionPolicy.RUNTIME)
-  public @interface Loggable {
+  public @interface LogDesired {
     int priority() default Log.DEBUG;
   }
 
   /**
-   * An {@link InvocationHandler} that logs invocations of {@link Loggable}
+   * An {@link InvocationHandler} that logs invocations of {@link LogDesired}
    * methods.
    */
   public static class LoggingWrapper implements InvocationHandler {
@@ -58,9 +58,9 @@ public class Logs {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (method.isAnnotationPresent(Loggable.class)) {
+      if (method.isAnnotationPresent(LogDesired.class)) {
         Log.println(
-            method.getAnnotation(Loggable.class).priority(),
+            method.getAnnotation(LogDesired.class).priority(),
             TAG,
             String.format("Invoking %s.%s(%s)", method.getDeclaringClass().getName(),
                 method.getName(), Joiner.on(",").join(args)));

@@ -16,13 +16,12 @@
 
 package com.google.android.droiddriver;
 
+import android.graphics.Rect;
+
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
-import com.google.android.droiddriver.util.Logs.Loggable;
-
-import android.graphics.Rect;
 
 /**
  * Represents an UI element within an Android App.
@@ -40,13 +39,11 @@ public interface UiElement {
    * @return The first matching element on the current context
    * @throws ElementNotFoundException If no matching elements are found
    */
-  @Loggable
   UiElement findElement(Matcher matcher);
 
   /**
    * Gets the text of this element.
    */
-  @Loggable
   String getText();
 
   /**
@@ -56,19 +53,16 @@ public interface UiElement {
    * @throws ElementNotVisibleException when the element is not visible
    */
   // TODO: Should this clear the text before setting?
-  @Loggable
   void setText(String text);
 
   /**
    * Gets the content description of this element.
    */
-  @Loggable
   String getContentDescription();
 
   /**
    * Gets the class name of the underlying view.
    */
-  @Loggable
   String getClassName();
 
   /**
@@ -77,7 +71,6 @@ public interface UiElement {
    * @param action The action to execute
    * @return true if the action is successful
    */
-  @Loggable
   boolean perform(Action action);
 
   /**
@@ -86,25 +79,21 @@ public interface UiElement {
    *
    * @throws ElementNotVisibleException when the element is not visible
    */
-  @Loggable
   void click();
 
   /**
    * @returns whether or not this element is visible on the device's display.
    */
-  @Loggable
   boolean isVisible();
 
   /**
    * Gets the UiElement bounds in screen coordinates. The coordinates may not be
    * visible on screen.
    */
-  @Loggable
   Rect getRect();
 
   /**
    * Scrolls in the given direction. Scrolling down means swiping upwards.
    */
-  @Loggable
   void scroll(ScrollDirection direction);
 }
