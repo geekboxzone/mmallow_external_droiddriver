@@ -8,7 +8,6 @@ import com.google.android.droiddriver.DroidDriver;
 /**
  * Base class for testing SendActivity.
  */
-// TODO: support Parameterized test runner?
 // google3/javatests/com/google/android/apps/common/testing/ui/espresso/exampletest/ExampleTest.java
 public abstract class AbstractSendActivityTest extends ActivityInstrumentationTestCase2<SendActivity> {
 
@@ -18,13 +17,14 @@ public abstract class AbstractSendActivityTest extends ActivityInstrumentationTe
     super(SendActivity.class);
   }
 
-  protected void setDriver(DroidDriver driver) {
-    this.driver = driver;
-  }
+  protected abstract DroidDriver getDriver();
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
+    if (driver == null) {
+      driver = getDriver();
+    }
     getActivity();
   }
 

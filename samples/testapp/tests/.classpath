@@ -4,11 +4,8 @@
 	<classpathentry kind="src" path="gen" />
 	<classpathentry combineaccessrules="false" kind="src"
 		path="/testapp" />
-	<!-- cannot use this until API18 is released -->
-	<!-- <classpathentry kind="con" -->
-	<!-- path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" /> -->
-	<classpathentry kind="lib"
-		path="../../../../../prebuilts/sdk/current/android.jar" />
+	<classpathentry kind="con"
+		path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" />
 	<classpathentry exported="true" kind="lib"
 		path="../../../../../out/target/common/obj/JAVA_LIBRARIES/droiddriver_intermediates/javalib.jar" />
 	<classpathentry kind="output" path="bin/classes" />

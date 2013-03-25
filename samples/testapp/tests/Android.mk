@@ -12,6 +12,6 @@ LOCAL_PACKAGE_NAME := droiddriver.samples.testapp.tests
 
 LOCAL_INSTRUMENTATION_FOR := droiddriver.samples.testapp
 
-LOCAL_SDK_VERSION := current
+LOCAL_SDK_VERSION := 16
 
 include $(BUILD_PACKAGE)
