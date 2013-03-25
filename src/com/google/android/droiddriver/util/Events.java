@@ -18,6 +18,7 @@ package com.google.android.droiddriver.util;
 
 import android.os.SystemClock;
 import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 /**
@@ -51,6 +52,12 @@ public class Events {
     long eventTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    return event;
+  }
+
+  public static KeyEvent newKeyEvent(long downTime, int action, int keyCode) {
+    KeyEvent event = new KeyEvent(downTime, downTime, action, keyCode, 0 /* repeat */);
+    event.setSource(InputDevice.SOURCE_KEYBOARD);
     return event;
   }
 
