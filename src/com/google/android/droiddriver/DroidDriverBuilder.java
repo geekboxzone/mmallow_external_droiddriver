@@ -17,6 +17,7 @@
 package com.google.android.droiddriver;
 
 import android.app.Instrumentation;
+import android.app.UiAutomation;
 import android.os.Build;
 
 import com.google.android.droiddriver.exceptions.DroidDriverException;
@@ -47,10 +48,10 @@ public class DroidDriverBuilder {
       case INSTRUMENTATION:
         return new InstrumentationDriver(instrumentation);
       case UI_AUTOMATION:
-        return new UiAutomationDriver(instrumentation.getUiAutomation());
+        return getUiAutomationDriver();
       case ANY:
-        if (Build.VERSION.SDK_INT >= 18) {
-          return new UiAutomationDriver(instrumentation.getUiAutomation());
+        if (hasUiAutomation()) {
+          return getUiAutomationDriver();
         }
         return new InstrumentationDriver(instrumentation);
     }
@@ -58,11 +59,35 @@ public class DroidDriverBuilder {
     throw new DroidDriverException("Cannot build DroidDriver");
   }
 
+  private boolean hasUiAutomation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      return true;
+    }
+    // TODO: remove after mr2 is released?
+    // This is necessary because now mr2 build has ro.build.version.sdk=17
+    try {
+      instrumentation.getUiAutomation();
+      return true;
+    } catch (NoSuchMethodError e) {
+      return false;
+    }
+  }
+
+  private UiAutomationDriver getUiAutomationDriver() {
+    if (!hasUiAutomation()) {
+      throw new DroidDriverException("UI_AUTOMATION is not available below API 18");
+    }
+    UiAutomation uiAutomation = instrumentation.getUiAutomation();
+    if (uiAutomation == null) {
+      throw new DroidDriverException(
+          "uiAutomation==null: did you forget to set '-w' flag for 'am instrument'?");
+    }
+    return new UiAutomationDriver(uiAutomation);
+  }
+
   public DroidDriverBuilder use(Implementation implementation) {
     Preconditions.checkState(this.implementation == null,
         "Cannot set implementation more than once");
-    Preconditions.checkArgument(implementation != Implementation.UI_AUTOMATION
-        || Build.VERSION.SDK_INT >= 18, "UI_AUTOMATION is not available below API 18");
     this.implementation = Preconditions.checkNotNull(implementation);
     return this;
   }
