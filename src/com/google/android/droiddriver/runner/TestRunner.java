@@ -17,12 +17,16 @@
 package com.google.android.droiddriver.runner;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
+import android.test.suitebuilder.TestMethod;
 import android.util.Log;
 
+import com.android.internal.util.Predicate;
 import com.google.android.droiddriver.util.Logs;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import junit.framework.AssertionFailedError;
@@ -30,6 +34,7 @@ import junit.framework.Test;
 import junit.framework.TestListener;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -88,6 +93,29 @@ public class TestRunner extends InstrumentationTestRunner {
       public void startTest(Test arg0) {}
     });
     super.onStart();
+  }
+
+  // Overrides InstrumentationTestRunner
+  List<Predicate<TestMethod>> getBuilderRequirements() {
+    List<Predicate<TestMethod>> requirements = Lists.newArrayList();
+    requirements.add(new Predicate<TestMethod>() {
+      @Override
+      public boolean apply(TestMethod arg0) {
+        MinSdkVersion annotation = arg0.getAnnotation(MinSdkVersion.class);
+        if (annotation == null) {
+          annotation = arg0.getEnclosingClass().getAnnotation(MinSdkVersion.class);
+        }
+        boolean result = annotation == null || annotation.value() <= Build.VERSION.SDK_INT;
+        if (!result) {
+          String msg =
+              String.format("filtered %s#%s: MinSdkVersion=%d", arg0.getEnclosingClassname(),
+                  arg0.getName(), annotation.value());
+          Log.i(Logs.TAG, msg);
+        }
+        return result;
+      }
+    });
+    return requirements;
   }
 
   @Override
