@@ -181,10 +181,22 @@ public abstract class AbstractUiElement implements UiElement {
     }
     Element element = getDocument().createElement(simpleClassName(className));
     element.setUserData(UI_ELEMENT, this, null /* UserDataHandler */);
-    // TODO: add all attrs
+
     setAttribute(element, "class", className);
+    setAttribute(element, "resource-id", getResourceId());
+    setAttribute(element, "package", getPackageName());
     setAttribute(element, "content-desc", getContentDescription());
     setAttribute(element, "text", getText());
+    setAttribute(element, "checkable", isCheckable());
+    setAttribute(element, "checked", isChecked());
+    setAttribute(element, "clickable", isClickable());
+    setAttribute(element, "enabled", isEnabled());
+    setAttribute(element, "focusable", isFocusable());
+    setAttribute(element, "focused", isFocused());
+    setAttribute(element, "scrollable", isScrollable());
+    setAttribute(element, "long-clickable", isLongClickable());
+    setAttribute(element, "password", isPassword());
+    setAttribute(element, "selected", isSelected());
 
     // TODO: visitor pattern
     int childCount = getChildCount();
@@ -204,6 +216,10 @@ public abstract class AbstractUiElement implements UiElement {
     if (value != null) {
       element.setAttribute(name, value);
     }
+  }
+
+  private static void setAttribute(Element element, String name, boolean value) {
+    element.setAttribute(name, String.valueOf(value));
   }
 
   private static String simpleClassName(String name) {

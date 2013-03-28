@@ -55,6 +55,16 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
+  public String getResourceId() {
+    return charSequenceToString(node.getViewIdResourceName());
+  }
+
+  @Override
+  public String getPackageName() {
+    return charSequenceToString(node.getPackageName());
+  }
+
+  @Override
   public boolean perform(Action action) {
     return action.perform(context.getInjector(), this);
   }
@@ -62,6 +72,56 @@ public class UiAutomationElement extends AbstractUiElement {
   @Override
   public boolean isVisible() {
     return node.isVisibleToUser();
+  }
+
+  @Override
+  public boolean isCheckable() {
+    return node.isCheckable();
+  }
+
+  @Override
+  public boolean isChecked() {
+    return node.isChecked();
+  }
+
+  @Override
+  public boolean isClickable() {
+    return node.isClickable();
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return node.isEnabled();
+  }
+
+  @Override
+  public boolean isFocusable() {
+    return node.isFocusable();
+  }
+
+  @Override
+  public boolean isFocused() {
+    return node.isFocused();
+  }
+
+  @Override
+  public boolean isScrollable() {
+    return node.isScrollable();
+  }
+
+  @Override
+  public boolean isLongClickable() {
+    return node.isLongClickable();
+  }
+
+  @Override
+  public boolean isPassword() {
+    return node.isPassword();
+  }
+
+  @Override
+  public boolean isSelected() {
+    return node.isSelected();
   }
 
   @Override

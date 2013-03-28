@@ -16,14 +16,17 @@
 
 package com.google.android.droiddriver.instrumentation;
 
+import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
+
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Checkable;
 import android.widget.TextView;
 
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.android.droiddriver.util.TextUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -44,17 +47,34 @@ public class ViewElement extends AbstractUiElement {
     if (!(view instanceof TextView)) {
       return null;
     }
-    return TextUtils.charSequenceToString(((TextView) view).getText());
+    return charSequenceToString(((TextView) view).getText());
   }
 
   @Override
   public String getContentDescription() {
-    return TextUtils.charSequenceToString(view.getContentDescription());
+    return charSequenceToString(view.getContentDescription());
   }
 
   @Override
   public String getClassName() {
     return view.getClass().getCanonicalName();
+  }
+
+  @Override
+  public String getResourceId() {
+    if (view.getId() != View.NO_ID) {
+      try {
+        return charSequenceToString(view.getResources().getResourceName(view.getId()));
+      } catch (Resources.NotFoundException nfe) {
+        /* ignore */
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public String getPackageName() {
+    return view.getContext().getPackageName();
   }
 
   @Override
@@ -65,6 +85,61 @@ public class ViewElement extends AbstractUiElement {
   @Override
   public boolean isVisible() {
     return view.getGlobalVisibleRect(new Rect());
+  }
+
+  @Override
+  public boolean isCheckable() {
+    return view instanceof Checkable;
+  }
+
+  @Override
+  public boolean isChecked() {
+    if (!isCheckable()) {
+      return false;
+    }
+    return ((Checkable) view).isChecked();
+  }
+
+  @Override
+  public boolean isClickable() {
+    return view.isClickable();
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return view.isEnabled();
+  }
+
+  @Override
+  public boolean isFocusable() {
+    return view.isFocusable();
+  }
+
+  @Override
+  public boolean isFocused() {
+    return view.isFocused();
+  }
+
+  @Override
+  public boolean isScrollable() {
+    // TODO: find a meaningful implementation
+    return true;
+  }
+
+  @Override
+  public boolean isLongClickable() {
+    return view.isLongClickable();
+  }
+
+  @Override
+  public boolean isPassword() {
+    // TODO: find a meaningful implementation
+    return false;
+  }
+
+  @Override
+  public boolean isSelected() {
+    return view.isSelected();
   }
 
   @Override

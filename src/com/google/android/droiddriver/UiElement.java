@@ -47,15 +47,6 @@ public interface UiElement {
   String getText();
 
   /**
-   * Sets the text of this element.
-   *
-   * @param text The text to enter.
-   * @throws ElementNotVisibleException when the element is not visible
-   */
-  // TODO: Should this clear the text before setting?
-  void setText(String text);
-
-  /**
    * Gets the content description of this element.
    */
   String getContentDescription();
@@ -66,6 +57,77 @@ public interface UiElement {
   String getClassName();
 
   /**
+   * Gets the resource id of this element.
+   */
+  String getResourceId();
+
+  /**
+   * Gets the package name of this element.
+   */
+  String getPackageName();
+
+  /**
+   * @return whether or not this element is visible on the device's display.
+   */
+  boolean isVisible();
+
+  /**
+   * @return whether this element is checkable.
+   */
+  boolean isCheckable();
+
+  /**
+   * @return whether this element is checked.
+   */
+  boolean isChecked();
+
+  /**
+   * @return whether this element is clickable.
+   */
+  boolean isClickable();
+
+  /**
+   * @return whether this element is enabled.
+   */
+  boolean isEnabled();
+
+  /**
+   * @return whether this element is focusable.
+   */
+  boolean isFocusable();
+
+  /**
+   * @return whether this element is focused.
+   */
+  boolean isFocused();
+
+  /**
+   * @return whether this element is scrollable.
+   */
+  boolean isScrollable();
+
+  /**
+   * @return whether this element is long-clickable.
+   */
+  boolean isLongClickable();
+
+  /**
+   * @return whether this element is password.
+   */
+  boolean isPassword();
+
+  /**
+   * @return whether this element is selected.
+   */
+  boolean isSelected();
+
+  /**
+   * Gets the UiElement bounds in screen coordinates. The coordinates may not be
+   * visible on screen.
+   */
+  Rect getRect();
+
+  /**
    * Executes the given action.
    *
    * @param action The action to execute
@@ -74,23 +136,21 @@ public interface UiElement {
   boolean perform(Action action);
 
   /**
+   * Sets the text of this element.
+   *
+   * @param text The text to enter.
+   * @throws ElementNotVisibleException when the element is not visible
+   */
+  // TODO: Should this clear the text before setting?
+  void setText(String text);
+
+  /**
    * Clicks this element. The click will be at the center of the visible
    * element.
    *
    * @throws ElementNotVisibleException when the element is not visible
    */
   void click();
-
-  /**
-   * @returns whether or not this element is visible on the device's display.
-   */
-  boolean isVisible();
-
-  /**
-   * Gets the UiElement bounds in screen coordinates. The coordinates may not be
-   * visible on screen.
-   */
-  Rect getRect();
 
   /**
    * Scrolls in the given direction. Scrolling down means swiping upwards.
