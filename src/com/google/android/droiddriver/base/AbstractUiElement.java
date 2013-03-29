@@ -36,7 +36,8 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -138,7 +139,7 @@ public abstract class AbstractUiElement implements UiElement {
       }
       return (AbstractUiElement) foundNode.getUserData(UI_ELEMENT);
     } catch (XPathExpressionException e) {
-      logDomNode();
+      logDomNode(byXPath);
       throw new ElementNotFoundException(matcherFailMessage(byXPath), e);
     } finally {
       try {
@@ -149,15 +150,27 @@ public abstract class AbstractUiElement implements UiElement {
     }
   }
 
-  private void logDomNode() {
+  private void logDomNode(ByXPath byXPath) {
     if (Logs.DEBUG) {
+      // logcat has a limit (4076b), so write to a file
+      FileOutputStream fos = null;
       try {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        File domFile = File.createTempFile("dom", ".xml");
+        domFile.setReadable(true /* readable */, false/* ownerOnly */);
+        fos = new FileOutputStream(domFile);
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(new DOMSource(getDomNode()), new StreamResult(baos));
-        Log.d(Logs.TAG, baos.toString());
+        transformer.transform(new DOMSource(getDomNode()), new StreamResult(fos));
+        Log.d(Logs.TAG, "Wrote dom for " + byXPath + " to " + domFile.getCanonicalPath());
       } catch (Exception e) {
-        Log.d(Logs.TAG, "fail to transform node", e);
+        Log.d(Logs.TAG, "Fail to transform node", e);
+      } finally {
+        if (fos != null) {
+          try {
+            fos.close();
+          } catch (Exception e) {
+            // ignore
+          }
+        }
       }
     }
   }
@@ -218,8 +231,11 @@ public abstract class AbstractUiElement implements UiElement {
     }
   }
 
+  // add attribute only if it's true
   private static void setAttribute(Element element, String name, boolean value) {
-    element.setAttribute(name, String.valueOf(value));
+    if (value) {
+      element.setAttribute(name, "");
+    }
   }
 
   private static String simpleClassName(String name) {

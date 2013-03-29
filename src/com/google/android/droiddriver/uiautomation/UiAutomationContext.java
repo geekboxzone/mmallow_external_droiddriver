@@ -22,6 +22,9 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.MapMaker;
+
+import java.util.Map;
 
 /**
  * Internal helper for managing all instances.
@@ -29,6 +32,8 @@ import com.google.common.base.Preconditions;
 public class UiAutomationContext {
   private final UiAutomation uiAutomation;
   private final InputInjector injector;
+  private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
+      .makeMap();
 
   UiAutomationContext(UiAutomation uiAutomation) {
     this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
@@ -48,8 +53,12 @@ public class UiAutomationContext {
     return injector;
   }
 
-  // TODO: cache by node?
   public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {
-    return new UiAutomationElement(this, node);
+    UiAutomationElement element = map.get(node);
+    if (element == null) {
+      element = new UiAutomationElement(this, node);
+      map.put(node, element);
+    }
+    return element;
   }
 }

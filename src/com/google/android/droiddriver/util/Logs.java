@@ -29,6 +29,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Internal helper for logging.
@@ -38,7 +39,7 @@ public class Logs {
   public static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
   // support TYPE as well?
-  @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
+  @Target({ElementType.METHOD})
   @Retention(RetentionPolicy.RUNTIME)
   public @interface LogDesired {
     int priority() default Log.DEBUG;
@@ -46,7 +47,7 @@ public class Logs {
 
   /**
    * An {@link InvocationHandler} that logs invocations of {@link LogDesired}
-   * methods.
+   * public methods.
    */
   public static class LoggingWrapper implements InvocationHandler {
     private final Object wrapped;
@@ -58,13 +59,18 @@ public class Logs {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (method.isAnnotationPresent(LogDesired.class)) {
-        Log.println(
-            method.getAnnotation(LogDesired.class).priority(),
-            TAG,
-            String.format("Invoking %s.%s(%s)", method.getDeclaringClass().getName(),
-                method.getName(), Joiner.on(",").join(args)));
+      if ((method.getModifiers() & Modifier.PUBLIC) != 0) {
+        Class<? extends Object> actualClass = wrapped.getClass();
+        Method actualMethod = actualClass.getMethod(method.getName(), method.getParameterTypes());
+        if (actualMethod.isAnnotationPresent(LogDesired.class)) {
+          Log.println(
+              actualMethod.getAnnotation(LogDesired.class).priority(),
+              TAG,
+              String.format("Invoking %s.%s(%s)", actualClass.getSimpleName(),
+                  actualMethod.getName(), Joiner.on(",").join(args)));
+        }
       }
+
       try {
         return method.invoke(wrapped, args);
         // TODO: log return value as well

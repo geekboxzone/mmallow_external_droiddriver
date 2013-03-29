@@ -25,6 +25,9 @@ import android.view.View;
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.MapMaker;
+
+import java.util.Map;
 
 /**
  * Internal helper for managing all instances.
@@ -32,6 +35,7 @@ import com.google.common.base.Preconditions;
 public class InstrumentationContext {
   private final Instrumentation instrumentation;
   private final InputInjector injector;
+  private final Map<View, ViewElement> map = new MapMaker().weakKeys().makeMap();
 
   InstrumentationContext(Instrumentation instrumentation) {
     this.instrumentation = Preconditions.checkNotNull(instrumentation);
@@ -58,8 +62,12 @@ public class InstrumentationContext {
     return injector;
   }
 
-  // TODO: cache by view?
   public ViewElement getUiElement(View view) {
-    return new ViewElement(this, view);
+    ViewElement element = map.get(view);
+    if (element == null) {
+      element = new ViewElement(this, view);
+      map.put(view, element);
+    }
+    return element;
   }
 }
