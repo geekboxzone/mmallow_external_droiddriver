@@ -2,7 +2,7 @@ package com.google.android.apps.common.testing.ui.testapp;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.google.android.droiddriver.By;
+import com.google.android.droiddriver.matchers.By;
 import com.google.android.droiddriver.DroidDriver;
 
 /**

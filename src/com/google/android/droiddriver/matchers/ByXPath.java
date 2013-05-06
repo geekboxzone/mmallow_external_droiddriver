@@ -25,13 +25,13 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 public class ByXPath implements Matcher {
-  private final String xPath;
+  private final String xPathString;
   private final XPathExpression xPathExpression;
 
-  protected ByXPath(String xPath) {
-    this.xPath = Preconditions.checkNotNull(xPath);
+  protected ByXPath(String xPathString) {
+    this.xPathString = Preconditions.checkNotNull(xPathString);
     try {
-      xPathExpression = XPathFactory.newInstance().newXPath().compile(xPath);
+      xPathExpression = XPathFactory.newInstance().newXPath().compile(xPathString);
     } catch (XPathExpressionException e) {
       throw new DroidDriverException(e);
     }
@@ -45,10 +45,14 @@ public class ByXPath implements Matcher {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(xPath).toString();
+    return Objects.toStringHelper(this).addValue(xPathString).toString();
   }
 
   public XPathExpression getXPathExpression() {
     return xPathExpression;
+  }
+
+  public String getXPathString() {
+    return xPathString;
   }
 }
