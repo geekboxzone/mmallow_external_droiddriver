@@ -17,6 +17,7 @@
 package com.google.android.droiddriver;
 
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.matchers.Matcher;
 
 public interface DroidDriver {
   /**

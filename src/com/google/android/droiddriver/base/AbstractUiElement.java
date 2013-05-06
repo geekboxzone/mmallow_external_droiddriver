@@ -18,8 +18,6 @@ package com.google.android.droiddriver.base;
 
 import android.util.Log;
 
-import com.google.android.droiddriver.By.ByXPath;
-import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
@@ -29,6 +27,9 @@ import com.google.android.droiddriver.actions.TypeAction;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.matchers.Attribute;
+import com.google.android.droiddriver.matchers.ByXPath;
+import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.Logs.LogDesired;
 
@@ -195,21 +196,21 @@ public abstract class AbstractUiElement implements UiElement {
     Element element = getDocument().createElement(simpleClassName(className));
     element.setUserData(UI_ELEMENT, this, null /* UserDataHandler */);
 
-    setAttribute(element, "class", className);
-    setAttribute(element, "resource-id", getResourceId());
-    setAttribute(element, "package", getPackageName());
-    setAttribute(element, "content-desc", getContentDescription());
-    setAttribute(element, "text", getText());
-    setAttribute(element, "checkable", isCheckable());
-    setAttribute(element, "checked", isChecked());
-    setAttribute(element, "clickable", isClickable());
-    setAttribute(element, "enabled", isEnabled());
-    setAttribute(element, "focusable", isFocusable());
-    setAttribute(element, "focused", isFocused());
-    setAttribute(element, "scrollable", isScrollable());
-    setAttribute(element, "long-clickable", isLongClickable());
-    setAttribute(element, "password", isPassword());
-    setAttribute(element, "selected", isSelected());
+    setAttribute(element, Attribute.CLASS, className);
+    setAttribute(element, Attribute.RESOURCE_ID, getResourceId());
+    setAttribute(element, Attribute.PACKAGE, getPackageName());
+    setAttribute(element, Attribute.CONTENT_DESC, getContentDescription());
+    setAttribute(element, Attribute.TEXT, getText());
+    setAttribute(element, Attribute.CHECKABLE, isCheckable());
+    setAttribute(element, Attribute.CHECKED, isChecked());
+    setAttribute(element, Attribute.CLICKABLE, isClickable());
+    setAttribute(element, Attribute.ENABLED, isEnabled());
+    setAttribute(element, Attribute.FOCUSABLE, isFocusable());
+    setAttribute(element, Attribute.FOCUSED, isFocused());
+    setAttribute(element, Attribute.SCROLLABLE, isScrollable());
+    setAttribute(element, Attribute.LONG_CLICKABLE, isLongClickable());
+    setAttribute(element, Attribute.PASSWORD, isPassword());
+    setAttribute(element, Attribute.SELECTED, isSelected());
 
     // TODO: visitor pattern
     int childCount = getChildCount();
@@ -225,16 +226,16 @@ public abstract class AbstractUiElement implements UiElement {
     return element;
   }
 
-  private static void setAttribute(Element element, String name, String value) {
+  private static void setAttribute(Element element, Attribute attr, String value) {
     if (value != null) {
-      element.setAttribute(name, value);
+      element.setAttribute(attr.getName(), value);
     }
   }
 
   // add attribute only if it's true
-  private static void setAttribute(Element element, String name, boolean value) {
+  private static void setAttribute(Element element, Attribute attr, boolean value) {
     if (value) {
-      element.setAttribute(name, "");
+      element.setAttribute(attr.getName(), "");
     }
   }
 

@@ -19,10 +19,10 @@ package com.google.android.droiddriver.util;
 import android.os.SystemClock;
 
 import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
+import com.google.android.droiddriver.matchers.Matcher;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;

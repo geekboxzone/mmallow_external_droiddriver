@@ -17,6 +17,7 @@
 package com.google.android.droiddriver;
 
 import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
+import com.google.android.droiddriver.matchers.Matcher;
 
 /**
  * Interface for polling mechanism.

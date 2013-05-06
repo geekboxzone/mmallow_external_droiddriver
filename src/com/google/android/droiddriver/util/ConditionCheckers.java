@@ -17,11 +17,11 @@
 package com.google.android.droiddriver.util;
 
 import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.Poller.ConditionChecker;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
+import com.google.android.droiddriver.matchers.Matcher;
 
 /**
  * Helpers for {@link ConditionChecker}.

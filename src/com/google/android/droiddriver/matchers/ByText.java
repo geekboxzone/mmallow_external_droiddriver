@@ -13,16 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.google.android.droiddriver.matchers;
 
-package com.google.android.droiddriver;
+import com.google.android.droiddriver.UiElement;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-public interface Matcher {
-  /**
-   * Returns true if the UiElement matches the implemented matcher. The
-   * implemented matcher should return quickly.
-   *
-   * @param element The element to validate against
-   * @return true if the element matches
-   */
-  boolean matches(UiElement element);
+public class ByText implements Matcher {
+  private final String text;
+
+  protected ByText(String text) {
+    this.text = Preconditions.checkNotNull(text);
+  }
+
+  @Override
+  public boolean matches(UiElement element) {
+    return text.equals(element.getText());
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).addValue(text).toString();
+  }
 }

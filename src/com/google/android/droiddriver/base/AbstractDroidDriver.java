@@ -17,9 +17,9 @@
 package com.google.android.droiddriver.base;
 
 import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.Matcher;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.ConditionCheckers;
 import com.google.android.droiddriver.util.DefaultPoller;
 

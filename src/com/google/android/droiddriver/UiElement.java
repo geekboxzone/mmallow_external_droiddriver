@@ -22,6 +22,7 @@ import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.matchers.Matcher;
 
 /**
  * Represents an UI element within an Android App.
