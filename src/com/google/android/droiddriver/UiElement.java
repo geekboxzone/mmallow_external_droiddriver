@@ -43,6 +43,11 @@ public interface UiElement {
   UiElement findElement(Matcher matcher);
 
   /**
+   * @return Whether a matching element exists
+   */
+  boolean hasElement(Matcher matcher);
+
+  /**
    * Gets the text of this element.
    */
   String getText();
@@ -152,6 +157,22 @@ public interface UiElement {
    * @throws ElementNotVisibleException when the element is not visible
    */
   void click();
+
+  /**
+   * Long-clicks this element. The click will be at the center of the visible
+   * element.
+   *
+   * @throws ElementNotVisibleException when the element is not visible
+   */
+  void longClick();
+
+  /**
+   * Double-clicks this element. The click will be at the center of the visible
+   * element.
+   *
+   * @throws ElementNotVisibleException when the element is not visible
+   */
+  void doubleClick();
 
   /**
    * Scrolls in the given direction. Scrolling down means swiping upwards.

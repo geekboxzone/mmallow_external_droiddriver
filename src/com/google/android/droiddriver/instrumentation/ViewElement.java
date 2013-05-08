@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.TextView;
 
-import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -78,8 +78,8 @@ public class ViewElement extends AbstractUiElement {
   }
 
   @Override
-  public boolean perform(Action action) {
-    return action.perform(context.getInjector(), this);
+  public InputInjector getInjector() {
+    return context.getInjector();
   }
 
   @Override

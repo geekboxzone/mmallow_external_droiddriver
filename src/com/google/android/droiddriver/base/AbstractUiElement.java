@@ -18,6 +18,7 @@ package com.google.android.droiddriver.base;
 
 import android.util.Log;
 
+import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
@@ -62,34 +63,63 @@ public abstract class AbstractUiElement implements UiElement {
 
   @LogDesired
   @Override
-  public abstract boolean perform(Action action);
+  public boolean perform(Action action) {
+    checkVisible();
+    return action.perform(getInjector(), this);
+  }
 
   @Override
   public void setText(String text) {
-    checkVisible();
     // TODO: Define common actions as a const.
     perform(new TypeAction(text));
+    if (Logs.DEBUG) {
+      String actual = getText();
+      if (!text.equals(actual)) {
+        throw new DroidDriverException(String.format(
+            "setText failed: expected=\"%s\", actual=\"%s\"", text, actual));
+      }
+    }
   }
 
   @Override
   public void click() {
-    checkVisible();
-    perform(new ClickAction());
+    perform(ClickAction.SINGLE);
+  }
+
+  @Override
+  public void longClick() {
+    perform(ClickAction.LONG);
+  }
+
+  @Override
+  public void doubleClick() {
+    perform(ClickAction.DOUBLE);
   }
 
   @Override
   public void scroll(ScrollDirection direction) {
-    checkVisible();
     perform(new SwipeAction(direction, false));
   }
 
   protected abstract int getChildCount();
+
+  protected abstract InputInjector getInjector();
 
   protected abstract AbstractUiElement getChild(int index);
 
   private void checkVisible() {
     if (!isVisible()) {
       throw new ElementNotVisibleException("Element is not visible on screen");
+    }
+  }
+
+  @Override
+  public boolean hasElement(Matcher matcher) {
+    try {
+      findElement(matcher);
+      return true;
+    } catch (ElementNotFoundException enfe) {
+      return false;
     }
   }
 

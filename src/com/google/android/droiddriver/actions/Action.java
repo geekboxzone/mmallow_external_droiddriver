@@ -26,8 +26,11 @@ public interface Action {
   /**
    * Performs the action.
    *
-   * @param injector the injector to inject input events.
-   * @param element the Ui element to perform the action on.
+   * @param injector the injector to inject input events
+   * @param element the Ui element to perform the action on
+   * @return Whether the action is successful. Some actions throw exceptions in
+   *         case of failure, when that behavior is more appropriate. For
+   *         example, ClickAction.
    */
   boolean perform(InputInjector injector, UiElement element);
 }

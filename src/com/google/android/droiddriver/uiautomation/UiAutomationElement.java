@@ -21,7 +21,7 @@ import static com.google.android.droiddriver.util.TextUtils.charSequenceToString
 import android.graphics.Rect;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -65,8 +65,8 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  public boolean perform(Action action) {
-    return action.perform(context.getInjector(), this);
+  public InputInjector getInjector() {
+    return context.getInjector();
   }
 
   @Override

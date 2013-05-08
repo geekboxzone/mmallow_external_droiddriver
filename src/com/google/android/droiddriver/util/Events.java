@@ -21,6 +21,9 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
+import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.exceptions.ActionException;
+
 /**
  * Helper methods to create InputEvents.
  */
@@ -59,6 +62,25 @@ public class Events {
     KeyEvent event = new KeyEvent(downTime, downTime, action, keyCode, 0 /* repeat */);
     event.setSource(InputDevice.SOURCE_KEYBOARD);
     return event;
+  }
+
+  /**
+   * Injects {@code event}, and recycles it. After calling this function you
+   * must not ever touch the event again.
+   */
+  public static boolean tryInjectEvent(InputInjector injector, MotionEvent event) {
+    boolean injected = injector.injectInputEvent(event);
+    event.recycle();
+    return injected;
+  }
+
+  /**
+   * Calls {@link #tryInjectEvent}, and throws in case of failure.
+   */
+  public static void injectEvent(InputInjector injector, MotionEvent event) {
+    if (!tryInjectEvent(injector, event)) {
+      throw new ActionException("Failed to inject " + event);
+    }
   }
 
   private Events() {}
