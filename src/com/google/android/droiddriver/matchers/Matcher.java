@@ -20,8 +20,8 @@ import com.google.android.droiddriver.UiElement;
 
 public interface Matcher {
   /**
-   * Returns true if the UiElement matches the implemented matcher. The
-   * implemented matcher should return quickly.
+   * Returns true if the UiElement matches the implementing matcher. The
+   * implementing matcher should return quickly.
    *
    * @param element The element to validate against
    * @return true if the element matches

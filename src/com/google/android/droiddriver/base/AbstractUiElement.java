@@ -61,6 +61,11 @@ public abstract class AbstractUiElement implements UiElement {
   private static Document document;
   private Element domNode;
 
+  @Override
+  public <T> T get(Attribute attribute) {
+    return attribute.getValue(this);
+  }
+
   @LogDesired
   @Override
   public boolean perform(Action action) {
@@ -223,7 +228,7 @@ public abstract class AbstractUiElement implements UiElement {
     if (className == null) {
       className = "UNKNOWN";
     }
-    Element element = getDocument().createElement(simpleClassName(className));
+    Element element = getDocument().createElement(ByXPath.tagName(className));
     element.setUserData(UI_ELEMENT, this, null /* UserDataHandler */);
 
     setAttribute(element, Attribute.CLASS, className);
@@ -267,22 +272,6 @@ public abstract class AbstractUiElement implements UiElement {
     if (value) {
       element.setAttribute(attr.getName(), "");
     }
-  }
-
-  private static String simpleClassName(String name) {
-    // the nth anonymous class has a class name ending in "Outer$n"
-    // and local inner classes have names ending in "Outer.$1Inner"
-    name = name.replaceAll("\\$[0-9]+", "\\$");
-
-    // we want the name of the inner class all by its lonesome
-    int start = name.lastIndexOf('$');
-
-    // if this isn't an inner class, just find the start of the
-    // top level class name.
-    if (start == -1) {
-      start = name.lastIndexOf('.');
-    }
-    return name.substring(start + 1);
   }
 
   private static Document getDocument() {

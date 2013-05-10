@@ -24,45 +24,81 @@ import com.google.common.base.Joiner;
  * Convenience methods to create commonly used matchers.
  */
 public class By {
+  /**
+   * Matches by {@link Object#equals(Object)}.
+   */
+  public static final class MatchByEquals<T> implements MatchStrategy<T> {
+    @Override
+    public boolean match(T expected, T actual) {
+      return actual.equals(expected);
+    }
+
+    @Override
+    public String toString() {
+      return "==";
+    }
+  }
+
+  public static final MatchStrategy<String> STRING_EQUALS = new MatchByEquals<String>();
+  /** Matches by {@link String#matches}. */
+  public static final MatchStrategy<String> STRING_MATCHES = new MatchStrategy<String>() {
+    @Override
+    public boolean match(String expected, String actual) {
+      return actual.matches(expected);
+    }
+
+    @Override
+    public String toString() {
+      return "matches pattern";
+    }
+  };
 
   /**
    * @param resourceId The resource id to match against
    * @return a matcher to find an element by resource id
    */
-  public static final ByResourceId resourceId(String resourceId) {
-    return new ByResourceId(resourceId);
+  public static final ByAttribute<String> resourceId(String resourceId) {
+    return ByAttribute.newMatcher(Attribute.RESOURCE_ID, STRING_EQUALS, resourceId);
   }
 
   /**
    * @param text The exact text to match against
    * @return a matcher to find an element by text
    */
-  public static final ByText text(String text) {
-    return new ByText(text);
+  public static final ByAttribute<String> text(String text) {
+    return ByAttribute.newMatcher(Attribute.TEXT, STRING_EQUALS, text);
+  }
+
+  /**
+   * @param regex The regular expression pattern to match against
+   * @return a matcher to find an element by text pattern
+   */
+  public static final ByAttribute<String> textRegex(String regex) {
+    return ByAttribute.newMatcher(Attribute.TEXT, STRING_MATCHES, regex);
   }
 
   /**
    * @param contentDescription The exact content description to match against
    * @return a matcher to find an element by content description
    */
-  public static final ByContentDescription contentDescription(String contentDescription) {
-    return new ByContentDescription(contentDescription);
+  public static final ByAttribute<String> contentDescription(String contentDescription) {
+    return ByAttribute.newMatcher(Attribute.CONTENT_DESC, STRING_EQUALS, contentDescription);
   }
 
   /**
    * @param className The exact class name to match against
    * @return a matcher to find an element by class name
    */
-  public static final ByClassName className(String className) {
-    return new ByClassName(className);
+  public static final ByAttribute<String> className(String className) {
+    return ByAttribute.newMatcher(Attribute.CLASS, STRING_EQUALS, className);
   }
 
   /**
    * @param clazz The class whose name is matched against
    * @return a matcher to find an element by class name
    */
-  public static final ByClassName className(Class<?> clazz) {
-    return new ByClassName(clazz.getName());
+  public static final ByAttribute<String> className(Class<?> clazz) {
+    return className(clazz.getName());
   }
 
   /**

@@ -55,4 +55,36 @@ public class ByXPath implements Matcher {
   public String getXPathString() {
     return xPathString;
   }
+
+  /**
+   * @return The tag name used to build UiElement DOM. It is preferable to use
+   *         this to build XPath instead of String literals.
+   */
+  public static String tagName(String className) {
+    return simpleClassName(className);
+  }
+
+  /**
+   * @return The tag name used to build UiElement DOM. It is preferable to use
+   *         this to build XPath instead of String literals.
+   */
+  public static String tagName(Class<?> clazz) {
+    return tagName(clazz.getName());
+  }
+
+  private static String simpleClassName(String name) {
+    // the nth anonymous class has a class name ending in "Outer$n"
+    // and local inner classes have names ending in "Outer.$1Inner"
+    name = name.replaceAll("\\$[0-9]+", "\\$");
+
+    // we want the name of the inner class all by its lonesome
+    int start = name.lastIndexOf('$');
+
+    // if this isn't an inner class, just find the start of the
+    // top level class name.
+    if (start == -1) {
+      start = name.lastIndexOf('.');
+    }
+    return name.substring(start + 1);
+  }
 }

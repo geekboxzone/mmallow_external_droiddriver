@@ -16,22 +16,114 @@
 
 package com.google.android.droiddriver.matchers;
 
+import com.google.android.droiddriver.UiElement;
+
 public enum Attribute {
-  CHECKABLE("checkable"),
-  CHECKED("checked"),
-  CLASS("class"),
-  CLICKABLE("clickable"),
-  CONTENT_DESC("content-desc"),
-  ENABLED("enabled"),
-  FOCUSABLE("focusable"),
-  FOCUSED("focused"),
-  LONG_CLICKABLE("long-clickable"),
-  PACKAGE("package"),
-  PASSWORD("password"),
-  RESOURCE_ID("resource-id"),
-  SCROLLABLE("scrollable"),
-  SELECTED("selected"),
-  TEXT("text");
+  CHECKABLE("checkable") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isCheckable();
+    }
+  },
+  CHECKED("checked") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isChecked();
+    }
+  },
+  CLASS("class") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getValue(UiElement element) {
+      return element.getClassName();
+    }
+  },
+  CLICKABLE("clickable") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isClickable();
+    }
+  },
+  CONTENT_DESC("content-desc") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getValue(UiElement element) {
+      return element.getContentDescription();
+    }
+  },
+  ENABLED("enabled") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isEnabled();
+    }
+  },
+  FOCUSABLE("focusable") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isFocusable();
+    }
+  },
+  FOCUSED("focused") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isFocused();
+    }
+  },
+  LONG_CLICKABLE("long-clickable") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isLongClickable();
+    }
+  },
+  PACKAGE("package") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getValue(UiElement element) {
+      return element.getPackageName();
+    }
+  },
+  PASSWORD("password") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isPassword();
+    }
+  },
+  RESOURCE_ID("resource-id") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getValue(UiElement element) {
+      return element.getResourceId();
+    }
+  },
+  SCROLLABLE("scrollable") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isScrollable();
+    }
+  },
+  SELECTED("selected") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Boolean getValue(UiElement element) {
+      return element.isSelected();
+    }
+  },
+  TEXT("text") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getValue(UiElement element) {
+      return element.getText();
+    }
+  };
 
   private final String name;
 
@@ -40,6 +132,13 @@ public enum Attribute {
   }
 
   public String getName() {
+    return name;
+  }
+
+  public abstract <T> T getValue(UiElement element);
+
+  @Override
+  public String toString() {
     return name;
   }
 

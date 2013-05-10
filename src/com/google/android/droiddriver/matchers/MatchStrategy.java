@@ -13,26 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.android.droiddriver.matchers;
 
-import com.google.android.droiddriver.UiElement;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-
-public class ByText implements Matcher {
-  private final String text;
-
-  protected ByText(String text) {
-    this.text = Preconditions.checkNotNull(text);
-  }
-
-  @Override
-  public boolean matches(UiElement element) {
-    return text.equals(element.getText());
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this).addValue(text).toString();
-  }
+/**
+ * Encapsulates the matching strategy.
+ */
+public interface MatchStrategy<T> {
+  /**
+   * @return true if actual matches expected
+   */
+  boolean match(T expected, T actual);
 }

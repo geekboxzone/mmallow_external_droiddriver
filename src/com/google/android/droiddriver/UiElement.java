@@ -22,6 +22,7 @@ import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.matchers.Attribute;
 import com.google.android.droiddriver.matchers.Matcher;
 
 /**
@@ -132,6 +133,11 @@ public interface UiElement {
    * visible on screen.
    */
   Rect getRect();
+
+  /**
+   * @return value of the given attribute.
+   */
+  <T> T get(Attribute attribute);
 
   /**
    * Executes the given action.
