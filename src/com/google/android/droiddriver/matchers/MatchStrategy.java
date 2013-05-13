@@ -24,4 +24,14 @@ public interface MatchStrategy<T> {
    * @return true if actual matches expected
    */
   boolean match(T expected, T actual);
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>
+   * It is recommended that this method return the description of the matching
+   * strategy, for example, "matches pattern".
+   */
+  @Override
+  String toString();
 }

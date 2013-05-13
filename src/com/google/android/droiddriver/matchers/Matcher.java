@@ -27,4 +27,14 @@ public interface Matcher {
    * @return true if the element matches
    */
   boolean matches(UiElement element);
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>
+   * It is recommended that this method return the description of the matcher,
+   * for example, "ByAttribute{text equals OK}".
+   */
+  @Override
+  String toString();
 }

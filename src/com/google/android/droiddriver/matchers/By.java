@@ -19,32 +19,29 @@ package com.google.android.droiddriver.matchers;
 import com.google.android.droiddriver.UiElement;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 
 /**
  * Convenience methods to create commonly used matchers.
  */
 public class By {
-  /**
-   * Matches by {@link Object#equals(Object)}.
-   */
-  public static final class MatchByEquals<T> implements MatchStrategy<T> {
+  /** Matches by {@link Object#equals}. */
+  public static final MatchStrategy<Object> OBJECT_EQUALS = new MatchStrategy<Object>() {
     @Override
-    public boolean match(T expected, T actual) {
-      return actual.equals(expected);
+    public boolean match(Object expected, Object actual) {
+      return Objects.equal(actual, expected);
     }
 
     @Override
     public String toString() {
-      return "==";
+      return "equals";
     }
-  }
-
-  public static final MatchStrategy<String> STRING_EQUALS = new MatchByEquals<String>();
+  };
   /** Matches by {@link String#matches}. */
   public static final MatchStrategy<String> STRING_MATCHES = new MatchStrategy<String>() {
     @Override
     public boolean match(String expected, String actual) {
-      return actual.matches(expected);
+      return actual != null && actual.matches(expected);
     }
 
     @Override
@@ -54,11 +51,27 @@ public class By {
   };
 
   /**
+   * Creates a new ByAttribute matcher. Frequently-used matchers have shorthands
+   * below, for example, {@link #text}, {@link #textRegex}. Users can create
+   * custom matchers using this method.
+   *
+   * @param attribute the attribute to match against
+   * @param strategy the matching strategy, for instance, equals or matches
+   *        regular expression
+   * @param expected the expected attribute value
+   * @return a new ByAttribute matcher
+   */
+  public static <T> ByAttribute<T> attribute(Attribute attribute,
+      MatchStrategy<? super T> strategy, T expected) {
+    return new ByAttribute<T>(attribute, strategy, expected);
+  }
+
+  /**
    * @param resourceId The resource id to match against
    * @return a matcher to find an element by resource id
    */
   public static final ByAttribute<String> resourceId(String resourceId) {
-    return ByAttribute.newMatcher(Attribute.RESOURCE_ID, STRING_EQUALS, resourceId);
+    return attribute(Attribute.RESOURCE_ID, OBJECT_EQUALS, resourceId);
   }
 
   /**
@@ -66,7 +79,7 @@ public class By {
    * @return a matcher to find an element by text
    */
   public static final ByAttribute<String> text(String text) {
-    return ByAttribute.newMatcher(Attribute.TEXT, STRING_EQUALS, text);
+    return attribute(Attribute.TEXT, OBJECT_EQUALS, text);
   }
 
   /**
@@ -74,7 +87,7 @@ public class By {
    * @return a matcher to find an element by text pattern
    */
   public static final ByAttribute<String> textRegex(String regex) {
-    return ByAttribute.newMatcher(Attribute.TEXT, STRING_MATCHES, regex);
+    return attribute(Attribute.TEXT, STRING_MATCHES, regex);
   }
 
   /**
@@ -82,7 +95,7 @@ public class By {
    * @return a matcher to find an element by content description
    */
   public static final ByAttribute<String> contentDescription(String contentDescription) {
-    return ByAttribute.newMatcher(Attribute.CONTENT_DESC, STRING_EQUALS, contentDescription);
+    return attribute(Attribute.CONTENT_DESC, OBJECT_EQUALS, contentDescription);
   }
 
   /**
@@ -90,7 +103,7 @@ public class By {
    * @return a matcher to find an element by class name
    */
   public static final ByAttribute<String> className(String className) {
-    return ByAttribute.newMatcher(Attribute.CLASS, STRING_EQUALS, className);
+    return attribute(Attribute.CLASS, OBJECT_EQUALS, className);
   }
 
   /**
@@ -99,6 +112,13 @@ public class By {
    */
   public static final ByAttribute<String> className(Class<?> clazz) {
     return className(clazz.getName());
+  }
+
+  /**
+   * @return a matcher to find an element that is selected
+   */
+  public static final ByAttribute<Boolean> selected() {
+    return attribute(Attribute.SELECTED, OBJECT_EQUALS, true);
   }
 
   /**
