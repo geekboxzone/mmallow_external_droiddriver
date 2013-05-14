@@ -20,9 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.android.droiddriver.UiElement;
 
 /**
- * A matcher that matches element by attributes.
+ * Matches UiElement by a single attribute.
  */
-public class ByAttribute<T> implements Matcher {
+public class ByAttribute<T> implements ElementMatcher {
   private final Attribute attribute;
   private final MatchStrategy<? super T> strategy;
   private final T expected;

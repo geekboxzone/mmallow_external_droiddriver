@@ -136,11 +136,11 @@ public class By {
 
   // Hamcrest style matcher aggregators
   /** @return a matcher that is the logical conjunction of given matchers */
-  public static final Matcher allOf(final Matcher... matchers) {
-    return new Matcher() {
+  public static final ElementMatcher allOf(final ElementMatcher... matchers) {
+    return new ElementMatcher() {
       @Override
       public boolean matches(UiElement element) {
-        for (Matcher matcher : matchers) {
+        for (ElementMatcher matcher : matchers) {
           if (!matcher.matches(element)) {
             return false;
           }
@@ -156,11 +156,11 @@ public class By {
   }
 
   /** @return a matcher that is the logical disjunction of given matchers */
-  public static final Matcher anyOf(final Matcher... matchers) {
-    return new Matcher() {
+  public static final ElementMatcher anyOf(final ElementMatcher... matchers) {
+    return new ElementMatcher() {
       @Override
       public boolean matches(UiElement element) {
-        for (Matcher matcher : matchers) {
+        for (ElementMatcher matcher : matchers) {
           if (matcher.matches(element)) {
             return true;
           }

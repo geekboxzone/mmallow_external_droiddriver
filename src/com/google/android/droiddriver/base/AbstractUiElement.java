@@ -29,6 +29,7 @@ import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.matchers.Attribute;
+import com.google.android.droiddriver.matchers.ElementMatcher;
 import com.google.android.droiddriver.matchers.ByXPath;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.matchers.XPaths;
@@ -136,11 +137,16 @@ public abstract class AbstractUiElement implements UiElement {
   }
 
   protected AbstractUiElement findUnwrappedElement(Matcher matcher) {
-    // Special case for XPath here to avoid polluting UiElement interface
     if (matcher instanceof ByXPath) {
       return findByXPath((ByXPath) matcher);
     }
+    if (matcher instanceof ElementMatcher) {
+      return findByElement((ElementMatcher) matcher);
+    }
+    throw new DroidDriverException("Unsupported Matcher type: " + matcher.getClass());
+  }
 
+  private AbstractUiElement findByElement(ElementMatcher matcher) {
     if (matcher.matches(this)) {
       Log.d(Logs.TAG, "Found match: " + toString());
       return this;

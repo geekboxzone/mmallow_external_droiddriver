@@ -16,12 +16,28 @@
 
 package com.google.android.droiddriver.matchers;
 
+import com.google.android.droiddriver.UiElement;
+
 /**
- * A marker interface for finding UiElement. Instances must be of one of the
- * known sub-types.
- *
- * @see ElementMatcher
- * @see ByXPath
+ * Find matching UiElement by operations on an instance.
  */
-public interface Matcher {
+public interface ElementMatcher extends Matcher {
+  /**
+   * Returns true if the UiElement matches the implementing matcher. The
+   * implementing matcher should return quickly.
+   *
+   * @param element The element to validate against
+   * @return true if the element matches
+   */
+  boolean matches(UiElement element);
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>
+   * It is recommended that this method return the description of the matcher,
+   * for example, "ByAttribute{text equals OK}".
+   */
+  @Override
+  String toString();
 }

@@ -15,32 +15,30 @@
  */
 package com.google.android.droiddriver.matchers;
 
-import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+/**
+ * Find matching UiElement by XPath.
+ */
 public class ByXPath implements Matcher {
+  private static final XPath XPATH_COMPILER = XPathFactory.newInstance().newXPath();
   private final String xPathString;
   private final XPathExpression xPathExpression;
 
   protected ByXPath(String xPathString) {
     this.xPathString = Preconditions.checkNotNull(xPathString);
     try {
-      xPathExpression = XPathFactory.newInstance().newXPath().compile(xPathString);
+      xPathExpression = XPATH_COMPILER.compile(xPathString);
     } catch (XPathExpressionException e) {
       throw new DroidDriverException(e);
     }
-  }
-
-  @Override
-  public boolean matches(UiElement element) {
-    throw new DroidDriverException("ByXPath.matches() should not be invoked; cyclic calling "
-        + toString());
   }
 
   @Override
