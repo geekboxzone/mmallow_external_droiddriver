@@ -141,14 +141,4 @@ public enum Attribute {
   public String toString() {
     return name;
   }
-
-  /** Convenience method to build XPath for boolean attributes */
-  public String getXPath(boolean exists) {
-    return exists ? String.format("[@%s]", name) : String.format("[not(@%s)]", name);
-  }
-
-  /** Convenience method to build XPath */
-  public String getXPath(String value) {
-    return String.format("[@%s='%s']", name, value);
-  }
 }

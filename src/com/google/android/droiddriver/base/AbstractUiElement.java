@@ -31,6 +31,7 @@ import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.matchers.Attribute;
 import com.google.android.droiddriver.matchers.ByXPath;
 import com.google.android.droiddriver.matchers.Matcher;
+import com.google.android.droiddriver.matchers.XPaths;
 import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.Logs.LogDesired;
 
@@ -228,7 +229,7 @@ public abstract class AbstractUiElement implements UiElement {
     if (className == null) {
       className = "UNKNOWN";
     }
-    Element element = getDocument().createElement(ByXPath.tagName(className));
+    Element element = getDocument().createElement(XPaths.tag(className));
     element.setUserData(UI_ELEMENT, this, null /* UserDataHandler */);
 
     setAttribute(element, Attribute.CLASS, className);
