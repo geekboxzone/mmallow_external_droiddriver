@@ -137,13 +137,19 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  protected int getChildCount() {
+  public int getChildCount() {
     return node.getChildCount();
   }
 
   @Override
-  protected UiAutomationElement getChild(int index) {
+  public UiAutomationElement getChild(int index) {
     AccessibilityNodeInfo child = node.getChild(index);
     return child == null ? null : context.getUiElement(child);
+  }
+
+  @Override
+  public UiAutomationElement getParent() {
+    AccessibilityNodeInfo parent = node.getParent();
+    return parent == null ? null : context.getUiElement(parent);
   }
 }

@@ -20,10 +20,8 @@ import android.app.UiAutomation;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.android.droiddriver.util.Logs;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
@@ -37,8 +35,8 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   }
 
   @Override
-  public UiElement getRootElement() {
-    return Logs.wrap(UiElement.class, context.getUiElement(getRootNode()));
+  public UiAutomationElement getRootElement() {
+    return context.getUiElement(getRootNode());
   }
 
   private AccessibilityNodeInfo getRootNode() {

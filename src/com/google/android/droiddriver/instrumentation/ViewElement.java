@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Checkable;
 import android.widget.TextView;
 
@@ -157,7 +158,7 @@ public class ViewElement extends AbstractUiElement {
   }
 
   @Override
-  protected int getChildCount() {
+  public int getChildCount() {
     if (!(view instanceof ViewGroup)) {
       return 0;
     }
@@ -165,11 +166,20 @@ public class ViewElement extends AbstractUiElement {
   }
 
   @Override
-  protected ViewElement getChild(int index) {
+  public ViewElement getChild(int index) {
     if (!(view instanceof ViewGroup)) {
       return null;
     }
     View child = ((ViewGroup) view).getChildAt(index);
     return child == null ? null : context.getUiElement(child);
+  }
+
+  @Override
+  public ViewElement getParent() {
+    ViewParent parent = view.getParent();
+    if (!(parent instanceof View)) {
+      return null;
+    }
+    return context.getUiElement((View) parent);
   }
 }

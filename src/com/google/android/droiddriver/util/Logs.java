@@ -19,17 +19,6 @@ package com.google.android.droiddriver.util;
 import android.util.Log;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.reflect.Reflection;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 /**
  * Internal helper for logging.
@@ -38,53 +27,18 @@ public class Logs {
   public static final String TAG = "DroidDriver";
   public static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
-  // support TYPE as well?
-  @Target({ElementType.METHOD})
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface LogDesired {
-    int priority() default Log.DEBUG;
+  public static void call(Object self, String method, Object... args) {
+    call(Log.DEBUG, self, method, args);
   }
 
-  /**
-   * An {@link InvocationHandler} that logs invocations of {@link LogDesired}
-   * public methods.
-   */
-  public static class LoggingWrapper implements InvocationHandler {
-    private final Object wrapped;
-
-    public LoggingWrapper(Object wrapped) {
-      this.wrapped = Preconditions.checkNotNull(wrapped);
-      assert !(wrapped instanceof LoggingWrapper); // prevent recursion
+  public static void call(int priority, Object self, String method, Object... args) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(
+          priority,
+          TAG,
+          String.format("Invoking %s.%s(%s)", self.getClass().getSimpleName(), method,
+              Joiner.on(",").join(args)));
     }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if ((method.getModifiers() & Modifier.PUBLIC) != 0) {
-        Class<? extends Object> actualClass = wrapped.getClass();
-        Method actualMethod = actualClass.getMethod(method.getName(), method.getParameterTypes());
-        if (actualMethod.isAnnotationPresent(LogDesired.class)) {
-          Log.println(
-              actualMethod.getAnnotation(LogDesired.class).priority(),
-              TAG,
-              String.format("Invoking %s.%s(%s)", actualClass.getSimpleName(),
-                  actualMethod.getName(), Joiner.on(",").join(args)));
-        }
-      }
-
-      try {
-        return method.invoke(wrapped, args);
-        // TODO: log return value as well
-      } catch (InvocationTargetException e) {
-        throw e.getTargetException();
-      }
-    }
-  }
-
-  /**
-   * Wraps {@code obj} in a {@link LoggingWrapper}.
-   */
-  public static <I> I wrap(Class<I> interfaceType, I obj) {
-    return Reflection.newProxy(interfaceType, new LoggingWrapper(obj));
   }
 
   private Logs() {}

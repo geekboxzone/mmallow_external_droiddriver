@@ -29,12 +29,11 @@ import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.matchers.Attribute;
-import com.google.android.droiddriver.matchers.ElementMatcher;
 import com.google.android.droiddriver.matchers.ByXPath;
+import com.google.android.droiddriver.matchers.ElementMatcher;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.matchers.XPaths;
 import com.google.android.droiddriver.util.Logs;
-import com.google.android.droiddriver.util.Logs.LogDesired;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -68,9 +67,9 @@ public abstract class AbstractUiElement implements UiElement {
     return attribute.getValue(this);
   }
 
-  @LogDesired
   @Override
   public boolean perform(Action action) {
+    Logs.call(this, "perform", action);
     checkVisible();
     return action.perform(getInjector(), this);
   }
@@ -108,11 +107,10 @@ public abstract class AbstractUiElement implements UiElement {
     perform(new SwipeAction(direction, false));
   }
 
-  protected abstract int getChildCount();
+  @Override
+  public abstract AbstractUiElement getChild(int index);
 
   protected abstract InputInjector getInjector();
-
-  protected abstract AbstractUiElement getChild(int index);
 
   private void checkVisible() {
     if (!isVisible()) {
@@ -130,13 +128,9 @@ public abstract class AbstractUiElement implements UiElement {
     }
   }
 
-  @LogDesired
   @Override
   public UiElement findElement(Matcher matcher) {
-    return Logs.wrap(UiElement.class, findUnwrappedElement(matcher));
-  }
-
-  protected AbstractUiElement findUnwrappedElement(Matcher matcher) {
+    Logs.call(this, "findElement", matcher);
     if (matcher instanceof ByXPath) {
       return findByXPath((ByXPath) matcher);
     }
@@ -146,7 +140,7 @@ public abstract class AbstractUiElement implements UiElement {
     throw new DroidDriverException("Unsupported Matcher type: " + matcher.getClass());
   }
 
-  private AbstractUiElement findByElement(ElementMatcher matcher) {
+  private UiElement findByElement(ElementMatcher matcher) {
     if (matcher.matches(this)) {
       Log.d(Logs.TAG, "Found match: " + toString());
       return this;
@@ -154,13 +148,13 @@ public abstract class AbstractUiElement implements UiElement {
     int childCount = getChildCount();
     Log.d(Logs.TAG, "Looping through number of children " + childCount);
     for (int i = 0; i < childCount; i++) {
-      AbstractUiElement child = getChild(i);
+      UiElement child = getChild(i);
       if (child == null) {
         Log.w(Logs.TAG, "Skip null child for " + toString());
         continue;
       }
       try {
-        return child.findUnwrappedElement(matcher);
+        return child.findElement(matcher);
       } catch (ElementNotFoundException enfe) {
         // Do nothing. Continue searching.
       }
@@ -172,7 +166,7 @@ public abstract class AbstractUiElement implements UiElement {
     return "Could not find any element matching " + matcher;
   }
 
-  private AbstractUiElement findByXPath(ByXPath byXPath) {
+  private UiElement findByXPath(ByXPath byXPath) {
     try {
       getDocument().appendChild(getDomNode());
       Element foundNode =
@@ -180,7 +174,7 @@ public abstract class AbstractUiElement implements UiElement {
       if (foundNode == null) {
         throw new XPathExpressionException("XPath evaluation returns null");
       }
-      return (AbstractUiElement) foundNode.getUserData(UI_ELEMENT);
+      return (UiElement) foundNode.getUserData(UI_ELEMENT);
     } catch (XPathExpressionException e) {
       logDomNode(byXPath);
       throw new ElementNotFoundException(matcherFailMessage(byXPath), e);
@@ -229,8 +223,8 @@ public abstract class AbstractUiElement implements UiElement {
   // to support searching above context element?
   // TODO: uiautomatorviewer filters out many "insignificant" views. If we want
   // to let users make use of it, we need to do the same filtering
-  @LogDesired
   private Element buildDomNode() {
+    Logs.call(this, "buildDomNode");
     String className = getClassName();
     if (className == null) {
       className = "UNKNOWN";

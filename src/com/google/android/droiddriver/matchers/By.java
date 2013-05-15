@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.matchers;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.android.droiddriver.UiElement;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Joiner;
@@ -64,6 +66,21 @@ public class By {
   public static <T> ByAttribute<T> attribute(Attribute attribute,
       MatchStrategy<? super T> strategy, T expected) {
     return new ByAttribute<T>(attribute, strategy, expected);
+  }
+
+  /** Shorthand for {@link #attribute}{@code (attribute, OBJECT_EQUALS, expected)} */
+  public static <T> ByAttribute<T> attribute(Attribute attribute, T expected) {
+    return attribute(attribute, OBJECT_EQUALS, expected);
+  }
+
+  /** Shorthand for {@link #attribute}{@code (attribute, true)} */
+  public static ByAttribute<Boolean> is(Attribute attribute) {
+    return attribute(attribute, true);
+  }
+
+  /** Shorthand for {@link #attribute}{@code (attribute, false)} */
+  public static ByAttribute<Boolean> not(Attribute attribute) {
+    return attribute(attribute, false);
   }
 
   /**
@@ -118,12 +135,40 @@ public class By {
    * @return a matcher to find an element that is selected
    */
   public static final ByAttribute<Boolean> selected() {
-    return attribute(Attribute.SELECTED, OBJECT_EQUALS, true);
+    return is(Attribute.SELECTED);
   }
 
   /**
    * Matches by XPath. When applied on an non-root element, it will not evaluate
    * above the context element.
+   * <p>
+   * XPath is the domain-specific-language for navigating a node tree. It is
+   * ideal if the UiElement to match has a complex relationship with surrounding
+   * nodes. For simple cases, consider {@link #withParent} or
+   * {@link #withAncestor}. For complex cases like below, XPath is superior:
+   *
+   * <pre>
+   * {@code
+   * <View><!-- a custom view to group a cluster of items -->
+   *   <LinearLayout>
+   *     <TextView text='Albums'/>
+   *     <TextView text='4 MORE'/>
+   *   </LinearLayout>
+   *   <RelativeLayout>
+   *     <TextView text='Forever'/>
+   *     <ImageView/>
+   *   </RelativeLayout>
+   * </View><!-- end of Albums cluster -->
+   * <!-- imagine there are other clusters for Artists and Songs -->
+   * }
+   * </pre>
+   *
+   * If we need to locate the RelativeLayout containing the album "Forever"
+   * instead of a song or an artist named "Forever", this XPath works:
+   *
+   * <pre>
+   * {@code //*[LinearLayout/*[@text='Albums']]/RelativeLayout[*[@text='Forever']]}
+   * </pre>
    *
    * @param xPath The xpath to use
    * @return a matcher which locates elements via XPath
@@ -171,6 +216,80 @@ public class By {
       @Override
       public String toString() {
         return "anyOf(" + Joiner.on(",").join(matchers) + ")";
+      }
+    };
+  }
+
+  /**
+   * Matches a UiElement whose parent matches the given parentMatcher. For
+   * complex cases, consider {@link #xpath}.
+   */
+  public static final ElementMatcher withParent(final ElementMatcher parentMatcher) {
+    checkNotNull(parentMatcher);
+    return new ElementMatcher() {
+      @Override
+      public boolean matches(UiElement element) {
+        UiElement parent = element.getParent();
+        return parent != null && parentMatcher.matches(parent);
+      }
+
+      @Override
+      public String toString() {
+        return "withParent(" + parentMatcher + ")";
+      }
+    };
+  }
+
+  /**
+   * Matches a UiElement whose ancestor matches the given ancestorMatcher. For
+   * complex cases, consider {@link #xpath}.
+   */
+  public static final ElementMatcher withAncestor(final ElementMatcher ancestorMatcher) {
+    checkNotNull(ancestorMatcher);
+    return new ElementMatcher() {
+      @Override
+      public boolean matches(UiElement element) {
+        UiElement parent = element.getParent();
+        while (parent != null) {
+          if (ancestorMatcher.matches(parent)) {
+            return true;
+          }
+          parent = parent.getParent();
+        }
+        return false;
+      }
+
+      @Override
+      public String toString() {
+        return "withAncestor(" + ancestorMatcher + ")";
+      }
+    };
+  }
+
+  /**
+   * Matches a UiElement which has a sibling matching the given siblingMatcher.
+   * For complex cases, consider {@link #xpath}.
+   */
+  public static final ElementMatcher withSibling(final ElementMatcher siblingMatcher) {
+    checkNotNull(siblingMatcher);
+    return new ElementMatcher() {
+      @Override
+      public boolean matches(UiElement element) {
+        UiElement parent = element.getParent();
+        if (parent == null) {
+          return false;
+        }
+        for (int i = 0; i < parent.getChildCount(); i++) {
+          if (siblingMatcher.matches(parent.getChild(i))) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      @Override
+      public String toString() {
+        return "withSibling(" + siblingMatcher + ")";
       }
     };
   }

@@ -16,14 +16,12 @@
 
 package com.google.android.droiddriver.instrumentation;
 
-import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.base.AbstractDroidDriver;
-import com.google.android.droiddriver.util.Logs;
-
 import android.app.Instrumentation;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.droiddriver.base.AbstractDroidDriver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +38,14 @@ public class InstrumentationDriver extends AbstractDroidDriver {
   }
 
   @Override
-  public UiElement getRootElement() {
+  public ViewElement getRootElement() {
     View[] views = RootFinder.getRootViews();
     // Need to create a fake root to be able to traverse all the possible views.
     RootViewGroup root = new RootViewGroup(context.getInstrumentation().getTargetContext());
     for (View view : views) {
       root.addView(view);
     }
-    return Logs.wrap(UiElement.class, context.getUiElement(root));
+    return context.getUiElement(root);
   }
 
   private static class RootViewGroup extends ViewGroup {

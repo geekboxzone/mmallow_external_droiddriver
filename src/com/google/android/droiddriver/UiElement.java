@@ -184,4 +184,19 @@ public interface UiElement {
    * Scrolls in the given direction. Scrolling down means swiping upwards.
    */
   void scroll(ScrollDirection direction);
+
+  /**
+   * @return the child at given index
+   */
+  UiElement getChild(int index);
+
+  /**
+   * @return the child count
+   */
+  int getChildCount();
+
+  /**
+   * @return the parent
+   */
+  UiElement getParent();
 }
