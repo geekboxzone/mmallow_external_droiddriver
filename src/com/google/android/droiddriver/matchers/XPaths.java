@@ -18,6 +18,11 @@ package com.google.android.droiddriver.matchers;
 
 /**
  * Convenience methods and constants for XPath.
+ * <p>
+ * DroidDriver implementation uses default XPath library on device, so the
+ * support may be limited to <a href="http://www.w3.org/TR/xpath/">XPath
+ * 1.0</a>. Newer XPath features may not be supported, for example, the
+ * fn:matches function.
  */
 public class XPaths {
 
@@ -74,5 +79,10 @@ public class XPaths {
   /** @return XPath predicate (with enclosing []) for attribute with value */
   public static String attr(Attribute attribute, String value) {
     return String.format("[@%s='%s']", attribute.getName(), value);
+  }
+
+  /** Shorthand for {@link #attr}{@code (Attribute.TEXT, value)} */
+  public static String text(String value) {
+    return attr(Attribute.TEXT, value);
   }
 }

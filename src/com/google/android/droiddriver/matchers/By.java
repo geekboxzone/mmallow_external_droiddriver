@@ -18,6 +18,8 @@ package com.google.android.droiddriver.matchers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import android.widget.Button;
+
 import com.google.android.droiddriver.UiElement;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Joiner;
@@ -180,7 +182,14 @@ public class By {
   }
 
   // Hamcrest style matcher aggregators
-  /** @return a matcher that is the logical conjunction of given matchers */
+  /**
+   * Evaluates given {@matchers} in short-circuit fashion in the
+   * order they are passed. Costly matchers (for example those returned by with*
+   * methods that navigate the node tree) should be passed after cheap matchers
+   * (for example the ByAttribute matchers).
+   *
+   * @return a matcher that is the logical conjunction of given matchers
+   */
   public static final ElementMatcher allOf(final ElementMatcher... matchers) {
     return new ElementMatcher() {
       @Override
@@ -200,7 +209,14 @@ public class By {
     };
   }
 
-  /** @return a matcher that is the logical disjunction of given matchers */
+  /**
+   * Evaluates given {@matchers} in short-circuit fashion in the
+   * order they are passed. Costly matchers (for example those returned by with*
+   * methods that navigate the node tree) should be passed after cheap matchers
+   * (for example the ByAttribute matchers).
+   *
+   * @return a matcher that is the logical disjunction of given matchers
+   */
   public static final ElementMatcher anyOf(final ElementMatcher... matchers) {
     return new ElementMatcher() {
       @Override
