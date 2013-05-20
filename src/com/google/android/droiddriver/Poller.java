@@ -47,6 +47,15 @@ public interface Poller {
    */
   interface ListenerRemover {
     /**
+     * A ListenerRemover that does nothing. Can be used as initial value for
+     * ListenerRemovers.
+     */
+    ListenerRemover NOP_LISTENER_REMOVER = new ListenerRemover() {
+      @Override
+      public void remove() {}
+    };
+
+    /**
      * Removes the associated listener.
      */
     void remove();
