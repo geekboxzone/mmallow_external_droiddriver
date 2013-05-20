@@ -40,13 +40,14 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   }
 
   private AccessibilityNodeInfo getRootNode() {
-    for (int i = 0; i < 3; i++) {
+    long end = SystemClock.uptimeMillis() + getPoller().getTimeoutMillis();
+    do {
       AccessibilityNodeInfo root = context.getUiAutomation().getRootInActiveWindow();
       if (root != null) {
         return root;
       }
       SystemClock.sleep(250);
-    }
+    } while (SystemClock.uptimeMillis() < end);
     throw new ElementNotFoundException("Could not find root node!");
   }
 }

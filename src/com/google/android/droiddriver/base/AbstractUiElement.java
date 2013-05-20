@@ -146,7 +146,6 @@ public abstract class AbstractUiElement implements UiElement {
       return this;
     }
     int childCount = getChildCount();
-    Log.d(Logs.TAG, "Looping through number of children " + childCount);
     for (int i = 0; i < childCount; i++) {
       UiElement child = getChild(i);
       if (child == null) {
