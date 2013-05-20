@@ -147,13 +147,13 @@ public abstract class AbstractUiElement implements UiElement {
     }
     int childCount = getChildCount();
     for (int i = 0; i < childCount; i++) {
-      UiElement child = getChild(i);
+      AbstractUiElement child = getChild(i);
       if (child == null) {
         Log.w(Logs.TAG, "Skip null child for " + toString());
         continue;
       }
       try {
-        return child.findElement(matcher);
+        return child.findByElement(matcher);
       } catch (ElementNotFoundException enfe) {
         // Do nothing. Continue searching.
       }

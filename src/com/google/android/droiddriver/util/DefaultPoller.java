@@ -21,7 +21,6 @@ import android.os.SystemClock;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.exceptions.TimeoutException;
-import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.common.collect.Lists;
 
@@ -71,8 +70,9 @@ public class DefaultPoller implements Poller {
           timeoutListener.onTimeout(driver, matcher);
         }
         throw new TimeoutException(String.format(
-            "Timed out after %d milliseconds waiting for element %s", timeoutMillis, matcher));
+            "Timed out after %d milliseconds waiting for %s %s", timeoutMillis, matcher, checker));
       }
+
       for (PollingListener pollingListener : pollingListeners) {
         pollingListener.onPolling(driver, matcher);
       }

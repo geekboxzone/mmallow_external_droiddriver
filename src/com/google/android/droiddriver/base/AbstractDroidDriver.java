@@ -18,16 +18,58 @@ package com.google.android.droiddriver.base;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
+import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
+import com.google.android.droiddriver.Poller.ConditionChecker;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.matchers.Matcher;
-import com.google.android.droiddriver.util.ConditionCheckers;
 import com.google.android.droiddriver.util.DefaultPoller;
 
 /**
- * Abstract implementation of DroidDriver that does the common actions, and should not
- * differ in implementations of {@link DroidDriver}.
+ * Abstract implementation of DroidDriver that does the common actions, and
+ * should not differ in implementations of {@link DroidDriver}.
  */
 public abstract class AbstractDroidDriver implements DroidDriver {
+
+  /**
+   * A ConditionChecker that does not throw only if the matching
+   * {@link UiElement} is gone.
+   */
+  private static final ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
+    @Override
+    public Void check(DroidDriver driver, Matcher matcher) throws UnsatisfiedConditionException {
+      try {
+        driver.getRootElement().findElement(matcher);
+        throw new UnsatisfiedConditionException();
+      } catch (ElementNotFoundException e) {
+        return null;
+      }
+    }
+
+    @Override
+    public String toString() {
+      return "to disappear";
+    }
+  };
+  /**
+   * A ConditionChecker that returns the matching {@link UiElement}.
+   */
+  private static final ConditionChecker<UiElement> EXISTS = new ConditionChecker<UiElement>() {
+    @Override
+    public UiElement check(DroidDriver driver, Matcher matcher)
+        throws UnsatisfiedConditionException {
+      try {
+        return driver.getRootElement().findElement(matcher);
+      } catch (ElementNotFoundException e) {
+        throw new UnsatisfiedConditionException();
+      }
+    }
+
+    @Override
+    public String toString() {
+      return "to appear";
+    }
+  };
 
   private Poller poller;
 
@@ -37,12 +79,12 @@ public abstract class AbstractDroidDriver implements DroidDriver {
 
   @Override
   public UiElement waitForElement(Matcher matcher) {
-    return getPoller().pollFor(this, matcher, ConditionCheckers.EXISTS_CHECKER);
+    return getPoller().pollFor(this, matcher, EXISTS);
   }
 
   @Override
   public void waitUntilGone(Matcher matcher) {
-    getPoller().pollFor(this, matcher, ConditionCheckers.GONE_CHECKER);
+    getPoller().pollFor(this, matcher, GONE);
   }
 
   @Override

@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver;
 
-import com.google.android.droiddriver.exceptions.UnsatisfiedConditionException;
 import com.google.android.droiddriver.matchers.Matcher;
 
 /**
@@ -63,6 +62,8 @@ public interface Poller {
 
   /**
    * Used by Poller to check conditions.
+   *
+   * @param <T> type of the value returned by {@link #check}
    */
   interface ConditionChecker<T> {
     /**
@@ -70,7 +71,12 @@ public interface Poller {
      *
      * @throws UnsatisfiedConditionException If the condition is not met
      */
-    T check(DroidDriver driver, Matcher matcher);
+    T check(DroidDriver driver, Matcher matcher) throws UnsatisfiedConditionException;
+  }
+
+  /** Thrown to indicate condition not met. Used in {@link ConditionChecker}. */
+  @SuppressWarnings("serial")
+  class UnsatisfiedConditionException extends Exception {
   }
 
   /**

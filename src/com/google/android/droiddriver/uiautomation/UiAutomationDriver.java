@@ -21,13 +21,12 @@ import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.base.AbstractDroidDriver;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
 public class UiAutomationDriver extends AbstractDroidDriver {
-
   private final UiAutomationContext context;
 
   public UiAutomationDriver(UiAutomation uiAutomation) {
@@ -40,14 +39,19 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   }
 
   private AccessibilityNodeInfo getRootNode() {
-    long end = SystemClock.uptimeMillis() + getPoller().getTimeoutMillis();
-    do {
+    int timeoutMillis = getPoller().getTimeoutMillis();
+    long end = SystemClock.uptimeMillis() + timeoutMillis;
+    while (true) {
       AccessibilityNodeInfo root = context.getUiAutomation().getRootInActiveWindow();
       if (root != null) {
         return root;
       }
+      if (SystemClock.uptimeMillis() > end) {
+        throw new TimeoutException(
+            String.format("Timed out after %d milliseconds waiting for root AccessibilityNodeInfo",
+                timeoutMillis));
+      }
       SystemClock.sleep(250);
-    } while (SystemClock.uptimeMillis() < end);
-    throw new ElementNotFoundException("Could not find root node!");
+    }
   }
 }
