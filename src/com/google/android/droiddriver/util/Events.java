@@ -69,6 +69,7 @@ public class Events {
    * must not ever touch the event again.
    */
   public static boolean tryInjectEvent(InputInjector injector, MotionEvent event) {
+    Logs.call(injector, "injectInputEvent", event);
     boolean injected = injector.injectInputEvent(event);
     event.recycle();
     return injected;
@@ -78,8 +79,9 @@ public class Events {
    * Calls {@link #tryInjectEvent}, and throws in case of failure.
    */
   public static void injectEvent(InputInjector injector, MotionEvent event) {
+    String eventString = event.toString();
     if (!tryInjectEvent(injector, event)) {
-      throw new ActionException("Failed to inject " + event);
+      throw new ActionException("Failed to inject " + eventString);
     }
   }
 

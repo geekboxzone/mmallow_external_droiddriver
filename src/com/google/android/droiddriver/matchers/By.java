@@ -18,8 +18,6 @@ package com.google.android.droiddriver.matchers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.widget.Button;
-
 import com.google.android.droiddriver.UiElement;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Joiner;

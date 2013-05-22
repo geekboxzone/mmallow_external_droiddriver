@@ -36,6 +36,9 @@ public enum ClickAction implements Action {
     public boolean perform(InputInjector injector, UiElement element) {
       Rect elementRect = element.getRect();
       long downTime = sendDown(injector, elementRect);
+      // UiAutomator clickAndSync does this, while
+      // android.test.TouchUtils#clickView sleep 1000
+      SystemClock.sleep(CLICK_DURATION_MILLIS);
       sendUp(injector, elementRect, downTime);
       return true;
     }
@@ -61,6 +64,8 @@ public enum ClickAction implements Action {
       return true;
     }
   };
+
+  private static final long CLICK_DURATION_MILLIS = 100;
 
   private static long sendDown(InputInjector injector, Rect elementRect) {
     MotionEvent downEvent = Events.newTouchDownEvent(elementRect.centerX(), elementRect.centerY());

@@ -27,9 +27,19 @@ import com.google.android.droiddriver.exceptions.TimeoutException;
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
 public class UiAutomationDriver extends AbstractDroidDriver {
+  // TODO: magic const from UiAutomator, but may not be useful
+  /**
+   * This value has the greatest bearing on the appearance of test execution
+   * speeds. This value is used as the minimum time to wait before considering
+   * the UI idle after each action.
+   */
+  private static final long QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE = 500;// ms
+
   private final UiAutomationContext context;
+  private final UiAutomation uiAutomation;
 
   public UiAutomationDriver(UiAutomation uiAutomation) {
+    this.uiAutomation = uiAutomation;
     this.context = new UiAutomationContext(uiAutomation);
   }
 
@@ -40,9 +50,14 @@ public class UiAutomationDriver extends AbstractDroidDriver {
 
   private AccessibilityNodeInfo getRootNode() {
     int timeoutMillis = getPoller().getTimeoutMillis();
+    try {
+      uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
+    } catch (java.util.concurrent.TimeoutException e) {
+      throw new TimeoutException(e);
+    }
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      AccessibilityNodeInfo root = context.getUiAutomation().getRootInActiveWindow();
+      AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();
       if (root != null) {
         return root;
       }

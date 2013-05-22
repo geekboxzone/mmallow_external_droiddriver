@@ -223,7 +223,6 @@ public abstract class AbstractUiElement implements UiElement {
   // TODO: uiautomatorviewer filters out many "insignificant" views. If we want
   // to let users make use of it, we need to do the same filtering
   private Element buildDomNode() {
-    Logs.call(this, "buildDomNode");
     String className = getClassName();
     if (className == null) {
       className = "UNKNOWN";
