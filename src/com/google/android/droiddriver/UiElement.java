@@ -132,7 +132,7 @@ public interface UiElement {
    * Gets the UiElement bounds in screen coordinates. The coordinates may not be
    * visible on screen.
    */
-  Rect getRect();
+  Rect getBounds();
 
   /**
    * @return value of the given attribute.
@@ -199,4 +199,13 @@ public interface UiElement {
    * @return the parent
    */
   UiElement getParent();
+
+  /**
+   * Dumps the View node hierarchy to a temporary file to help debug.
+   *
+   * @param nodeDescription Help identify this UiElement in log; the Matcher is
+   *        a good candidate for this value
+   * @return whether the dumping succeeded
+   */
+  boolean dumpDom(String nodeDescription);
 }

@@ -172,7 +172,7 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
-  public Rect getRect() {
+  public Rect getBounds() {
     Rect rect = new Rect();
     node.getBoundsInScreen(rect);
     return rect;

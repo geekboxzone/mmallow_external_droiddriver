@@ -41,7 +41,7 @@ public class SwipeAction implements Action {
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
-    Rect elementRect = element.getRect();
+    Rect elementRect = element.getBounds();
 
     int swipeAreaHeightAdjust = (int)(elementRect.height() * 0.1);
     int swipeAreaWidthAdjust = (int)(elementRect.width() * 0.1);

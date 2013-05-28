@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.matchers;
 
+import android.graphics.Rect;
+
 import com.google.android.droiddriver.UiElement;
 
 public enum Attribute {
@@ -122,6 +124,14 @@ public enum Attribute {
     @Override
     public String getValue(UiElement element) {
       return element.getText();
+    }
+  },
+  BOUNDS("bounds") {
+    @SuppressWarnings("unchecked")
+    @Override
+    public Rect getValue(UiElement element) {
+      // TODO: clip by boundsInParent?
+      return element.getBounds();
     }
   };
 

@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.base;
 
+import android.graphics.Rect;
 import android.util.Log;
 
 import com.google.android.droiddriver.InputInjector;
@@ -44,6 +45,7 @@ import java.io.FileOutputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -152,6 +154,10 @@ public abstract class AbstractUiElement implements UiElement {
         Log.w(Logs.TAG, "Skip null child for " + toString());
         continue;
       }
+      if (!child.isVisible()) {
+        Logs.println(Log.VERBOSE, "Skip invisible child: ", child);
+        continue;
+      }
       try {
         return child.findByElement(matcher);
       } catch (ElementNotFoundException enfe) {
@@ -171,11 +177,14 @@ public abstract class AbstractUiElement implements UiElement {
       Element foundNode =
           (Element) byXPath.getXPathExpression().evaluate(getDomNode(), XPathConstants.NODE);
       if (foundNode == null) {
-        throw new XPathExpressionException("XPath evaluation returns null");
+        if (Logs.DEBUG) {
+          dumpDom(byXPath.getXPathString());
+        }
+        throw new ElementNotFoundException("XPath evaluation returns null for " + byXPath);
       }
       return (UiElement) foundNode.getUserData(UI_ELEMENT);
     } catch (XPathExpressionException e) {
-      logDomNode(byXPath);
+      dumpDom(byXPath.getXPathString());
       throw new ElementNotFoundException(matcherFailMessage(byXPath), e);
     } finally {
       try {
@@ -186,29 +195,31 @@ public abstract class AbstractUiElement implements UiElement {
     }
   }
 
-  private void logDomNode(ByXPath byXPath) {
-    if (Logs.DEBUG) {
-      // logcat has a limit (4076b), so write to a file
-      FileOutputStream fos = null;
-      try {
-        File domFile = File.createTempFile("dom", ".xml");
-        domFile.setReadable(true /* readable */, false/* ownerOnly */);
-        fos = new FileOutputStream(domFile);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(new DOMSource(getDomNode()), new StreamResult(fos));
-        Log.d(Logs.TAG, "Wrote dom for " + byXPath + " to " + domFile.getCanonicalPath());
-      } catch (Exception e) {
-        Log.d(Logs.TAG, "Fail to transform node", e);
-      } finally {
-        if (fos != null) {
-          try {
-            fos.close();
-          } catch (Exception e) {
-            // ignore
-          }
+  @Override
+  public boolean dumpDom(String nodeDescription) {
+    // logcat has a per-entry limit (4076b), so write to a file
+    FileOutputStream fos = null;
+    try {
+      File domFile = File.createTempFile("dom", ".xml");
+      domFile.setReadable(true /* readable */, false/* ownerOnly */);
+      fos = new FileOutputStream(domFile);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.transform(new DOMSource(getDomNode()), new StreamResult(fos));
+      Log.i(Logs.TAG, "Wrote dom for " + nodeDescription + " to " + domFile.getCanonicalPath());
+    } catch (Exception e) {
+      Log.e(Logs.TAG, "Fail to transform node", e);
+      return false;
+    } finally {
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (Exception e) {
+          // ignore
         }
       }
     }
+    return true;
   }
 
   private Element getDomNode() {
@@ -245,6 +256,7 @@ public abstract class AbstractUiElement implements UiElement {
     setAttribute(element, Attribute.LONG_CLICKABLE, isLongClickable());
     setAttribute(element, Attribute.PASSWORD, isPassword());
     setAttribute(element, Attribute.SELECTED, isSelected());
+    setAttribute(element, Attribute.BOUNDS, getBounds());
 
     // TODO: visitor pattern
     int childCount = getChildCount();
@@ -271,6 +283,10 @@ public abstract class AbstractUiElement implements UiElement {
     if (value) {
       element.setAttribute(attr.getName(), "");
     }
+  }
+
+  private static void setAttribute(Element element, Attribute bounds, Rect boundsInScreen) {
+    element.setAttribute(bounds.getName(), boundsInScreen.toShortString());
   }
 
   private static Document getDocument() {

@@ -144,7 +144,7 @@ public class ViewElement extends AbstractUiElement {
   }
 
   @Override
-  public Rect getRect() {
+  public Rect getBounds() {
     Rect rect = new Rect();
     int[] xy = new int[2];
     view.getLocationOnScreen(xy);

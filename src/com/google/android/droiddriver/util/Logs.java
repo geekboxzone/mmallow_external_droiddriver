@@ -28,16 +28,17 @@ public class Logs {
   public static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
   public static void call(Object self, String method, Object... args) {
-    call(Log.DEBUG, self, method, args);
-  }
-
-  public static void call(int priority, Object self, String method, Object... args) {
-    if (Log.isLoggable(TAG, priority)) {
-      Log.println(
-          priority,
+    if (DEBUG) {
+      Log.d(
           TAG,
           String.format("Invoking %s.%s(%s)", self.getClass().getSimpleName(), method,
               Joiner.on(",").join(args)));
+    }
+  }
+
+  public static void println(int priority, Object... msgs) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(priority, TAG, Joiner.on(" ").join(msgs));
     }
   }
 
