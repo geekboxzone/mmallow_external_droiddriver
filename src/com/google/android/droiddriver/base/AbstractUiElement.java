@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver.base;
 
-import android.graphics.Rect;
 import android.util.Log;
 
 import com.google.android.droiddriver.InputInjector;
@@ -256,7 +255,7 @@ public abstract class AbstractUiElement implements UiElement {
     setAttribute(element, Attribute.LONG_CLICKABLE, isLongClickable());
     setAttribute(element, Attribute.PASSWORD, isPassword());
     setAttribute(element, Attribute.SELECTED, isSelected());
-    setAttribute(element, Attribute.BOUNDS, getBounds());
+    element.setAttribute(Attribute.BOUNDS.getName(), getBounds().toShortString());
 
     // TODO: visitor pattern
     int childCount = getChildCount();
@@ -283,10 +282,6 @@ public abstract class AbstractUiElement implements UiElement {
     if (value) {
       element.setAttribute(attr.getName(), "");
     }
-  }
-
-  private static void setAttribute(Element element, Attribute bounds, Rect boundsInScreen) {
-    element.setAttribute(bounds.getName(), boundsInScreen.toShortString());
   }
 
   private static Document getDocument() {

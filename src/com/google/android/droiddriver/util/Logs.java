@@ -38,7 +38,7 @@ public class Logs {
 
   public static void println(int priority, Object... msgs) {
     if (Log.isLoggable(TAG, priority)) {
-      Log.println(priority, TAG, Joiner.on(" ").join(msgs));
+      Log.println(priority, TAG, Joiner.on("").join(msgs));
     }
   }
 

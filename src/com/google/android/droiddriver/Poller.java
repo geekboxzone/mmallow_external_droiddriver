@@ -100,20 +100,20 @@ public interface Poller {
   /**
    * Sets timeoutMillis.
    */
-  void setTimeoutMillis(int timeoutMillis);
+  void setTimeoutMillis(long timeoutMillis);
 
   /**
    * @return timeoutMillis
    */
-  int getTimeoutMillis();
+  long getTimeoutMillis();
 
   /**
    * Sets intervalMillis.
    */
-  void setIntervalMillis(int intervalMillis);
+  void setIntervalMillis(long intervalMillis);
 
   /**
    * @return intervalMillis
    */
-  int getIntervalMillis();
+  long getIntervalMillis();
 }

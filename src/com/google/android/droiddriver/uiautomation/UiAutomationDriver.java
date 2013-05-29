@@ -22,6 +22,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.common.primitives.Longs;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
@@ -49,7 +50,7 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   }
 
   private AccessibilityNodeInfo getRootNode() {
-    int timeoutMillis = getPoller().getTimeoutMillis();
+    long timeoutMillis = getPoller().getTimeoutMillis();
     try {
       uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
     } catch (java.util.concurrent.TimeoutException e) {
@@ -61,12 +62,13 @@ public class UiAutomationDriver extends AbstractDroidDriver {
       if (root != null) {
         return root;
       }
-      if (SystemClock.uptimeMillis() > end) {
+      long remainingMillis = end - SystemClock.uptimeMillis();
+      if (remainingMillis < 0) {
         throw new TimeoutException(
             String.format("Timed out after %d milliseconds waiting for root AccessibilityNodeInfo",
                 timeoutMillis));
       }
-      SystemClock.sleep(250);
+      SystemClock.sleep(Longs.min(250, remainingMillis));
     }
   }
 }

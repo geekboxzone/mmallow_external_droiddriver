@@ -23,6 +23,7 @@ import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Longs;
 
 import java.util.Collection;
 
@@ -32,26 +33,26 @@ import java.util.Collection;
 public class DefaultPoller implements Poller {
   private final Collection<TimeoutListener> timeoutListeners = Lists.newLinkedList();
   private final Collection<PollingListener> pollingListeners = Lists.newLinkedList();
-  private int timeoutMillis = 10000;
-  private int intervalMillis = 500;
+  private long timeoutMillis = 10000;
+  private long intervalMillis = 500;
 
   @Override
-  public int getIntervalMillis() {
+  public long getIntervalMillis() {
     return intervalMillis;
   }
 
   @Override
-  public void setIntervalMillis(int intervalMillis) {
+  public void setIntervalMillis(long intervalMillis) {
     this.intervalMillis = intervalMillis;
   }
 
   @Override
-  public int getTimeoutMillis() {
+  public long getTimeoutMillis() {
     return timeoutMillis;
   }
 
   @Override
-  public void setTimeoutMillis(int timeoutMillis) {
+  public void setTimeoutMillis(long timeoutMillis) {
     this.timeoutMillis = timeoutMillis;
   }
 
@@ -65,7 +66,8 @@ public class DefaultPoller implements Poller {
         // fall through to poll
       }
 
-      if (SystemClock.uptimeMillis() > end) {
+      long remainingMillis = end - SystemClock.uptimeMillis();
+      if (remainingMillis < 0) {
         for (TimeoutListener timeoutListener : timeoutListeners) {
           timeoutListener.onTimeout(driver, matcher);
         }
@@ -76,7 +78,7 @@ public class DefaultPoller implements Poller {
       for (PollingListener pollingListener : pollingListeners) {
         pollingListener.onPolling(driver, matcher);
       }
-      SystemClock.sleep(intervalMillis);
+      SystemClock.sleep(Longs.min(intervalMillis, remainingMillis));
     }
   }
 
