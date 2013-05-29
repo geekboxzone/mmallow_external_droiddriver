@@ -19,6 +19,7 @@ package com.google.android.droiddriver.exceptions;
 /**
  * Thrown when an element is not visible on screen, and cannot be interacted with.
  */
+@SuppressWarnings("serial")
 public class ElementNotVisibleException extends DroidDriverException {
   public ElementNotVisibleException(String message) {
     super(message);

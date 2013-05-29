@@ -21,6 +21,7 @@ package com.google.android.droiddriver.exceptions;
  *
  * <p>All exceptions should extend this.
  */
+@SuppressWarnings("serial")
 public class DroidDriverException extends RuntimeException {
   public DroidDriverException(String message) {
     super(message);

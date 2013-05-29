@@ -19,6 +19,7 @@ package com.google.android.droiddriver.exceptions;
 /**
  * Thrown when an element is not found within the given time.
  */
+@SuppressWarnings("serial")
 public class TimeoutException extends DroidDriverException {
 
   public TimeoutException(String message) {

@@ -22,7 +22,7 @@ import com.google.android.droiddriver.UiElement;
 /**
  * Matches UiElement by a single attribute.
  */
-public class ByAttribute<T> implements ElementMatcher {
+public class ByAttribute<T> extends ElementMatcher {
   private final Attribute attribute;
   private final MatchStrategy<? super T> strategy;
   private final T expected;

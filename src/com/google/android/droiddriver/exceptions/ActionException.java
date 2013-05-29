@@ -19,6 +19,7 @@ package com.google.android.droiddriver.exceptions;
 /**
  * Thrown when an exception occurs while performing an Action.
  */
+@SuppressWarnings("serial")
 public class ActionException extends DroidDriverException {
   public ActionException(String message) {
     super(message);

@@ -16,12 +16,29 @@
 
 package com.google.android.droiddriver.matchers;
 
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+
 /**
- * A marker interface for finding UiElement. Instances must be of one of the
- * known sub-types.
- *
- * @see ElementMatcher
- * @see ByXPath
+ * Interface for finding UiElement.
  */
 public interface Matcher {
+  /**
+   * Returns the matching UiElement. The implementing matcher should not poll.
+   *
+   * @param context The starting UiElement, used as search context
+   * @return The first matching element on the current context
+   * @throws ElementNotFoundException If no matching elements are found
+   */
+  UiElement find(UiElement context);
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>
+   * It is recommended that this method return the description of the matcher,
+   * for example, "ByAttribute{text equals OK}".
+   */
+  @Override
+  String toString();
 }

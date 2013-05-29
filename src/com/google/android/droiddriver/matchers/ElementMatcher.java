@@ -16,20 +16,24 @@
 
 package com.google.android.droiddriver.matchers;
 
+import android.util.Log;
+
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.util.Logs;
 
 /**
  * Find matching UiElement by operations on an instance.
  */
-public interface ElementMatcher extends Matcher {
+public abstract class ElementMatcher implements Matcher {
   /**
-   * Returns true if the UiElement matches the implementing matcher. The
+   * Returns true if the {@code element} matches the implementing matcher. The
    * implementing matcher should return quickly.
    *
    * @param element The element to validate against
    * @return true if the element matches
    */
-  boolean matches(UiElement element);
+  public abstract boolean matches(UiElement element);
 
   /**
    * {@inheritDoc}
@@ -39,5 +43,30 @@ public interface ElementMatcher extends Matcher {
    * for example, "ByAttribute{text equals OK}".
    */
   @Override
-  String toString();
+  public abstract String toString();
+
+  public UiElement find(UiElement context) {
+    if (matches(context)) {
+      Log.d(Logs.TAG, "Found match: " + context);
+      return context;
+    }
+    int childCount = context.getChildCount();
+    for (int i = 0; i < childCount; i++) {
+      UiElement child = context.getChild(i);
+      if (child == null) {
+        Log.w(Logs.TAG, "Skip null child for " + context);
+        continue;
+      }
+      if (!child.isVisible()) {
+        Logs.println(Log.VERBOSE, "Skip invisible child: ", child);
+        continue;
+      }
+      try {
+        return find(child);
+      } catch (ElementNotFoundException enfe) {
+        // Do nothing. Continue searching.
+      }
+    }
+    throw new ElementNotFoundException(this);
+  }
 }
