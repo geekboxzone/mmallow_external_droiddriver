@@ -21,6 +21,7 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -29,8 +30,15 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.BufferedOutputStream;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -54,7 +62,7 @@ public class ByXPath implements Matcher {
     try {
       xPathExpression = XPATH_COMPILER.compile(xPathString);
     } catch (XPathExpressionException e) {
-      throw new DroidDriverException(e);
+      throw new DroidDriverException("xPathString=" + xPathString, e);
     }
   }
 
@@ -71,15 +79,11 @@ public class ByXPath implements Matcher {
       getDocument().appendChild(domNode);
       Element foundNode = (Element) xPathExpression.evaluate(domNode, XPathConstants.NODE);
       if (foundNode == null) {
-        if (Logs.DEBUG) {
-          Log.d(Logs.TAG, "XPath evaluation returns null for " + xPathString);
-          context.dumpDom(xPathString);
-        }
+        Logs.log(Log.DEBUG, "XPath evaluation returns null for " + xPathString);
         throw new ElementNotFoundException(this);
       }
       return (UiElement) foundNode.getUserData(UI_ELEMENT);
     } catch (XPathExpressionException e) {
-      context.dumpDom(xPathString);
       throw new ElementNotFoundException(this, e);
     } finally {
       try {
@@ -134,11 +138,11 @@ public class ByXPath implements Matcher {
     for (int i = 0; i < childCount; i++) {
       AbstractUiElement child = uiElement.getChild(i);
       if (child == null) {
-        Log.w(Logs.TAG, "Skip null child for " + uiElement);
+        Logs.log(Log.WARN, "Skip null child for " + uiElement);
         continue;
       }
       if (!child.isVisible()) {
-        Logs.println(Log.VERBOSE, "Skip invisible child: ", child);
+        Logs.log(Log.VERBOSE, "Skip invisible child: " + child);
         continue;
       }
 
@@ -158,5 +162,28 @@ public class ByXPath implements Matcher {
     if (value) {
       element.setAttribute(attr.getName(), "");
     }
+  }
+
+  public static boolean dumpDom(String path, AbstractUiElement uiElement) {
+    BufferedOutputStream bos = null;
+    try {
+      bos = FileUtils.open(path);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.transform(new DOMSource(uiElement.getDomNode()), new StreamResult(bos));
+      Logs.log(Log.INFO, "Wrote dom to " + path);
+    } catch (Exception e) {
+      Logs.log(Log.ERROR, e, "Fail to transform node");
+      return false;
+    } finally {
+      if (bos != null) {
+        try {
+          bos.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+    }
+    return true;
   }
 }

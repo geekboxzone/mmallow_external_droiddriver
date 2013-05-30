@@ -18,12 +18,14 @@ package com.google.android.droiddriver.base;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
-import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.Poller.ConditionChecker;
+import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.matchers.ByXPath;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.DefaultPoller;
+import com.google.android.droiddriver.util.Logs;
 
 /**
  * Abstract implementation of DroidDriver that does the common actions, and
@@ -95,5 +97,14 @@ public abstract class AbstractDroidDriver implements DroidDriver {
   @Override
   public void setPoller(Poller poller) {
     this.poller = poller;
+  }
+
+  @Override
+  public abstract AbstractUiElement getRootElement();
+
+  @Override
+  public boolean dumpUiElementTree(String path) {
+    Logs.call(this, "dumpDom", path);
+    return ByXPath.dumpDom(path, getRootElement());
   }
 }

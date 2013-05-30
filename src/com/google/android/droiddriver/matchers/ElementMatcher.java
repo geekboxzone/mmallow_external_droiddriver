@@ -47,18 +47,18 @@ public abstract class ElementMatcher implements Matcher {
 
   public UiElement find(UiElement context) {
     if (matches(context)) {
-      Log.d(Logs.TAG, "Found match: " + context);
+      Logs.log(Log.INFO, "Found match: " + context);
       return context;
     }
     int childCount = context.getChildCount();
     for (int i = 0; i < childCount; i++) {
       UiElement child = context.getChild(i);
       if (child == null) {
-        Log.w(Logs.TAG, "Skip null child for " + context);
+        Logs.log(Log.WARN, "Skip null child for " + context);
         continue;
       }
       if (!child.isVisible()) {
-        Logs.println(Log.VERBOSE, "Skip invisible child: ", child);
+        Logs.log(Log.VERBOSE, "Skip invisible child: " + child);
         continue;
       }
       try {

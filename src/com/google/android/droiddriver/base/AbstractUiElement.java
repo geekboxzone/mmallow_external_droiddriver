@@ -16,8 +16,6 @@
 
 package com.google.android.droiddriver.base;
 
-import android.util.Log;
-
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
@@ -32,17 +30,10 @@ import com.google.android.droiddriver.matchers.Attribute;
 import com.google.android.droiddriver.matchers.ByXPath;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.Logs;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 import org.w3c.dom.Element;
-
-import java.io.File;
-import java.io.FileOutputStream;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Abstract implementation with common methods already implemented.
@@ -123,34 +114,27 @@ public abstract class AbstractUiElement implements UiElement {
   }
 
   @Override
-  public boolean dumpDom(String nodeDescription) {
-    // logcat has a per-entry limit (4076b), so write to a file
-    FileOutputStream fos = null;
-    try {
-      File domFile = File.createTempFile("dom", ".xml");
-      domFile.setReadable(true /* readable */, false/* ownerOnly */);
-      fos = new FileOutputStream(domFile);
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.transform(new DOMSource(getDomNode()), new StreamResult(fos));
-      Log.i(Logs.TAG, "Wrote dom for " + nodeDescription + " to " + domFile.getCanonicalPath());
-    } catch (Exception e) {
-      Log.e(Logs.TAG, "Fail to transform node", e);
-      return false;
-    } finally {
-      if (fos != null) {
-        try {
-          fos.close();
-        } catch (Exception e) {
-          // ignore
-        }
+  public String toString() {
+    ToStringHelper toStringHelper = Objects.toStringHelper(this);
+    for (Attribute attr : Attribute.values()) {
+      addAttribute(toStringHelper, attr, get(attr));
+    }
+    return toStringHelper.toString();
+  }
+
+  private static void addAttribute(ToStringHelper toStringHelper, Attribute attr, Object value) {
+    if (value != null) {
+      if (value instanceof Boolean && (Boolean) value) {
+        toStringHelper.addValue(attr.getName());
+      } else {
+        toStringHelper.add(attr.getName(), value);
       }
     }
-    return true;
   }
 
   /**
-   * Used internally in {@link ByXPath}.
+   * Used internally in {@link ByXPath}. Returns the DOM node representing this
+   * UiElement. The DOM is constructed from the UiElement tree.
    */
   public Element getDomNode() {
     if (domNode == null) {

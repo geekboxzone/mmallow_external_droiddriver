@@ -36,9 +36,33 @@ public class Logs {
     }
   }
 
-  public static void println(int priority, Object... msgs) {
+  public static void log(int priority, String msg) {
     if (Log.isLoggable(TAG, priority)) {
-      Log.println(priority, TAG, Joiner.on("").join(msgs));
+      Log.println(priority, TAG, msg);
+    }
+  }
+
+  public static void log(int priority, Throwable e) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(priority, TAG, Log.getStackTraceString(e));
+    }
+  }
+
+  public static void log(int priority, Throwable e, String msg) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(priority, TAG, msg + '\n' + Log.getStackTraceString(e));
+    }
+  }
+
+  public static void logfmt(int priority, String format, Object... args) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(priority, TAG, String.format(format, args));
+    }
+  }
+
+  public static void logfmt(int priority, Throwable e, String format, Object... args) {
+    if (Log.isLoggable(TAG, priority)) {
+      Log.println(priority, TAG, String.format(format, args) + '\n' + Log.getStackTraceString(e));
     }
   }
 

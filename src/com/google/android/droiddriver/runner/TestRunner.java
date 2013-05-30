@@ -72,10 +72,10 @@ public class TestRunner extends InstrumentationTestRunner {
               iterator.remove();
               if (!activity.isFinishing()) {
                 try {
-                  Log.i(Logs.TAG, "Stopping activity: " + activity);
+                  Logs.log(Log.INFO, "Stopping activity: " + activity);
                   activity.finish();
                 } catch (RuntimeException e) {
-                  Log.e(Logs.TAG, "Failed to stop activity", e);
+                  Logs.log(Log.ERROR, e, "Failed to stop activity");
                 }
               }
             }
@@ -110,7 +110,7 @@ public class TestRunner extends InstrumentationTestRunner {
           String msg =
               String.format("filtered %s#%s: MinSdkVersion=%d", arg0.getEnclosingClassname(),
                   arg0.getName(), annotation.value());
-          Log.i(Logs.TAG, msg);
+          Logs.log(Log.INFO, msg);
         }
         return result;
       }

@@ -57,4 +57,12 @@ public interface DroidDriver {
    * Sets the {@link Poller}.
    */
   void setPoller(Poller poller);
+
+  /**
+   * Dumps the UiElement tree to a file to help debug.
+   *
+   * @param path the path of file to save the tree
+   * @return whether the dumping succeeded
+   */
+  boolean dumpUiElementTree(String path);
 }

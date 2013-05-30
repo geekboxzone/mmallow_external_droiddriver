@@ -27,7 +27,7 @@ public interface Poller {
    */
   interface TimeoutListener {
     /**
-     * Called when {@link #pollFor} times out.
+     * Called when {@link #pollFor} times out. Should return quickly.
      */
     void onTimeout(DroidDriver driver, Matcher matcher);
   }
@@ -37,7 +37,7 @@ public interface Poller {
    */
   interface PollingListener {
     /**
-     * Called when {@link #pollFor} polls.
+     * Called when {@link #pollFor} polls. Should return quickly.
      */
     void onPolling(DroidDriver driver, Matcher matcher);
   }

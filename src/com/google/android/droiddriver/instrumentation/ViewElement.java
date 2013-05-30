@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -150,11 +149,6 @@ public class ViewElement extends AbstractUiElement {
     view.getLocationOnScreen(xy);
     rect.set(xy[0], xy[1], xy[0] + view.getWidth(), xy[1] + view.getHeight());
     return rect;
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this).add("view", view).toString();
   }
 
   @Override

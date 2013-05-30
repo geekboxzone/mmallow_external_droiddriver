@@ -17,17 +17,24 @@
 package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
+import android.graphics.Bitmap;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.google.android.droiddriver.Screenshotter;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.util.FileUtils;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
+
+import java.io.BufferedOutputStream;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
-public class UiAutomationDriver extends AbstractDroidDriver {
+public class UiAutomationDriver extends AbstractDroidDriver implements Screenshotter {
   // TODO: magic const from UiAutomator, but may not be useful
   /**
    * This value has the greatest bearing on the appearance of test execution
@@ -69,6 +76,33 @@ public class UiAutomationDriver extends AbstractDroidDriver {
                 timeoutMillis));
       }
       SystemClock.sleep(Longs.min(250, remainingMillis));
+    }
+  }
+
+  @Override
+  public boolean takeScreenshot(String path, int quality) {
+    Logs.call(this, "takeScreenshot", path, quality);
+    Bitmap screenshot = uiAutomation.takeScreenshot();
+    if (screenshot == null) {
+      return false;
+    }
+    BufferedOutputStream bos = null;
+    try {
+      bos = FileUtils.open(path);
+      screenshot.compress(Bitmap.CompressFormat.JPEG, quality, bos);
+      return true;
+    } catch (Exception e) {
+      Logs.log(Log.WARN, e);
+      return false;
+    } finally {
+      if (bos != null) {
+        try {
+          bos.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      screenshot.recycle();
     }
   }
 }

@@ -199,13 +199,4 @@ public interface UiElement {
    * @return the parent
    */
   UiElement getParent();
-
-  /**
-   * Dumps the View node hierarchy to a temporary file to help debug.
-   *
-   * @param nodeDescription Help identify this UiElement in log; the Matcher is
-   *        a good candidate for this value
-   * @return whether the dumping succeeded
-   */
-  boolean dumpDom(String nodeDescription);
 }

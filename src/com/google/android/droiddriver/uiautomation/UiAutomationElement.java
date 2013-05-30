@@ -28,7 +28,6 @@ import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import java.util.concurrent.TimeoutException;
@@ -82,7 +81,7 @@ public class UiAutomationElement extends AbstractUiElement {
           AnyEventFilter.of(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
               | AccessibilityEvent.TYPE_VIEW_SELECTED), WAIT_FOR_ACTION_ACKNOWLEDGMENT);
     } catch (TimeoutException e) {
-      Log.w(Logs.TAG, "executeAndWaitForEvent timed out");
+      Logs.log(Log.WARN, "executeAndWaitForEvent timed out");
     }
   }
 
@@ -176,11 +175,6 @@ public class UiAutomationElement extends AbstractUiElement {
     Rect rect = new Rect();
     node.getBoundsInScreen(rect);
     return rect;
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this).add("node", node).toString();
   }
 
   @Override

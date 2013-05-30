@@ -77,7 +77,7 @@ public class RootFinder {
 
     try {
       views = (View[]) viewsField.get(windowManagerObj);
-      Log.d(Logs.TAG, "View size:" +views.length);
+      Logs.log(Log.DEBUG, "View size:" +views.length);
       return views;
     } catch (RuntimeException re) {
       throw new DroidDriverException(String.format("Reflective access to %s on %s failed.",
