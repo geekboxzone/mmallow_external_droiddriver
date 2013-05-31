@@ -21,20 +21,20 @@ import com.google.android.droiddriver.matchers.Matcher;
 
 public interface DroidDriver {
   /**
-   * @return The root {@link UiElement}
+   * Returns whether a matching element exists without polling.
    */
-  UiElement getRootElement();
+  boolean has(Matcher matcher);
 
   /**
-   * Polls until the first {@link UiElement} that matches the given matcher.
-   * This method will poll until a match is found, or the timeout is reached.
+   * Returns the first {@link UiElement} that matches the given matcher. This
+   * method will poll until a match is found, or the timeout is reached.
    *
    * @param matcher The matching mechanism
    * @return The first matching element
    * @throws TimeoutException If no matching elements are found within the
    *         allowed time
    */
-  UiElement waitForElement(Matcher matcher);
+  UiElement on(Matcher matcher);
 
 
   /**
@@ -46,7 +46,7 @@ public interface DroidDriver {
    * @throws TimeoutException If matching element is not gone within the allowed
    *         time
    */
-  void waitUntilGone(Matcher matcher);
+  void checkGone(Matcher matcher);
 
   /**
    * Returns the {@link Poller}.

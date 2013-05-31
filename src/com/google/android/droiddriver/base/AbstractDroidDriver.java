@@ -40,12 +40,10 @@ public abstract class AbstractDroidDriver implements DroidDriver {
   private static final ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
     @Override
     public Void check(DroidDriver driver, Matcher matcher) throws UnsatisfiedConditionException {
-      try {
-        driver.getRootElement().findElement(matcher);
+      if (driver.has(matcher)) {
         throw new UnsatisfiedConditionException();
-      } catch (ElementNotFoundException e) {
-        return null;
       }
+      return null;
     }
 
     @Override
@@ -61,7 +59,7 @@ public abstract class AbstractDroidDriver implements DroidDriver {
     public UiElement check(DroidDriver driver, Matcher matcher)
         throws UnsatisfiedConditionException {
       try {
-        return driver.getRootElement().findElement(matcher);
+        return matcher.find(((AbstractDroidDriver) driver).getRootElement());
       } catch (ElementNotFoundException e) {
         throw new UnsatisfiedConditionException();
       }
@@ -73,19 +71,29 @@ public abstract class AbstractDroidDriver implements DroidDriver {
     }
   };
 
-  private Poller poller;
+  private Poller poller = new DefaultPoller();
 
-  public AbstractDroidDriver() {
-    this.poller = new DefaultPoller();
+  @Override
+  public boolean has(Matcher matcher) {
+    Logs.call(this, "has", matcher);
+    try {
+      matcher.find(getRootElement());
+      return true;
+    } catch (ElementNotFoundException enfe) {
+      return false;
+    }
+
   }
 
   @Override
-  public UiElement waitForElement(Matcher matcher) {
+  public UiElement on(Matcher matcher) {
+    Logs.call(this, "on", matcher);
     return getPoller().pollFor(this, matcher, EXISTS);
   }
 
   @Override
-  public void waitUntilGone(Matcher matcher) {
+  public void checkGone(Matcher matcher) {
+    Logs.call(this, "checkGone", matcher);
     getPoller().pollFor(this, matcher, GONE);
   }
 
@@ -99,12 +107,11 @@ public abstract class AbstractDroidDriver implements DroidDriver {
     this.poller = poller;
   }
 
-  @Override
-  public abstract AbstractUiElement getRootElement();
+  protected abstract AbstractUiElement getRootElement();
 
   @Override
   public boolean dumpUiElementTree(String path) {
-    Logs.call(this, "dumpDom", path);
+    Logs.call(this, "dumpUiElementTree", path);
     return ByXPath.dumpDom(path, getRootElement());
   }
 }

@@ -24,11 +24,9 @@ import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TypeAction;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.matchers.Attribute;
 import com.google.android.droiddriver.matchers.ByXPath;
-import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -95,22 +93,6 @@ public abstract class AbstractUiElement implements UiElement {
     if (!isVisible()) {
       throw new ElementNotVisibleException("Element is not visible on screen");
     }
-  }
-
-  @Override
-  public boolean hasElement(Matcher matcher) {
-    try {
-      findElement(matcher);
-      return true;
-    } catch (ElementNotFoundException enfe) {
-      return false;
-    }
-  }
-
-  @Override
-  public UiElement findElement(Matcher matcher) {
-    Logs.call(this, "findElement", matcher);
-    return matcher.find(this);
   }
 
   @Override

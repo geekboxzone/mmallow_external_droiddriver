@@ -20,10 +20,8 @@ import android.graphics.Rect;
 
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ScrollDirection;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.matchers.Attribute;
-import com.google.android.droiddriver.matchers.Matcher;
 
 /**
  * Represents an UI element within an Android App.
@@ -32,22 +30,6 @@ import com.google.android.droiddriver.matchers.Matcher;
  * UI elements are generally views.
  */
 public interface UiElement {
-  /**
-   * Finds the first {@link UiElement} that matches the given matcher,
-   * traversing from this element. If the elements tree may change, use
-   * {@link DroidDriver#waitForElement(Matcher)}.
-   *
-   * @param matcher The matching mechanism
-   * @return The first matching element on the current context
-   * @throws ElementNotFoundException If no matching elements are found
-   */
-  UiElement findElement(Matcher matcher);
-
-  /**
-   * @return Whether a matching element exists
-   */
-  boolean hasElement(Matcher matcher);
-
   /**
    * Gets the text of this element.
    */

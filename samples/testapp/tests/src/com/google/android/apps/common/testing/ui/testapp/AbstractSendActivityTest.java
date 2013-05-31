@@ -29,8 +29,8 @@ public abstract class AbstractSendActivityTest extends ActivityInstrumentationTe
   }
 
   public void testClick() {
-    driver.waitForElement(By.text("Send")).click();
-    assertTrue(driver.waitForElement(By.text("Data from sender")).isVisible());
+    driver.on(By.text("Send")).click();
+    assertTrue(driver.on(By.text("Data from sender")).isVisible());
   }
 
   public void testClickXPath() {
@@ -38,7 +38,7 @@ public abstract class AbstractSendActivityTest extends ActivityInstrumentationTe
     // between.
     // We'll do the same filtering in DroidDriver, or provide our own viewer
     // tool.
-    driver.waitForElement(By.xpath("//ScrollView//Button")).click();
-    assertTrue(driver.waitForElement(By.xpath("//TextView[@text='Data from sender']")).isVisible());
+    driver.on(By.xpath("//ScrollView//Button")).click();
+    assertTrue(driver.on(By.xpath("//TextView[@text='Data from sender']")).isVisible());
   }
 }

@@ -87,7 +87,7 @@ public class By {
    * @param resourceId The resource id to match against
    * @return a matcher to find an element by resource id
    */
-  public static final ByAttribute<String> resourceId(String resourceId) {
+  public static ByAttribute<String> resourceId(String resourceId) {
     return attribute(Attribute.RESOURCE_ID, OBJECT_EQUALS, resourceId);
   }
 
@@ -95,7 +95,7 @@ public class By {
    * @param text The exact text to match against
    * @return a matcher to find an element by text
    */
-  public static final ByAttribute<String> text(String text) {
+  public static ByAttribute<String> text(String text) {
     return attribute(Attribute.TEXT, OBJECT_EQUALS, text);
   }
 
@@ -103,7 +103,7 @@ public class By {
    * @param regex The regular expression pattern to match against
    * @return a matcher to find an element by text pattern
    */
-  public static final ByAttribute<String> textRegex(String regex) {
+  public static ByAttribute<String> textRegex(String regex) {
     return attribute(Attribute.TEXT, STRING_MATCHES, regex);
   }
 
@@ -111,7 +111,7 @@ public class By {
    * @param contentDescription The exact content description to match against
    * @return a matcher to find an element by content description
    */
-  public static final ByAttribute<String> contentDescription(String contentDescription) {
+  public static ByAttribute<String> contentDescription(String contentDescription) {
     return attribute(Attribute.CONTENT_DESC, OBJECT_EQUALS, contentDescription);
   }
 
@@ -119,7 +119,7 @@ public class By {
    * @param className The exact class name to match against
    * @return a matcher to find an element by class name
    */
-  public static final ByAttribute<String> className(String className) {
+  public static ByAttribute<String> className(String className) {
     return attribute(Attribute.CLASS, OBJECT_EQUALS, className);
   }
 
@@ -127,14 +127,14 @@ public class By {
    * @param clazz The class whose name is matched against
    * @return a matcher to find an element by class name
    */
-  public static final ByAttribute<String> className(Class<?> clazz) {
+  public static ByAttribute<String> className(Class<?> clazz) {
     return className(clazz.getName());
   }
 
   /**
    * @return a matcher to find an element that is selected
    */
-  public static final ByAttribute<Boolean> selected() {
+  public static ByAttribute<Boolean> selected() {
     return is(Attribute.SELECTED);
   }
 
@@ -175,8 +175,16 @@ public class By {
    */
   // TODO: add UiElement.findElements
   @Beta
-  public static final ByXPath xpath(String xPath) {
+  public static ByXPath xpath(String xPath) {
     return new ByXPath(xPath);
+  }
+
+  /**
+   * @return a matcher that uses the UiElement returned by first Matcher as
+   *         context for the second Matcher
+   */
+  public static ChainMatcher chain(Matcher first, Matcher second) {
+    return new ChainMatcher(first, second);
   }
 
   // Hamcrest style matcher aggregators
@@ -188,7 +196,7 @@ public class By {
    *
    * @return a matcher that is the logical conjunction of given matchers
    */
-  public static final ElementMatcher allOf(final ElementMatcher... matchers) {
+  public static ElementMatcher allOf(final ElementMatcher... matchers) {
     return new ElementMatcher() {
       @Override
       public boolean matches(UiElement element) {
@@ -215,7 +223,7 @@ public class By {
    *
    * @return a matcher that is the logical disjunction of given matchers
    */
-  public static final ElementMatcher anyOf(final ElementMatcher... matchers) {
+  public static ElementMatcher anyOf(final ElementMatcher... matchers) {
     return new ElementMatcher() {
       @Override
       public boolean matches(UiElement element) {
@@ -238,7 +246,7 @@ public class By {
    * Matches a UiElement whose parent matches the given parentMatcher. For
    * complex cases, consider {@link #xpath}.
    */
-  public static final ElementMatcher withParent(final ElementMatcher parentMatcher) {
+  public static ElementMatcher withParent(final ElementMatcher parentMatcher) {
     checkNotNull(parentMatcher);
     return new ElementMatcher() {
       @Override
@@ -258,7 +266,7 @@ public class By {
    * Matches a UiElement whose ancestor matches the given ancestorMatcher. For
    * complex cases, consider {@link #xpath}.
    */
-  public static final ElementMatcher withAncestor(final ElementMatcher ancestorMatcher) {
+  public static ElementMatcher withAncestor(final ElementMatcher ancestorMatcher) {
     checkNotNull(ancestorMatcher);
     return new ElementMatcher() {
       @Override
@@ -284,7 +292,7 @@ public class By {
    * Matches a UiElement which has a sibling matching the given siblingMatcher.
    * For complex cases, consider {@link #xpath}.
    */
-  public static final ElementMatcher withSibling(final ElementMatcher siblingMatcher) {
+  public static ElementMatcher withSibling(final ElementMatcher siblingMatcher) {
     checkNotNull(siblingMatcher);
     return new ElementMatcher() {
       @Override
