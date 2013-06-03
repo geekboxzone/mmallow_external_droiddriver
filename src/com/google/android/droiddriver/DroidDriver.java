@@ -26,8 +26,35 @@ public interface DroidDriver {
   boolean has(Matcher matcher);
 
   /**
+   * Returns whether a matching element exists within up to
+   * {@code timeoutMillis}.
+   */
+  boolean has(Matcher matcher, long timeoutMillis);
+
+  /**
+   * Polls until a {@link UiElement} that matches the given matcher appears, or
+   * the default timeout is reached.
+   *
+   * @param matcher The matching mechanism
+   * @throws TimeoutException If matching element does not appear within the
+   *         default timeout
+   */
+  void checkExists(Matcher matcher);
+
+  /**
+   * Polls until a {@link UiElement} that matches the given matcher appears, or
+   * {@code timeoutMillis} is reached.
+   *
+   * @param matcher The matching mechanism
+   * @param timeoutMillis The ad-hoc timeout for this method
+   * @throws TimeoutException If matching element does not appear within
+   *         {@code timeoutMillis}
+   */
+  void checkExists(Matcher matcher, long timeoutMillis);
+
+  /**
    * Returns the first {@link UiElement} that matches the given matcher. This
-   * method will poll until a match is found, or the timeout is reached.
+   * method will poll until a match is found, or the default timeout is reached.
    *
    * @param matcher The matching mechanism
    * @return The first matching element
@@ -36,17 +63,26 @@ public interface DroidDriver {
    */
   UiElement on(Matcher matcher);
 
-
   /**
-   * Polls until the {@link UiElement} that matches the given matcher is gone.
-   * This method will poll until matching element is gone, or the timeout is
-   * reached.
+   * Polls until the {@link UiElement} that matches the given matcher is gone,
+   * or the default timeout is reached.
    *
    * @param matcher The matching mechanism
-   * @throws TimeoutException If matching element is not gone within the allowed
-   *         time
+   * @throws TimeoutException If matching element is not gone within the default
+   *         timeout
    */
   void checkGone(Matcher matcher);
+
+  /**
+   * Polls until the {@link UiElement} that matches the given matcher is gone,
+   * or {@code timeoutMillis} is reached.
+   *
+   * @param matcher The matching mechanism
+   * @param timeoutMillis The ad-hoc timeout for this method
+   * @throws TimeoutException If matching element is not gone within
+   *         {@code timeoutMillis}
+   */
+  void checkGone(Matcher matcher, long timeoutMillis);
 
   /**
    * Returns the {@link Poller}.

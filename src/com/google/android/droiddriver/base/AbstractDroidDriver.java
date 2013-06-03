@@ -22,6 +22,7 @@ import com.google.android.droiddriver.Poller.ConditionChecker;
 import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.matchers.ByXPath;
 import com.google.android.droiddriver.matchers.Matcher;
 import com.google.android.droiddriver.util.DefaultPoller;
@@ -82,7 +83,27 @@ public abstract class AbstractDroidDriver implements DroidDriver {
     } catch (ElementNotFoundException enfe) {
       return false;
     }
+  }
 
+  @Override
+  public boolean has(Matcher matcher, long timeoutMillis) {
+    Logs.call(this, "has", matcher, timeoutMillis);
+    try {
+      checkExists(matcher, timeoutMillis);
+      return true;
+    } catch (TimeoutException e) {
+      return false;
+    }
+  }
+
+  @Override
+  public void checkExists(Matcher matcher) {
+    checkExists(matcher, getPoller().getTimeoutMillis());
+  }
+
+  @Override
+  public void checkExists(Matcher matcher, long timeoutMillis) {
+    getPoller().pollFor(this, matcher, EXISTS, timeoutMillis);
   }
 
   @Override
@@ -93,8 +114,13 @@ public abstract class AbstractDroidDriver implements DroidDriver {
 
   @Override
   public void checkGone(Matcher matcher) {
+    checkGone(matcher, getPoller().getTimeoutMillis());
+  }
+
+  @Override
+  public void checkGone(Matcher matcher, long timeoutMillis) {
     Logs.call(this, "checkGone", matcher);
-    getPoller().pollFor(this, matcher, GONE);
+    getPoller().pollFor(this, matcher, GONE, timeoutMillis);
   }
 
   @Override

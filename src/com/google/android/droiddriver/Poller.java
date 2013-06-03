@@ -81,11 +81,20 @@ public interface Poller {
 
   /**
    * Polls until {@code checker} does not throw
-   * {@link UnsatisfiedConditionException}.
+   * {@link UnsatisfiedConditionException}, up to the default timeout.
    *
    * @return An object of type T returned by {@code checker}
    */
   <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker);
+
+  /**
+   * Polls until {@code checker} does not throw
+   * {@link UnsatisfiedConditionException}, up to {@code timeoutMillis}.
+   *
+   * @return An object of type T returned by {@code checker}
+   */
+  <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker,
+      long timeoutMillis);
 
   /**
    * Adds a {@link TimeoutListener}.
@@ -98,12 +107,12 @@ public interface Poller {
   ListenerRemover addListener(PollingListener pollingListener);
 
   /**
-   * Sets timeoutMillis.
+   * Sets default timeoutMillis.
    */
   void setTimeoutMillis(long timeoutMillis);
 
   /**
-   * @return timeoutMillis
+   * @return default timeoutMillis
    */
   long getTimeoutMillis();
 

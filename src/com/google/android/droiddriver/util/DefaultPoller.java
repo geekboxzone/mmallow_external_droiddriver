@@ -58,6 +58,12 @@ public class DefaultPoller implements Poller {
 
   @Override
   public <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker) {
+    return pollFor(driver, matcher, checker, timeoutMillis);
+  }
+
+  @Override
+  public <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker,
+      long timeoutMillis) {
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
       try {
