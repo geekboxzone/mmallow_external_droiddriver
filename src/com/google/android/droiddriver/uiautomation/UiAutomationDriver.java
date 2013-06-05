@@ -18,6 +18,7 @@ package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -80,7 +81,12 @@ public class UiAutomationDriver extends AbstractDroidDriver implements Screensho
   }
 
   @Override
-  public boolean takeScreenshot(String path, int quality) {
+  public boolean takeScreenshot(String path) {
+    return takeScreenshot(path, Bitmap.CompressFormat.PNG, 0);
+  }
+
+  @Override
+  public boolean takeScreenshot(String path, CompressFormat format, int quality) {
     Logs.call(this, "takeScreenshot", path, quality);
     Bitmap screenshot = uiAutomation.takeScreenshot();
     if (screenshot == null) {
@@ -89,7 +95,7 @@ public class UiAutomationDriver extends AbstractDroidDriver implements Screensho
     BufferedOutputStream bos = null;
     try {
       bos = FileUtils.open(path);
-      screenshot.compress(Bitmap.CompressFormat.JPEG, quality, bos);
+      screenshot.compress(format, quality, bos);
       return true;
     } catch (Exception e) {
       Logs.log(Log.WARN, e);
