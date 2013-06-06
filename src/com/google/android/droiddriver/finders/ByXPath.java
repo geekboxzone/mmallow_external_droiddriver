@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import android.util.Log;
 
@@ -48,7 +48,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Find matching UiElement by XPath.
  */
-public class ByXPath implements Matcher {
+public class ByXPath implements Finder {
   private static final XPath XPATH_COMPILER = XPathFactory.newInstance().newXPath();
   private static final String UI_ELEMENT = "UiElement";
   // document needs to be static so that when buildDomNode is called recursively

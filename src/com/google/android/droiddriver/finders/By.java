@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,7 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 
 /**
- * Convenience methods to create commonly used matchers.
+ * Convenience methods to create commonly used finders.
  */
 public class By {
   /** Matches by {@link Object#equals}. */
@@ -53,15 +53,15 @@ public class By {
   };
 
   /**
-   * Creates a new ByAttribute matcher. Frequently-used matchers have shorthands
+   * Creates a new ByAttribute finder. Frequently-used finders have shorthands
    * below, for example, {@link #text}, {@link #textRegex}. Users can create
-   * custom matchers using this method.
+   * custom finders using this method.
    *
    * @param attribute the attribute to match against
    * @param strategy the matching strategy, for instance, equals or matches
    *        regular expression
    * @param expected the expected attribute value
-   * @return a new ByAttribute matcher
+   * @return a new ByAttribute finder
    */
   public static <T> ByAttribute<T> attribute(Attribute attribute,
       MatchStrategy<? super T> strategy, T expected) {
@@ -85,7 +85,7 @@ public class By {
 
   /**
    * @param resourceId The resource id to match against
-   * @return a matcher to find an element by resource id
+   * @return a finder to find an element by resource id
    */
   public static ByAttribute<String> resourceId(String resourceId) {
     return attribute(Attribute.RESOURCE_ID, OBJECT_EQUALS, resourceId);
@@ -93,7 +93,7 @@ public class By {
 
   /**
    * @param text The exact text to match against
-   * @return a matcher to find an element by text
+   * @return a finder to find an element by text
    */
   public static ByAttribute<String> text(String text) {
     return attribute(Attribute.TEXT, OBJECT_EQUALS, text);
@@ -101,7 +101,7 @@ public class By {
 
   /**
    * @param regex The regular expression pattern to match against
-   * @return a matcher to find an element by text pattern
+   * @return a finder to find an element by text pattern
    */
   public static ByAttribute<String> textRegex(String regex) {
     return attribute(Attribute.TEXT, STRING_MATCHES, regex);
@@ -109,7 +109,7 @@ public class By {
 
   /**
    * @param contentDescription The exact content description to match against
-   * @return a matcher to find an element by content description
+   * @return a finder to find an element by content description
    */
   public static ByAttribute<String> contentDescription(String contentDescription) {
     return attribute(Attribute.CONTENT_DESC, OBJECT_EQUALS, contentDescription);
@@ -117,7 +117,7 @@ public class By {
 
   /**
    * @param className The exact class name to match against
-   * @return a matcher to find an element by class name
+   * @return a finder to find an element by class name
    */
   public static ByAttribute<String> className(String className) {
     return attribute(Attribute.CLASS, OBJECT_EQUALS, className);
@@ -125,14 +125,14 @@ public class By {
 
   /**
    * @param clazz The class whose name is matched against
-   * @return a matcher to find an element by class name
+   * @return a finder to find an element by class name
    */
   public static ByAttribute<String> className(Class<?> clazz) {
     return className(clazz.getName());
   }
 
   /**
-   * @return a matcher to find an element that is selected
+   * @return a finder to find an element that is selected
    */
   public static ByAttribute<Boolean> selected() {
     return is(Attribute.SELECTED);
@@ -171,7 +171,7 @@ public class By {
    * </pre>
    *
    * @param xPath The xpath to use
-   * @return a matcher which locates elements via XPath
+   * @return a finder which locates elements via XPath
    */
   // TODO: add UiElement.findElements
   @Beta
@@ -180,28 +180,28 @@ public class By {
   }
 
   /**
-   * @return a matcher that uses the UiElement returned by first Matcher as
-   *         context for the second Matcher
+   * @return a finder that uses the UiElement returned by first Finder as
+   *         context for the second Finder
    */
-  public static ChainMatcher chain(Matcher first, Matcher second) {
-    return new ChainMatcher(first, second);
+  public static ChainFinder chain(Finder first, Finder second) {
+    return new ChainFinder(first, second);
   }
 
-  // Hamcrest style matcher aggregators
+  // Hamcrest style finder aggregators
   /**
-   * Evaluates given {@matchers} in short-circuit fashion in the
-   * order they are passed. Costly matchers (for example those returned by with*
-   * methods that navigate the node tree) should be passed after cheap matchers
-   * (for example the ByAttribute matchers).
+   * Evaluates given {@finders} in short-circuit fashion in the
+   * order they are passed. Costly finders (for example those returned by with*
+   * methods that navigate the node tree) should be passed after cheap finders
+   * (for example the ByAttribute finders).
    *
-   * @return a matcher that is the logical conjunction of given matchers
+   * @return a finder that is the logical conjunction of given finders
    */
-  public static ElementMatcher allOf(final ElementMatcher... matchers) {
-    return new ElementMatcher() {
+  public static MatchFinder allOf(final MatchFinder... finders) {
+    return new MatchFinder() {
       @Override
       public boolean matches(UiElement element) {
-        for (ElementMatcher matcher : matchers) {
-          if (!matcher.matches(element)) {
+        for (MatchFinder finder : finders) {
+          if (!finder.matches(element)) {
             return false;
           }
         }
@@ -210,25 +210,25 @@ public class By {
 
       @Override
       public String toString() {
-        return "allOf(" + Joiner.on(",").join(matchers) + ")";
+        return "allOf(" + Joiner.on(",").join(finders) + ")";
       }
     };
   }
 
   /**
-   * Evaluates given {@matchers} in short-circuit fashion in the
-   * order they are passed. Costly matchers (for example those returned by with*
-   * methods that navigate the node tree) should be passed after cheap matchers
-   * (for example the ByAttribute matchers).
+   * Evaluates given {@finders} in short-circuit fashion in the
+   * order they are passed. Costly finders (for example those returned by with*
+   * methods that navigate the node tree) should be passed after cheap finders
+   * (for example the ByAttribute finders).
    *
-   * @return a matcher that is the logical disjunction of given matchers
+   * @return a finder that is the logical disjunction of given finders
    */
-  public static ElementMatcher anyOf(final ElementMatcher... matchers) {
-    return new ElementMatcher() {
+  public static MatchFinder anyOf(final MatchFinder... finders) {
+    return new MatchFinder() {
       @Override
       public boolean matches(UiElement element) {
-        for (ElementMatcher matcher : matchers) {
-          if (matcher.matches(element)) {
+        for (MatchFinder finder : finders) {
+          if (finder.matches(element)) {
             return true;
           }
         }
@@ -237,43 +237,43 @@ public class By {
 
       @Override
       public String toString() {
-        return "anyOf(" + Joiner.on(",").join(matchers) + ")";
+        return "anyOf(" + Joiner.on(",").join(finders) + ")";
       }
     };
   }
 
   /**
-   * Matches a UiElement whose parent matches the given parentMatcher. For
+   * Matches a UiElement whose parent matches the given parentFinder. For
    * complex cases, consider {@link #xpath}.
    */
-  public static ElementMatcher withParent(final ElementMatcher parentMatcher) {
-    checkNotNull(parentMatcher);
-    return new ElementMatcher() {
+  public static MatchFinder withParent(final MatchFinder parentFinder) {
+    checkNotNull(parentFinder);
+    return new MatchFinder() {
       @Override
       public boolean matches(UiElement element) {
         UiElement parent = element.getParent();
-        return parent != null && parentMatcher.matches(parent);
+        return parent != null && parentFinder.matches(parent);
       }
 
       @Override
       public String toString() {
-        return "withParent(" + parentMatcher + ")";
+        return "withParent(" + parentFinder + ")";
       }
     };
   }
 
   /**
-   * Matches a UiElement whose ancestor matches the given ancestorMatcher. For
+   * Matches a UiElement whose ancestor matches the given ancestorFinder. For
    * complex cases, consider {@link #xpath}.
    */
-  public static ElementMatcher withAncestor(final ElementMatcher ancestorMatcher) {
-    checkNotNull(ancestorMatcher);
-    return new ElementMatcher() {
+  public static MatchFinder withAncestor(final MatchFinder ancestorFinder) {
+    checkNotNull(ancestorFinder);
+    return new MatchFinder() {
       @Override
       public boolean matches(UiElement element) {
         UiElement parent = element.getParent();
         while (parent != null) {
-          if (ancestorMatcher.matches(parent)) {
+          if (ancestorFinder.matches(parent)) {
             return true;
           }
           parent = parent.getParent();
@@ -283,18 +283,18 @@ public class By {
 
       @Override
       public String toString() {
-        return "withAncestor(" + ancestorMatcher + ")";
+        return "withAncestor(" + ancestorFinder + ")";
       }
     };
   }
 
   /**
-   * Matches a UiElement which has a sibling matching the given siblingMatcher.
+   * Matches a UiElement which has a sibling matching the given siblingFinder.
    * For complex cases, consider {@link #xpath}.
    */
-  public static ElementMatcher withSibling(final ElementMatcher siblingMatcher) {
-    checkNotNull(siblingMatcher);
-    return new ElementMatcher() {
+  public static MatchFinder withSibling(final MatchFinder siblingFinder) {
+    checkNotNull(siblingFinder);
+    return new MatchFinder() {
       @Override
       public boolean matches(UiElement element) {
         UiElement parent = element.getParent();
@@ -302,7 +302,7 @@ public class By {
           return false;
         }
         for (int i = 0; i < parent.getChildCount(); i++) {
-          if (siblingMatcher.matches(parent.getChild(i))) {
+          if (siblingFinder.matches(parent.getChild(i))) {
             return true;
           }
         }
@@ -311,7 +311,7 @@ public class By {
 
       @Override
       public String toString() {
-        return "withSibling(" + siblingMatcher + ")";
+        return "withSibling(" + siblingFinder + ")";
       }
     };
   }

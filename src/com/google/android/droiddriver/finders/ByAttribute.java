@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,7 +22,7 @@ import com.google.android.droiddriver.UiElement;
 /**
  * Matches UiElement by a single attribute.
  */
-public class ByAttribute<T> extends ElementMatcher {
+public class ByAttribute<T> extends MatchFinder {
   private final Attribute attribute;
   private final MatchStrategy<? super T> strategy;
   private final T expected;

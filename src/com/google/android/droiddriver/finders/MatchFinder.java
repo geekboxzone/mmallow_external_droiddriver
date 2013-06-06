@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import android.util.Log;
 
@@ -23,12 +23,13 @@ import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.Logs;
 
 /**
- * Find matching UiElement by operations on an instance.
+ * Traverses the UiElement tree and returns the first UiElement satisfying
+ * {@link #matches(UiElement)}.
  */
-public abstract class ElementMatcher implements Matcher {
+public abstract class MatchFinder implements Finder {
   /**
-   * Returns true if the {@code element} matches the implementing matcher. The
-   * implementing matcher should return quickly.
+   * Returns true if the {@code element} matches the implementing finder. The
+   * implementing finder should not poll.
    *
    * @param element The element to validate against
    * @return true if the element matches
@@ -39,7 +40,7 @@ public abstract class ElementMatcher implements Matcher {
    * {@inheritDoc}
    *
    * <p>
-   * It is recommended that this method return the description of the matcher,
+   * It is recommended that this method return the description of the finder,
    * for example, "ByAttribute{text equals OK}".
    */
   @Override

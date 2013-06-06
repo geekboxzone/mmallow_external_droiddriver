@@ -21,7 +21,7 @@ import android.os.SystemClock;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.exceptions.TimeoutException;
-import com.google.android.droiddriver.matchers.Matcher;
+import com.google.android.droiddriver.finders.Finder;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
@@ -57,17 +57,17 @@ public class DefaultPoller implements Poller {
   }
 
   @Override
-  public <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker) {
-    return pollFor(driver, matcher, checker, timeoutMillis);
+  public <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker) {
+    return pollFor(driver, finder, checker, timeoutMillis);
   }
 
   @Override
-  public <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker,
+  public <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker,
       long timeoutMillis) {
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
       try {
-        return checker.check(driver, matcher);
+        return checker.check(driver, finder);
       } catch (UnsatisfiedConditionException e) {
         // fall through to poll
       }
@@ -75,14 +75,14 @@ public class DefaultPoller implements Poller {
       long remainingMillis = end - SystemClock.uptimeMillis();
       if (remainingMillis < 0) {
         for (TimeoutListener timeoutListener : timeoutListeners) {
-          timeoutListener.onTimeout(driver, matcher);
+          timeoutListener.onTimeout(driver, finder);
         }
         throw new TimeoutException(String.format(
-            "Timed out after %d milliseconds waiting for %s %s", timeoutMillis, matcher, checker));
+            "Timed out after %d milliseconds waiting for %s %s", timeoutMillis, finder, checker));
       }
 
       for (PollingListener pollingListener : pollingListeners) {
-        pollingListener.onPolling(driver, matcher);
+        pollingListener.onPolling(driver, finder);
       }
       SystemClock.sleep(Longs.min(intervalMillis, remainingMillis));
     }

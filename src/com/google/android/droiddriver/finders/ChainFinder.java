@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.common.base.Preconditions;
 
 /**
- * Find UiElement by using the UiElement returned by first Matcher as context
- * for the second Matcher.
+ * Find UiElement by using the UiElement returned by first Finder as context
+ * for the second Finder.
  */
-public class ChainMatcher implements Matcher {
-  private final Matcher first;
-  private final Matcher second;
+public class ChainFinder implements Finder {
+  private final Finder first;
+  private final Finder second;
 
-  protected ChainMatcher(Matcher first, Matcher second) {
+  protected ChainFinder(Finder first, Finder second) {
     this.first = Preconditions.checkNotNull(first);
     this.second = Preconditions.checkNotNull(second);
   }
 
   @Override
   public String toString() {
-    return String.format("ChainMatcher{%s, %s}", first, second);
+    return String.format("ChainFinder{%s, %s}", first, second);
   }
 
   @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
@@ -22,9 +22,9 @@ import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 /**
  * Interface for finding UiElement.
  */
-public interface Matcher {
+public interface Finder {
   /**
-   * Returns the matching UiElement. The implementing matcher should not poll.
+   * Returns the matching UiElement. The implementing finder should not poll.
    *
    * @param context The starting UiElement, used as search context
    * @return The first matching element on the current context
@@ -36,7 +36,7 @@ public interface Matcher {
    * {@inheritDoc}
    *
    * <p>
-   * It is recommended that this method return the description of the matcher,
+   * It is recommended that this method return the description of the finder,
    * for example, "ByAttribute{text equals OK}".
    */
   @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.matchers;
+package com.google.android.droiddriver.finders;
 
 import android.graphics.Rect;
 

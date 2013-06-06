@@ -23,8 +23,8 @@ import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
-import com.google.android.droiddriver.matchers.ByXPath;
-import com.google.android.droiddriver.matchers.Matcher;
+import com.google.android.droiddriver.finders.ByXPath;
+import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.util.DefaultPoller;
 import com.google.android.droiddriver.util.Logs;
 
@@ -40,8 +40,8 @@ public abstract class AbstractDroidDriver implements DroidDriver {
    */
   private static final ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
     @Override
-    public Void check(DroidDriver driver, Matcher matcher) throws UnsatisfiedConditionException {
-      if (driver.has(matcher)) {
+    public Void check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
+      if (driver.has(finder)) {
         throw new UnsatisfiedConditionException();
       }
       return null;
@@ -57,10 +57,10 @@ public abstract class AbstractDroidDriver implements DroidDriver {
    */
   private static final ConditionChecker<UiElement> EXISTS = new ConditionChecker<UiElement>() {
     @Override
-    public UiElement check(DroidDriver driver, Matcher matcher)
+    public UiElement check(DroidDriver driver, Finder finder)
         throws UnsatisfiedConditionException {
       try {
-        return matcher.find(((AbstractDroidDriver) driver).getRootElement());
+        return ((AbstractDroidDriver) driver).find(finder);
       } catch (ElementNotFoundException e) {
         throw new UnsatisfiedConditionException();
       }
@@ -74,11 +74,22 @@ public abstract class AbstractDroidDriver implements DroidDriver {
 
   private Poller poller = new DefaultPoller();
 
+  /**
+   * For internal use.
+   *
+   * @param finder
+   * @return the matching element without polling
+   * @throws ElementNotFoundException
+   */
+  public UiElement find(Finder finder) {
+    Logs.call(this, "find", finder);
+    return finder.find(getRootElement());
+  }
+
   @Override
-  public boolean has(Matcher matcher) {
-    Logs.call(this, "has", matcher);
+  public boolean has(Finder finder) {
     try {
-      matcher.find(getRootElement());
+      find(finder);
       return true;
     } catch (ElementNotFoundException enfe) {
       return false;
@@ -86,10 +97,9 @@ public abstract class AbstractDroidDriver implements DroidDriver {
   }
 
   @Override
-  public boolean has(Matcher matcher, long timeoutMillis) {
-    Logs.call(this, "has", matcher, timeoutMillis);
+  public boolean has(Finder finder, long timeoutMillis) {
     try {
-      checkExists(matcher, timeoutMillis);
+      checkExists(finder, timeoutMillis);
       return true;
     } catch (TimeoutException e) {
       return false;
@@ -97,30 +107,31 @@ public abstract class AbstractDroidDriver implements DroidDriver {
   }
 
   @Override
-  public void checkExists(Matcher matcher) {
-    checkExists(matcher, getPoller().getTimeoutMillis());
+  public void checkExists(Finder finder) {
+    checkExists(finder, getPoller().getTimeoutMillis());
   }
 
   @Override
-  public void checkExists(Matcher matcher, long timeoutMillis) {
-    getPoller().pollFor(this, matcher, EXISTS, timeoutMillis);
+  public void checkExists(Finder finder, long timeoutMillis) {
+    Logs.call(this, "checkExists", finder, timeoutMillis);
+    getPoller().pollFor(this, finder, EXISTS, timeoutMillis);
   }
 
   @Override
-  public UiElement on(Matcher matcher) {
-    Logs.call(this, "on", matcher);
-    return getPoller().pollFor(this, matcher, EXISTS);
+  public UiElement on(Finder finder) {
+    Logs.call(this, "on", finder);
+    return getPoller().pollFor(this, finder, EXISTS);
   }
 
   @Override
-  public void checkGone(Matcher matcher) {
-    checkGone(matcher, getPoller().getTimeoutMillis());
+  public void checkGone(Finder finder) {
+    checkGone(finder, getPoller().getTimeoutMillis());
   }
 
   @Override
-  public void checkGone(Matcher matcher, long timeoutMillis) {
-    Logs.call(this, "checkGone", matcher);
-    getPoller().pollFor(this, matcher, GONE, timeoutMillis);
+  public void checkGone(Finder finder, long timeoutMillis) {
+    Logs.call(this, "checkGone", finder, timeoutMillis);
+    getPoller().pollFor(this, finder, GONE, timeoutMillis);
   }
 
   @Override

@@ -16,7 +16,7 @@
 
 package com.google.android.droiddriver;
 
-import com.google.android.droiddriver.matchers.Matcher;
+import com.google.android.droiddriver.finders.Finder;
 
 /**
  * Interface for polling mechanism.
@@ -29,7 +29,7 @@ public interface Poller {
     /**
      * Called when {@link #pollFor} times out. Should return quickly.
      */
-    void onTimeout(DroidDriver driver, Matcher matcher);
+    void onTimeout(DroidDriver driver, Finder finder);
   }
 
   /**
@@ -39,7 +39,7 @@ public interface Poller {
     /**
      * Called when {@link #pollFor} polls. Should return quickly.
      */
-    void onPolling(DroidDriver driver, Matcher matcher);
+    void onPolling(DroidDriver driver, Finder finder);
   }
   /**
    * Interface for removing a listener.
@@ -71,7 +71,7 @@ public interface Poller {
      *
      * @throws UnsatisfiedConditionException If the condition is not met
      */
-    T check(DroidDriver driver, Matcher matcher) throws UnsatisfiedConditionException;
+    T check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException;
   }
 
   /** Thrown to indicate condition not met. Used in {@link ConditionChecker}. */
@@ -85,7 +85,7 @@ public interface Poller {
    *
    * @return An object of type T returned by {@code checker}
    */
-  <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker);
+  <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker);
 
   /**
    * Polls until {@code checker} does not throw
@@ -93,7 +93,7 @@ public interface Poller {
    *
    * @return An object of type T returned by {@code checker}
    */
-  <T> T pollFor(DroidDriver driver, Matcher matcher, ConditionChecker<T> checker,
+  <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker,
       long timeoutMillis);
 
   /**

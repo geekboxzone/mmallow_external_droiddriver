@@ -16,19 +16,19 @@
 
 package com.google.android.droiddriver.exceptions;
 
-import com.google.android.droiddriver.matchers.Matcher;
+import com.google.android.droiddriver.finders.Finder;
 
 /**
  * Thrown when element is not found.
  */
 @SuppressWarnings("serial")
 public class ElementNotFoundException extends DroidDriverException {
-  public ElementNotFoundException(Matcher matcher) {
-    super(failMessage(matcher));
+  public ElementNotFoundException(Finder finder) {
+    super(failMessage(finder));
   }
 
-  public ElementNotFoundException(Matcher matcher, Throwable cause) {
-    super(failMessage(matcher), cause);
+  public ElementNotFoundException(Finder finder, Throwable cause) {
+    super(failMessage(finder), cause);
   }
 
   public ElementNotFoundException(String message) {
@@ -39,7 +39,7 @@ public class ElementNotFoundException extends DroidDriverException {
     super(message, cause);
   }
 
-  protected static String failMessage(Matcher matcher) {
-    return "Could not find any element matching " + matcher;
+  protected static String failMessage(Finder finder) {
+    return "Could not find any element matching " + finder;
   }
 }
