@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 
 /**
  * Class to find the root view.
+ * Note(twickham): This class is no longer being used.
  */
 public class RootFinder {
 
