@@ -17,6 +17,7 @@
 package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
+import android.app.Instrumentation;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -38,11 +39,11 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   private static final long QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE = 500;// ms
 
   private final UiAutomationContext context;
-  private final UiAutomation uiAutomation;
+  private final Instrumentation instrumentation;
 
-  public UiAutomationDriver(UiAutomation uiAutomation) {
-    this.uiAutomation = uiAutomation;
-    this.context = new UiAutomationContext(uiAutomation);
+  public UiAutomationDriver(Instrumentation instrumentation) {
+    this.instrumentation = instrumentation;
+    this.context = new UiAutomationContext(instrumentation);
   }
 
   @Override
@@ -53,13 +54,14 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   private AccessibilityNodeInfo getRootNode() {
     long timeoutMillis = getPoller().getTimeoutMillis();
     try {
-      uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
+      getUiAutomation().waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE,
+              timeoutMillis);
     } catch (java.util.concurrent.TimeoutException e) {
       throw new TimeoutException(e);
     }
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();
+      AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
       if (root != null) {
         return root;
       }
@@ -75,6 +77,10 @@ public class UiAutomationDriver extends AbstractDroidDriver {
 
   @Override
   protected Bitmap takeScreenshot() {
-    return uiAutomation.takeScreenshot();
+    return getUiAutomation().takeScreenshot();
+  }
+
+  private UiAutomation getUiAutomation() {
+      return instrumentation.getUiAutomation();
   }
 }

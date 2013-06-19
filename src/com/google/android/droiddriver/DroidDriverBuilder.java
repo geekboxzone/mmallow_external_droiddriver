@@ -77,12 +77,11 @@ public class DroidDriverBuilder {
     if (!hasUiAutomation()) {
       throw new DroidDriverException("UI_AUTOMATION is not available below API 18");
     }
-    UiAutomation uiAutomation = instrumentation.getUiAutomation();
-    if (uiAutomation == null) {
-      throw new DroidDriverException(
-          "uiAutomation==null: did you forget to set '-w' flag for 'am instrument'?");
+    if (instrumentation.getUiAutomation() == null) {
+        throw new DroidDriverException(
+                "uiAutomation==null: did you forget to set '-w' flag for 'am instrument'?");
     }
-    return new UiAutomationDriver(uiAutomation);
+    return new UiAutomationDriver(instrumentation);
   }
 
   public DroidDriverBuilder use(Implementation implementation) {

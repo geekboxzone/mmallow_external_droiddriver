@@ -20,6 +20,7 @@ import static com.google.android.droiddriver.util.TextUtils.charSequenceToString
 
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 
 /**
@@ -89,6 +91,8 @@ public class ViewElement extends AbstractUiElement {
         return charSequenceToString(view.getResources().getResourceName(view.getId()));
       } catch (Resources.NotFoundException nfe) {
         /* ignore */
+      } catch (NullPointerException npe) {
+        // TODO(twickham): This is necessary until Kevin's changes come in.
       }
     }
     return null;
@@ -106,10 +110,9 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public boolean isVisible() {
-    // TODO: use getVisibleBounds() once it's in
     // isShown() checks the visibility flag of this view and ancestors; it needs
     // to have the VISIBLE flag as well as non-empty bounds to be visible.
-    return view.isShown() && !getBounds().isEmpty();
+    return view.isShown() && !getVisibleBounds().isEmpty();
   }
 
   @Override
@@ -174,6 +177,16 @@ public class ViewElement extends AbstractUiElement {
     view.getLocationOnScreen(xy);
     rect.set(xy[0], xy[1], xy[0] + view.getWidth(), xy[1] + view.getHeight());
     return rect;
+  }
+
+  @Override
+  public Rect getVisibleBounds() {
+    Rect visibleBounds = new Rect();
+    if (!view.getGlobalVisibleRect(visibleBounds)) {
+        Logs.log(Log.INFO, "View is invisible: " + toString());
+        visibleBounds.setEmpty();
+    }
+    return visibleBounds;
   }
 
   @Override

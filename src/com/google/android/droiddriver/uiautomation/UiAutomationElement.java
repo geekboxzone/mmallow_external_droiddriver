@@ -178,6 +178,23 @@ public class UiAutomationElement extends AbstractUiElement {
   }
 
   @Override
+  public Rect getVisibleBounds() {
+    if (!isVisible()) {
+      Logs.log(Log.INFO, "Node is invisible: " + node);
+      return new Rect();
+    }
+    Rect visibleBounds = getBounds();
+    UiAutomationElement parent = getParent();
+    Rect parentBounds;
+    while (parent != null) {
+      parentBounds = parent.getBounds();
+      visibleBounds.intersect(parentBounds);
+      parent = parent.getParent();
+    }
+    return visibleBounds;
+  }
+
+  @Override
   public int getChildCount() {
     return node.getChildCount();
   }

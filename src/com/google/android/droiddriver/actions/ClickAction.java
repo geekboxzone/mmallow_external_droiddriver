@@ -34,7 +34,7 @@ public enum ClickAction implements Action {
     /** @throws ActionException */
     @Override
     public boolean perform(InputInjector injector, UiElement element) {
-      Rect elementRect = element.getBounds();
+      Rect elementRect = element.getVisibleBounds();
       long downTime = sendDown(injector, elementRect);
       // UiAutomator clickAndSync does this, while
       // android.test.TouchUtils#clickView sleep 1000
@@ -47,7 +47,7 @@ public enum ClickAction implements Action {
     /** @throws ActionException */
     @Override
     public boolean perform(InputInjector injector, UiElement element) {
-      Rect elementRect = element.getBounds();
+      Rect elementRect = element.getVisibleBounds();
       long downTime = sendDown(injector, elementRect);
       // see android.test.TouchUtils - *1.5 to make sure it's long press
       SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5));

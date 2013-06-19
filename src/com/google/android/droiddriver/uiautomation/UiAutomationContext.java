@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.view.InputEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -30,13 +31,13 @@ import java.util.Map;
  * Internal helper for managing all instances.
  */
 public class UiAutomationContext {
-  private final UiAutomation uiAutomation;
+  private final Instrumentation instrumentation;
   private final InputInjector injector;
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
       .makeMap();
 
-  UiAutomationContext(UiAutomation uiAutomation) {
-    this.uiAutomation = Preconditions.checkNotNull(uiAutomation);
+  UiAutomationContext(Instrumentation instrumentation) {
+    this.instrumentation = Preconditions.checkNotNull(instrumentation);
     injector = new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
@@ -45,8 +46,12 @@ public class UiAutomationContext {
     };
   }
 
+  public Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
   public UiAutomation getUiAutomation() {
-    return uiAutomation;
+      return instrumentation.getUiAutomation();
   }
 
   public InputInjector getInjector() {

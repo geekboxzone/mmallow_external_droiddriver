@@ -118,6 +118,11 @@ public interface UiElement {
   Rect getBounds();
 
   /**
+   * Gets the UiElement bounds in screen coordinates. The coordinates will be visible on screen.
+   */
+  Rect getVisibleBounds();
+
+  /**
    * @return value of the given attribute.
    */
   <T> T get(Attribute attribute);
