@@ -51,6 +51,18 @@ public class By {
       return "matches pattern";
     }
   };
+  /** Matches by {@link String#contains}. */
+  public static final MatchStrategy<String> STRING_CONTAINS = new MatchStrategy<String>() {
+    @Override
+    public boolean match(String expected, String actual) {
+      return actual != null && actual.contains(expected);
+    }
+
+    @Override
+    public String toString() {
+      return "contains";
+    }
+  };
 
   /**
    * Creates a new ByAttribute finder. Frequently-used finders have shorthands
@@ -92,6 +104,14 @@ public class By {
   }
 
   /**
+   * @param name The exact package name to match against
+   * @return a finder to find an element by package name
+   */
+  public static ByAttribute<String> packageName(String name) {
+    return attribute(Attribute.PACKAGE, OBJECT_EQUALS, name);
+  }
+
+  /**
    * @param text The exact text to match against
    * @return a finder to find an element by text
    */
@@ -108,11 +128,27 @@ public class By {
   }
 
   /**
+   * @param substring String inside a text field
+   * @return a finder to find an element by text substring
+   */
+  public static ByAttribute<String> textContains(String substring) {
+    return attribute(Attribute.TEXT, STRING_CONTAINS, substring);
+  }
+
+  /**
    * @param contentDescription The exact content description to match against
    * @return a finder to find an element by content description
    */
   public static ByAttribute<String> contentDescription(String contentDescription) {
     return attribute(Attribute.CONTENT_DESC, OBJECT_EQUALS, contentDescription);
+  }
+
+  /**
+   * @param substring String inside a content description
+   * @return a finder to find an element by content description substring
+   */
+  public static ByAttribute<String> contentDescriptionContains(String substring) {
+    return attribute(Attribute.CONTENT_DESC, STRING_CONTAINS, substring);
   }
 
   /**
