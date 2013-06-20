@@ -7,8 +7,8 @@ import com.google.android.droiddriver.DroidDriverBuilder.Implementation;
 import com.google.android.droiddriver.runner.MinSdkVersion;
 
 // Optional annotation to show filtering tests by build version.
-// This should be 18 when mr2 is released.
-@MinSdkVersion(17)
+// SDK Version 18 corresponds to JB-mr2 (Android 4.3).
+@MinSdkVersion(18)
 public class UseUiAutomation extends AbstractSendActivityTest {
   @Override
   protected DroidDriver getDriver() {
