@@ -25,6 +25,7 @@ import android.test.suitebuilder.TestMethod;
 import android.util.Log;
 
 import com.android.internal.util.Predicate;
+import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -128,5 +129,19 @@ public class TestRunner extends InstrumentationTestRunner {
   public void callActivityOnCreate(Activity activity, Bundle bundle) {
     super.callActivityOnCreate(activity, bundle);
     activities.add(activity);
+  }
+
+  @Override
+  public void callActivityOnResume(Activity activity) {
+    super.callActivityOnResume(activity);
+    ActivityUtils.setRunningActivity(activity);
+  }
+
+  @Override
+  public void callActivityOnPause(Activity activity) {
+    super.callActivityOnPause(activity);
+    if (activity == ActivityUtils.getRunningActivity()) {
+      ActivityUtils.setRunningActivity(null);
+    }
   }
 }

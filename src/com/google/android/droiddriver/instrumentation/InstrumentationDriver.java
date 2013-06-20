@@ -16,12 +16,17 @@
 
 package com.google.android.droiddriver.instrumentation;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.droiddriver.base.AbstractDroidDriver;
+import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.util.ActivityUtils;
+import com.google.android.droiddriver.util.Logs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +44,32 @@ public class InstrumentationDriver extends AbstractDroidDriver {
 
   @Override
   public ViewElement getRootElement() {
+    Activity runningActivity = ActivityUtils.getRunningActivity();
+
+    if (runningActivity == null) {
+      // Maybe loop main thread and try again?
+      throw new DroidDriverException("The application under test has no foreground activity.");
+    }
+
     View[] views = RootFinder.getRootViews();
+    if (views.length > 1) {
+      // We are assuming that there is only one root view.
+      Logs.log(Log.WARN, "There are more than one root views.");
+    }
+
+    // Note(twickham): This is no longer needed (will be deleted soon).
     // Need to create a fake root to be able to traverse all the possible views.
-    RootViewGroup root = new RootViewGroup(context.getInstrumentation().getTargetContext());
+    /* RootViewGroup root = new RootViewGroup(context.getInstrumentation().getTargetContext());
     for (View view : views) {
       root.addView(view);
-    }
+    } */
+
+    // We assume getWindow().getDecorView() on the currently resumed activity is the sole root.
+    View root = runningActivity.getWindow().getDecorView();
     return context.getUiElement(root);
   }
 
+  // Note(twickham): This class is no longer in use (will be deleted soon).
   private static class RootViewGroup extends ViewGroup {
     private final List<View> children = new ArrayList<View>();
 
