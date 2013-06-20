@@ -91,7 +91,7 @@ public abstract class AbstractUiElement implements UiElement {
 
   private void checkVisible() {
     if (!isVisible()) {
-      throw new ElementNotVisibleException("Element is not visible on screen");
+      throw new ElementNotVisibleException(this);
     }
   }
 

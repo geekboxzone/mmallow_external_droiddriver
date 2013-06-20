@@ -84,7 +84,10 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public boolean isVisible() {
-    return view.getGlobalVisibleRect(new Rect());
+    // TODO: use getVisibleBounds() once it's in
+    // isShown() checks the visibility flag of this view and ancestors; it needs
+    // to have the VISIBLE flag as well as non-empty bounds to be visible.
+    return view.isShown() && !getBounds().isEmpty();
   }
 
   @Override
