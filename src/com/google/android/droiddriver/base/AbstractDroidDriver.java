@@ -16,8 +16,13 @@
 
 package com.google.android.droiddriver.base;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.util.Log;
+
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
+import com.google.android.droiddriver.Screenshotter;
 import com.google.android.droiddriver.Poller.ConditionChecker;
 import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.UiElement;
@@ -26,13 +31,16 @@ import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.util.DefaultPoller;
+import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
+
+import java.io.BufferedOutputStream;
 
 /**
  * Abstract implementation of DroidDriver that does the common actions, and
  * should not differ in implementations of {@link DroidDriver}.
  */
-public abstract class AbstractDroidDriver implements DroidDriver {
+public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter {
 
   /**
    * A ConditionChecker that does not throw only if the matching
@@ -57,8 +65,7 @@ public abstract class AbstractDroidDriver implements DroidDriver {
    */
   private static final ConditionChecker<UiElement> EXISTS = new ConditionChecker<UiElement>() {
     @Override
-    public UiElement check(DroidDriver driver, Finder finder)
-        throws UnsatisfiedConditionException {
+    public UiElement check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
       try {
         return ((AbstractDroidDriver) driver).find(finder);
       } catch (ElementNotFoundException e) {
@@ -151,4 +158,38 @@ public abstract class AbstractDroidDriver implements DroidDriver {
     Logs.call(this, "dumpUiElementTree", path);
     return ByXPath.dumpDom(path, getRootElement());
   }
+
+  @Override
+  public boolean takeScreenshot(String path) {
+    return takeScreenshot(path, Bitmap.CompressFormat.PNG, 0);
+  }
+
+  @Override
+  public boolean takeScreenshot(String path, CompressFormat format, int quality) {
+    Logs.call(this, "takeScreenshot", path, quality);
+    Bitmap screenshot = takeScreenshot();
+    if (screenshot == null) {
+      return false;
+    }
+    BufferedOutputStream bos = null;
+    try {
+      bos = FileUtils.open(path);
+      screenshot.compress(format, quality, bos);
+      return true;
+    } catch (Exception e) {
+      Logs.log(Log.WARN, e);
+      return false;
+    } finally {
+      if (bos != null) {
+        try {
+          bos.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      screenshot.recycle();
+    }
+  }
+
+  protected abstract Bitmap takeScreenshot();
 }

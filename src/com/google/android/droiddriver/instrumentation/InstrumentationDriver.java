@@ -19,6 +19,7 @@ package com.google.android.droiddriver.instrumentation;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,12 +60,14 @@ public class InstrumentationDriver extends AbstractDroidDriver {
 
     // Note(twickham): This is no longer needed (will be deleted soon).
     // Need to create a fake root to be able to traverse all the possible views.
-    /* RootViewGroup root = new RootViewGroup(context.getInstrumentation().getTargetContext());
-    for (View view : views) {
-      root.addView(view);
-    } */
+    /*
+     * RootViewGroup root = new
+     * RootViewGroup(context.getInstrumentation().getTargetContext()); for (View
+     * view : views) { root.addView(view); }
+     */
 
-    // We assume getWindow().getDecorView() on the currently resumed activity is the sole root.
+    // We assume getWindow().getDecorView() on the currently resumed activity is
+    // the sole root.
     View root = runningActivity.getWindow().getDecorView();
     return context.getUiElement(root);
   }
@@ -96,5 +99,29 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     protected void onLayout(boolean arg0, int arg1, int arg2, int arg3, int arg4) {
       // Do nothing.
     }
+  }
+
+  private static class ScreenshotRunnable implements Runnable {
+    private final View rootView;
+    private Bitmap screenshot;
+
+    private ScreenshotRunnable(View rootView) {
+      this.rootView = rootView;
+    }
+
+    @Override
+    public void run() {
+      rootView.destroyDrawingCache();
+      rootView.buildDrawingCache(false);
+      screenshot = rootView.getDrawingCache();
+      rootView.destroyDrawingCache();
+    }
+  }
+
+  @Override
+  protected Bitmap takeScreenshot() {
+    ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(getRootElement().getView());
+    context.getInstrumentation().runOnMainSync(screenshotRunnable);
+    return screenshotRunnable.screenshot;
   }
 }

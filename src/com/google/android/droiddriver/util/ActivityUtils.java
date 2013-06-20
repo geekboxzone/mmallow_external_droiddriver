@@ -25,15 +25,20 @@ public class ActivityUtils {
   private static Activity runningActivity;
 
   /**
-   * Sets the running activity. Called from TestRunner.
+   * Sets the running (a.k.a. resumed or foreground) activity. Called from
+   * {@link com.google.android.droiddriver.runner.TestRunner}. If a custom
+   * runner is used, it must call this method at appropriate time, otherwise
+   * {@link com.google.android.droiddriver.instrumentation.InstrumentationDriver}
+   * won't work.
    */
   public static void setRunningActivity(Activity activity) {
     runningActivity = activity;
   }
 
   /**
-   * Gets the activity in the foreground of the screen. This activity must have user focus.
-   * @return the currently running activity, or null if no single activity has focus.
+   * Gets the running (a.k.a. resumed or foreground) activity.
+   *
+   * @return the currently running activity, or null if no activity has focus.
    */
   public static Activity getRunningActivity() {
     return runningActivity;

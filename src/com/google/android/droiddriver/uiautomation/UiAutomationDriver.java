@@ -18,24 +18,17 @@ package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.Screenshotter;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
-import com.google.android.droiddriver.util.FileUtils;
-import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
-
-import java.io.BufferedOutputStream;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
-public class UiAutomationDriver extends AbstractDroidDriver implements Screenshotter {
+public class UiAutomationDriver extends AbstractDroidDriver {
   // TODO: magic const from UiAutomator, but may not be useful
   /**
    * This value has the greatest bearing on the appearance of test execution
@@ -81,34 +74,7 @@ public class UiAutomationDriver extends AbstractDroidDriver implements Screensho
   }
 
   @Override
-  public boolean takeScreenshot(String path) {
-    return takeScreenshot(path, Bitmap.CompressFormat.PNG, 0);
-  }
-
-  @Override
-  public boolean takeScreenshot(String path, CompressFormat format, int quality) {
-    Logs.call(this, "takeScreenshot", path, quality);
-    Bitmap screenshot = uiAutomation.takeScreenshot();
-    if (screenshot == null) {
-      return false;
-    }
-    BufferedOutputStream bos = null;
-    try {
-      bos = FileUtils.open(path);
-      screenshot.compress(format, quality, bos);
-      return true;
-    } catch (Exception e) {
-      Logs.log(Log.WARN, e);
-      return false;
-    } finally {
-      if (bos != null) {
-        try {
-          bos.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      screenshot.recycle();
-    }
+  protected Bitmap takeScreenshot() {
+    return uiAutomation.takeScreenshot();
   }
 }
