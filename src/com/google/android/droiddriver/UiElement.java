@@ -41,7 +41,8 @@ public interface UiElement {
   String getContentDescription();
 
   /**
-   * Gets the class name of the underlying view.
+   * Gets the class name of the underlying view, as seen by
+   * AccessibilityService.
    */
   String getClassName();
 

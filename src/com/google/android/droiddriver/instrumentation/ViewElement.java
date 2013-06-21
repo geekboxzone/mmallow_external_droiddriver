@@ -23,6 +23,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Checkable;
 import android.widget.TextView;
 
@@ -57,7 +58,10 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public String getClassName() {
-    return view.getClass().getCanonicalName();
+    AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
+    String className = charSequenceToString(accessibilityNodeInfo.getClassName());
+    accessibilityNodeInfo.recycle();
+    return className;
   }
 
   @Override
