@@ -113,7 +113,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     public void run() {
       rootView.destroyDrawingCache();
       rootView.buildDrawingCache(false);
-      screenshot = rootView.getDrawingCache();
+      screenshot = Bitmap.createBitmap(rootView.getDrawingCache());
       rootView.destroyDrawingCache();
     }
   }

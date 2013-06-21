@@ -34,9 +34,12 @@ import com.google.common.base.Preconditions;
 /**
  * A UiElement that is backed by a View.
  */
+// TODO: always accessing view on the UI thread even when only get access is
+// needed -- the field may be in the middle of updating.
 public class ViewElement extends AbstractUiElement {
   private final InstrumentationContext context;
   private final View view;
+  private String className;
 
   public ViewElement(InstrumentationContext context, View view) {
     this.context = Preconditions.checkNotNull(context);
@@ -58,9 +61,19 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public String getClassName() {
-    AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
-    String className = charSequenceToString(accessibilityNodeInfo.getClassName());
-    accessibilityNodeInfo.recycle();
+    if (className != null) {
+      return className;
+    }
+    // createAccessibilityNodeInfo is expensive and, surprisingly, it calls
+    // setText, which requires it be called on the UI thread.
+    context.getInstrumentation().runOnMainSync(new Runnable() {
+      @Override
+      public void run() {
+        AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
+        className = charSequenceToString(accessibilityNodeInfo.getClassName());
+        accessibilityNodeInfo.recycle();
+      }
+    });
     return className;
   }
 
