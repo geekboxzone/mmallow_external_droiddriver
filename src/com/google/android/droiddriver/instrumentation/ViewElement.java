@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
+import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.common.base.Preconditions;
 
 /**
@@ -69,9 +70,13 @@ public class ViewElement extends AbstractUiElement {
     context.getInstrumentation().runOnMainSync(new Runnable() {
       @Override
       public void run() {
-        AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
-        className = charSequenceToString(accessibilityNodeInfo.getClassName());
-        accessibilityNodeInfo.recycle();
+        try {
+          AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
+          className = charSequenceToString(accessibilityNodeInfo.getClassName());
+          accessibilityNodeInfo.recycle();
+        } catch (NoSuchMethodError e) {
+          throw new DroidDriverException("getClassName() is not available below API 14");
+        }
       }
     });
     return className;
