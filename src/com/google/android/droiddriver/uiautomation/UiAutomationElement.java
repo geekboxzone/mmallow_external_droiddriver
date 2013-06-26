@@ -18,71 +18,25 @@ package com.google.android.droiddriver.uiautomation;
 
 import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
 
-import android.app.UiAutomation.AccessibilityEventFilter;
 import android.graphics.Rect;
 import android.util.Log;
-import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.base.AbstractUiElement;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
-
-import java.util.concurrent.TimeoutException;
 
 /**
  * A UiElement that is backed by the UiAutomation object.
  */
 public class UiAutomationElement extends AbstractUiElement {
-  // UiAutomator magic const
-  private static long WAIT_FOR_ACTION_ACKNOWLEDGMENT = 3 * 1000;
-
   private final UiAutomationContext context;
   private final AccessibilityNodeInfo node;
 
   public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node) {
     this.context = Preconditions.checkNotNull(context);
     this.node = Preconditions.checkNotNull(node);
-  }
-
-  private static class AnyEventFilter implements AccessibilityEventFilter {
-    private final int mask;
-
-    private AnyEventFilter(int mask) {
-      this.mask = mask;
-    }
-
-    public static AnyEventFilter of(int mask) {
-      return new AnyEventFilter(mask);
-    }
-
-    @Override
-    public boolean accept(AccessibilityEvent t) {
-      return (t.getEventType() & mask) != 0;
-    }
-  }
-
-  // TODO: Address synchronization issues for other actions as well. I've seen
-  // problems with DrawerLayout (side panel) -- clicking has no effect. This
-  // seems to solve it, but I'm not sure executeAndWaitForEvent is the right
-  // solution, or simply because it adds delay.
-  @Override
-  public void click() {
-    try {
-      context.getUiAutomation().executeAndWaitForEvent(
-          new Runnable() {
-            @Override
-            public void run() {
-              perform(ClickAction.SINGLE);
-            }
-          },
-          AnyEventFilter.of(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-              | AccessibilityEvent.TYPE_VIEW_SELECTED), WAIT_FOR_ACTION_ACKNOWLEDGMENT);
-    } catch (TimeoutException e) {
-      Logs.log(Log.WARN, "executeAndWaitForEvent timed out");
-    }
   }
 
   @Override

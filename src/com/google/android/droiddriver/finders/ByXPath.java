@@ -82,7 +82,10 @@ public class ByXPath implements Finder {
         Logs.log(Log.DEBUG, "XPath evaluation returns null for " + xPathString);
         throw new ElementNotFoundException(this);
       }
-      return (UiElement) foundNode.getUserData(UI_ELEMENT);
+
+      UiElement match = (UiElement) foundNode.getUserData(UI_ELEMENT);
+      Logs.log(Log.INFO, "Found match: " + match);
+      return match;
     } catch (XPathExpressionException e) {
       throw new ElementNotFoundException(this, e);
     } finally {

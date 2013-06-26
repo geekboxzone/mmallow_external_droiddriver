@@ -106,8 +106,10 @@ public abstract class AbstractUiElement implements UiElement {
 
   private static void addAttribute(ToStringHelper toStringHelper, Attribute attr, Object value) {
     if (value != null) {
-      if (value instanceof Boolean && (Boolean) value) {
-        toStringHelper.addValue(attr.getName());
+      if (value instanceof Boolean) {
+        if ((Boolean) value) {
+          toStringHelper.addValue(attr.getName());
+        }
       } else {
         toStringHelper.add(attr.getName(), value);
       }
