@@ -41,8 +41,10 @@ public interface UiElement {
   String getContentDescription();
 
   /**
-   * Gets the class name of the underlying view, as seen by
-   * AccessibilityService.
+   * Gets the class name of the underlying view. The actual name could be
+   * overridden.
+   *
+   * @see com.google.android.droiddriver.instrumentation.ViewElement#overrideClassName
    */
   String getClassName();
 
@@ -118,7 +120,8 @@ public interface UiElement {
   Rect getBounds();
 
   /**
-   * Gets the UiElement bounds in screen coordinates. The coordinates will be visible on screen.
+   * Gets the UiElement bounds in screen coordinates. The coordinates will be
+   * visible on screen.
    */
   Rect getVisibleBounds();
 

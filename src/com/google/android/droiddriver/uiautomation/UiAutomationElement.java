@@ -134,7 +134,7 @@ public class UiAutomationElement extends AbstractUiElement {
   @Override
   public Rect getVisibleBounds() {
     if (!isVisible()) {
-      Logs.log(Log.INFO, "Node is invisible: " + node);
+      Logs.log(Log.DEBUG, "Node is invisible: " + node);
       return new Rect();
     }
     Rect visibleBounds = getBounds();

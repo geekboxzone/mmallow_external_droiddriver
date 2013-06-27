@@ -30,9 +30,11 @@ import android.widget.TextView;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.base.AbstractUiElement;
-import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
  * A UiElement that is backed by a View.
@@ -40,9 +42,29 @@ import com.google.common.base.Preconditions;
 // TODO: always accessing view on the UI thread even when only get access is
 // needed -- the field may be in the middle of updating.
 public class ViewElement extends AbstractUiElement {
+  private static final Map<String, String> CLASS_NAME_OVERRIDES = Maps.newHashMap();
+
   private final InstrumentationContext context;
   private final View view;
-  private String className;
+
+  /**
+   * Typically users find the class name to use in tests using SDK tool
+   * uiautomatorviewer. This name is returned by
+   * {@link AccessibilityNodeInfo#getClassName}. If the app uses custom View
+   * classes that do not call {@link AccessibilityNodeInfo#setClassName} with
+   * the actual class name, different types of drivers see different class names
+   * (InstrumentationDriver sees the actual class name, while UiAutomationDriver
+   * sees {@link AccessibilityNodeInfo#getClassName}).
+   * <p>
+   * If tests fail with InstrumentationDriver, find the actual class name by
+   * examining app code or by calling
+   * {@link com.google.android.droiddriver.DroidDriver#dumpUiElementTree}, then
+   * call this method in setUp to override it with the class name seen in
+   * uiautomatorviewer.
+   */
+  public static void overrideClassName(String actualClassName, String overridingClassName) {
+    CLASS_NAME_OVERRIDES.put(actualClassName, overridingClassName);
+  }
 
   public ViewElement(InstrumentationContext context, View view) {
     this.context = Preconditions.checkNotNull(context);
@@ -64,24 +86,9 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public String getClassName() {
-    if (className != null) {
-      return className;
-    }
-    // createAccessibilityNodeInfo is expensive and, surprisingly, it calls
-    // setText, which requires it be called on the UI thread.
-    context.getInstrumentation().runOnMainSync(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          AccessibilityNodeInfo accessibilityNodeInfo = view.createAccessibilityNodeInfo();
-          className = charSequenceToString(accessibilityNodeInfo.getClassName());
-          accessibilityNodeInfo.recycle();
-        } catch (NoSuchMethodError e) {
-          throw new DroidDriverException("getClassName() is not available below API 14");
-        }
-      }
-    });
-    return className;
+    String className = view.getClass().getName();
+    return CLASS_NAME_OVERRIDES.containsKey(className) ? CLASS_NAME_OVERRIDES.get(className)
+        : className;
   }
 
   @Override
@@ -183,8 +190,8 @@ public class ViewElement extends AbstractUiElement {
   public Rect getVisibleBounds() {
     Rect visibleBounds = new Rect();
     if (!view.getGlobalVisibleRect(visibleBounds)) {
-        Logs.log(Log.INFO, "View is invisible: " + toString());
-        visibleBounds.setEmpty();
+      Logs.log(Log.DEBUG, "View is invisible: " + toString());
+      visibleBounds.setEmpty();
     }
     return visibleBounds;
   }
