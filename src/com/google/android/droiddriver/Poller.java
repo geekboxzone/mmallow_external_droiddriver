@@ -27,7 +27,8 @@ public interface Poller {
    */
   interface TimeoutListener {
     /**
-     * Called when {@link #pollFor} times out. Should return quickly.
+     * Called when {@link #pollFor} times out. Should return quickly (no
+     * polling).
      */
     void onTimeout(DroidDriver driver, Finder finder);
   }
@@ -37,7 +38,7 @@ public interface Poller {
    */
   interface PollingListener {
     /**
-     * Called when {@link #pollFor} polls. Should return quickly.
+     * Called when {@link #pollFor} polls. Should return quickly (no polling).
      */
     void onPolling(DroidDriver driver, Finder finder);
   }
@@ -93,8 +94,7 @@ public interface Poller {
    *
    * @return An object of type T returned by {@code checker}
    */
-  <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker,
-      long timeoutMillis);
+  <T> T pollFor(DroidDriver driver, Finder finder, ConditionChecker<T> checker, long timeoutMillis);
 
   /**
    * Adds a {@link TimeoutListener}.

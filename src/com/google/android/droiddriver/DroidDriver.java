@@ -67,6 +67,18 @@ public interface DroidDriver {
   UiElement on(Finder finder);
 
   /**
+   * Returns the first {@link UiElement} found using the given finder without
+   * polling. This method is useful in {@link Poller.PollingListener#onPolling}.
+   * In other situations polling is desired, and {@link #on} is more
+   * appropriate.
+   *
+   * @param finder The matching mechanism
+   * @return The first matching element
+   * @throws ElementNotFoundException If no matching elements are found
+   */
+  UiElement find(Finder finder);
+
+  /**
    * Polls until the {@link UiElement} found using the given finder is gone, or
    * the default timeout is reached.
    *

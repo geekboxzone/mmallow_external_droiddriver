@@ -67,7 +67,7 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
     @Override
     public UiElement check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
       try {
-        return ((AbstractDroidDriver) driver).find(finder);
+        return driver.find(finder);
       } catch (ElementNotFoundException e) {
         throw new UnsatisfiedConditionException();
       }
@@ -81,13 +81,7 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
 
   private Poller poller = new DefaultPoller();
 
-  /**
-   * For internal use.
-   *
-   * @param finder
-   * @return the matching element without polling
-   * @throws ElementNotFoundException
-   */
+  @Override
   public UiElement find(Finder finder) {
     Logs.call(this, "find", finder);
     return finder.find(getRootElement());
