@@ -98,8 +98,6 @@ public class ViewElement extends AbstractUiElement {
         return charSequenceToString(view.getResources().getResourceName(view.getId()));
       } catch (Resources.NotFoundException nfe) {
         /* ignore */
-      } catch (NullPointerException npe) {
-        // TODO(twickham): This is necessary until Kevin's changes come in.
       }
     }
     return null;

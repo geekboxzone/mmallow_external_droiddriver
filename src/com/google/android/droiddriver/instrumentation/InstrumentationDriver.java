@@ -20,14 +20,16 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.droiddriver.base.AbstractDroidDriver;
-import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
+import com.google.common.primitives.Longs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +47,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
 
   @Override
   public ViewElement getRootElement() {
-    Activity runningActivity = ActivityUtils.getRunningActivity();
-
-    if (runningActivity == null) {
-      // Maybe loop main thread and try again?
-      throw new DroidDriverException("The application under test has no foreground activity.");
-    }
+    Activity runningActivity = getRunningActivity();
 
     View[] views = RootFinder.getRootViews();
     if (views.length > 1) {
@@ -70,6 +67,24 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     // the sole root.
     View root = runningActivity.getWindow().getDecorView();
     return context.getUiElement(root);
+  }
+
+  private Activity getRunningActivity() {
+    long timeoutMillis = getPoller().getTimeoutMillis();
+    long end = SystemClock.uptimeMillis() + timeoutMillis;
+    while (true) {
+      context.getInstrumentation().waitForIdleSync();
+      Activity runningActivity = ActivityUtils.getRunningActivity();
+      if (runningActivity != null) {
+        return runningActivity;
+      }
+      long remainingMillis = end - SystemClock.uptimeMillis();
+      if (remainingMillis < 0) {
+        throw new TimeoutException(String.format(
+            "Timed out after %d milliseconds waiting for foreground activity", timeoutMillis));
+      }
+      SystemClock.sleep(Longs.min(250, remainingMillis));
+    }
   }
 
   // Note(twickham): This class is no longer in use (will be deleted soon).

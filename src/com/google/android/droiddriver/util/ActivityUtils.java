@@ -31,7 +31,7 @@ public class ActivityUtils {
    * {@link com.google.android.droiddriver.instrumentation.InstrumentationDriver}
    * won't work.
    */
-  public static void setRunningActivity(Activity activity) {
+  public static synchronized void setRunningActivity(Activity activity) {
     runningActivity = activity;
   }
 
@@ -40,7 +40,7 @@ public class ActivityUtils {
    *
    * @return the currently running activity, or null if no activity has focus.
    */
-  public static Activity getRunningActivity() {
+  public static synchronized Activity getRunningActivity() {
     return runningActivity;
   }
 }
