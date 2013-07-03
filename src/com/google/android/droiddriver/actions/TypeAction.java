@@ -19,6 +19,7 @@ package com.google.android.droiddriver.actions;
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import android.os.SystemClock;
@@ -30,8 +31,8 @@ import android.view.KeyEvent;
  */
 public class TypeAction implements Action {
 
-  private static final KeyCharacterMap KEY_CHAR_MAP =
-      KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+  private static final KeyCharacterMap KEY_CHAR_MAP = KeyCharacterMap
+      .load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
   private final String text;
 
@@ -41,6 +42,7 @@ public class TypeAction implements Action {
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
+    // TODO: recycle events?
     KeyEvent[] events = KEY_CHAR_MAP.getEvents(text.toCharArray());
     boolean success = false;
 
@@ -61,5 +63,10 @@ public class TypeAction implements Action {
       throw new ActionException("The given text is not supported: " + text);
     }
     return success;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).addValue(text).toString();
   }
 }

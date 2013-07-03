@@ -33,4 +33,14 @@ public interface Action {
    *         example, ClickAction.
    */
   boolean perform(InputInjector injector, UiElement element);
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>
+   * It is recommended that this method return the description of the action,
+   * for example, "TypeAction{text to type}".
+   */
+  @Override
+  String toString();
 }

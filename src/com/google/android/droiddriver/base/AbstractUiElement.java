@@ -23,7 +23,6 @@ import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TypeAction;
-import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.ByXPath;
@@ -55,13 +54,15 @@ public abstract class AbstractUiElement implements UiElement {
   public void setText(String text) {
     // TODO: Define common actions as a const.
     perform(new TypeAction(text));
-    if (Logs.DEBUG) {
-      String actual = getText();
-      if (!text.equals(actual)) {
-        throw new DroidDriverException(String.format(
-            "setText failed: expected=\"%s\", actual=\"%s\"", text, actual));
-      }
-    }
+    // TypeAction may not be effective immediately and reflected bygetText(),
+    // so the following will fail.
+    // if (Logs.DEBUG) {
+    // String actual = getText();
+    // if (!text.equals(actual)) {
+    // throw new DroidDriverException(String.format(
+    // "setText failed: expected=\"%s\", actual=\"%s\"", text, actual));
+    // }
+    // }
   }
 
   @Override

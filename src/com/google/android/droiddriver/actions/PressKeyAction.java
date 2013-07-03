@@ -22,6 +22,7 @@ import android.view.KeyEvent;
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.util.Events;
+import com.google.common.base.Objects;
 
 /**
  * An general action to press any of the soft keys on the device.
@@ -40,5 +41,10 @@ public class PressKeyAction implements Action {
     KeyEvent upEvent = Events.newKeyEvent(downTime, KeyEvent.ACTION_UP, keyCode);
 
     return injector.injectInputEvent(downEvent) && injector.injectInputEvent(upEvent);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).addValue(KeyEvent.keyCodeToString(keyCode)).toString();
   }
 }
