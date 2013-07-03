@@ -40,9 +40,10 @@ public class FileUtils {
     }
     mkdirs(file.getParentFile());
 
-    file.setReadable(true /* readable */, false/* ownerOnly */);
     Logs.log(Log.INFO, "opening file " + file.getAbsolutePath());
-    return new BufferedOutputStream(new FileOutputStream(file));
+    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
+    file.setReadable(true /* readable */, false/* ownerOnly */);
+    return stream;
   }
 
   private static void mkdirs(File dir) {
