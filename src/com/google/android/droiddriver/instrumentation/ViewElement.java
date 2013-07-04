@@ -93,7 +93,7 @@ public class ViewElement extends AbstractUiElement {
 
   @Override
   public String getResourceId() {
-    if (view.getId() != View.NO_ID) {
+    if (view.getId() != View.NO_ID && view.getResources() != null) {
       try {
         return charSequenceToString(view.getResources().getResourceName(view.getId()));
       } catch (Resources.NotFoundException nfe) {
