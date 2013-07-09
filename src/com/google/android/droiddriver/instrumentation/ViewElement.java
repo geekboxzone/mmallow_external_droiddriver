@@ -188,9 +188,13 @@ public class ViewElement extends AbstractUiElement {
   public Rect getVisibleBounds() {
     Rect visibleBounds = new Rect();
     if (!view.getGlobalVisibleRect(visibleBounds)) {
-      Logs.log(Log.DEBUG, "View is invisible: " + toString());
+      Logs.log(Log.VERBOSE, "View is invisible: " + toString());
       visibleBounds.setEmpty();
     }
+    int[] xy = new int[2];
+    view.getLocationOnScreen(xy);
+    // Bounds are relative to root view; adjust to screen coordinates.
+    visibleBounds.offsetTo(xy[0], xy[1]);
     return visibleBounds;
   }
 
