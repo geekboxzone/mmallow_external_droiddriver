@@ -18,21 +18,14 @@ package com.google.android.droiddriver.instrumentation;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.droiddriver.base.AbstractDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
-import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of a UiDriver that is driven via instrumentation.
@@ -47,26 +40,20 @@ public class InstrumentationDriver extends AbstractDroidDriver {
 
   @Override
   public ViewElement getRootElement() {
-    Activity runningActivity = getRunningActivity();
+    return context.getUiElement(findRootView());
+  }
 
+  private View findRootView() {
+    Activity runningActivity = getRunningActivity();
     View[] views = RootFinder.getRootViews();
     if (views.length > 1) {
-      // We are assuming that there is only one root view.
-      Logs.log(Log.WARN, "There are more than one root views.");
+      for (View view : views) {
+        if (view.hasWindowFocus()) {
+          return view;
+        }
+      }
     }
-
-    // Note(twickham): This is no longer needed (will be deleted soon).
-    // Need to create a fake root to be able to traverse all the possible views.
-    /*
-     * RootViewGroup root = new
-     * RootViewGroup(context.getInstrumentation().getTargetContext()); for (View
-     * view : views) { root.addView(view); }
-     */
-
-    // We assume getWindow().getDecorView() on the currently resumed activity is
-    // the sole root.
-    View root = runningActivity.getWindow().getDecorView();
-    return context.getUiElement(root);
+    return runningActivity.getWindow().getDecorView();
   }
 
   private Activity getRunningActivity() {
@@ -84,35 +71,6 @@ public class InstrumentationDriver extends AbstractDroidDriver {
             "Timed out after %d milliseconds waiting for foreground activity", timeoutMillis));
       }
       SystemClock.sleep(Longs.min(250, remainingMillis));
-    }
-  }
-
-  // Note(twickham): This class is no longer in use (will be deleted soon).
-  private static class RootViewGroup extends ViewGroup {
-    private final List<View> children = new ArrayList<View>();
-
-    public RootViewGroup(Context context) {
-      super(context);
-    }
-
-    @Override
-    public void addView(View view) {
-      children.add(view);
-    }
-
-    @Override
-    public int getChildCount() {
-      return children.size();
-    }
-
-    @Override
-    public View getChildAt(int index) {
-      return children.get(index);
-    }
-
-    @Override
-    protected void onLayout(boolean arg0, int arg1, int arg2, int arg3, int arg4) {
-      // Do nothing.
     }
   }
 
@@ -135,7 +93,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
 
   @Override
   protected Bitmap takeScreenshot() {
-    ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(getRootElement().getView());
+    ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
     context.getInstrumentation().runOnMainSync(screenshotRunnable);
     return screenshotRunnable.screenshot;
   }

@@ -223,8 +223,4 @@ public class ViewElement extends AbstractUiElement {
     }
     return context.getUiElement((View) parent);
   }
-
-  public View getView() {
-    return view;
-  }
 }
