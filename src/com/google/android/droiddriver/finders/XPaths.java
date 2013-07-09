@@ -81,6 +81,11 @@ public class XPaths {
     return String.format("[@%s='%s']", attribute.getName(), value);
   }
 
+  /** @return XPath predicate (with enclosing []) for attribute containing value */
+  public static String containsAttr(Attribute attribute, String containedValue) {
+    return String.format("[contains(@%s, '%s')]", attribute.getName(), containedValue);
+  }
+
   /** Shorthand for {@link #attr}{@code (Attribute.TEXT, value)} */
   public static String text(String value) {
     return attr(Attribute.TEXT, value);
