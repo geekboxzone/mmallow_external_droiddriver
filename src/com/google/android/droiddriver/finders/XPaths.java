@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.finders;
 
+import com.google.common.base.Joiner;
+
 /**
  * Convenience methods and constants for XPath.
  * <p>
@@ -78,16 +80,46 @@ public class XPaths {
 
   /** @return XPath predicate (with enclosing []) for attribute with value */
   public static String attr(Attribute attribute, String value) {
-    return String.format("[@%s='%s']", attribute.getName(), value);
+    return String.format("[@%s=%s]", attribute.getName(), quoteXPathLiteral(value));
   }
 
   /** @return XPath predicate (with enclosing []) for attribute containing value */
   public static String containsAttr(Attribute attribute, String containedValue) {
-    return String.format("[contains(@%s, '%s')]", attribute.getName(), containedValue);
+    return String.format("[contains(@%s, %s)]", attribute.getName(),
+        quoteXPathLiteral(containedValue));
   }
 
   /** Shorthand for {@link #attr}{@code (Attribute.TEXT, value)} */
   public static String text(String value) {
     return attr(Attribute.TEXT, value);
+  }
+
+  /**
+   * Adapted from http://stackoverflow.com/questions/1341847/.
+   * <p>
+   * Produce an XPath literal equal to the value if possible; if not, produce an
+   * XPath expression that will match the value. Note that this function will
+   * produce very long XPath expressions if a value contains a long run of
+   * double quotes.
+   */
+  private static String quoteXPathLiteral(String value) {
+    // if the value contains only single or double quotes, construct an XPath
+    // literal
+    if (!value.contains("\"")) {
+      return "\"" + value + "\"";
+    }
+    if (!value.contains("'")) {
+      return "'" + value + "'";
+    }
+
+    // if the value contains both single and double quotes, construct an
+    // expression that concatenates all non-double-quote substrings with
+    // the quotes, e.g.:
+    // concat("foo", '"', "bar")
+    StringBuilder sb = new StringBuilder();
+    sb.append("concat(\"");
+    Joiner.on("\",'\"',\"").appendTo(sb, value.split("\""));
+    sb.append("\")");
+    return sb.toString();
   }
 }
