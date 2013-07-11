@@ -4,11 +4,9 @@ import com.google.android.apps.common.testing.ui.testapp.AbstractSendActivityTes
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.DroidDriverBuilder;
 import com.google.android.droiddriver.DroidDriverBuilder.Implementation;
-import com.google.android.droiddriver.runner.MinSdkVersion;
 
 // Optional annotation to show filtering tests by build version.
-// SDK Version 18 corresponds to JB-mr2 (Android 4.3).
-@MinSdkVersion(18)
+@com.google.android.droiddriver.runner.UseUiAutomation
 public class UseUiAutomation extends AbstractSendActivityTest {
   @Override
   protected DroidDriver getDriver() {

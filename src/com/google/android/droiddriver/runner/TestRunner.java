@@ -34,6 +34,7 @@ import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestListener;
 
+import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -102,18 +103,29 @@ public class TestRunner extends InstrumentationTestRunner {
     requirements.add(new Predicate<TestMethod>() {
       @Override
       public boolean apply(TestMethod arg0) {
-        MinSdkVersion annotation = arg0.getAnnotation(MinSdkVersion.class);
+        MinSdkVersion minSdkVersion = getAnnotation(arg0, MinSdkVersion.class);
+        if (minSdkVersion != null && minSdkVersion.value() > Build.VERSION.SDK_INT) {
+          Logs.logfmt(Log.INFO, "filtered %s#%s: MinSdkVersion=%d", arg0.getEnclosingClassname(),
+              arg0.getName(), minSdkVersion.value());
+          return false;
+        }
+
+        UseUiAutomation useUiAutomation = getAnnotation(arg0, UseUiAutomation.class);
+        if (useUiAutomation != null && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+          Logs.logfmt(Log.INFO,
+              "filtered %s#%s: Has @UseUiAutomation, but ro.build.version.sdk=%d",
+              arg0.getEnclosingClassname(), arg0.getName(), Build.VERSION.SDK_INT);
+          return false;
+        }
+        return true;
+      }
+
+      private <T extends Annotation> T getAnnotation(TestMethod testMethod, Class<T> clazz) {
+        T annotation = testMethod.getAnnotation(clazz);
         if (annotation == null) {
-          annotation = arg0.getEnclosingClass().getAnnotation(MinSdkVersion.class);
+          annotation = testMethod.getEnclosingClass().getAnnotation(clazz);
         }
-        boolean result = annotation == null || annotation.value() <= Build.VERSION.SDK_INT;
-        if (!result) {
-          String msg =
-              String.format("filtered %s#%s: MinSdkVersion=%d", arg0.getEnclosingClassname(),
-                  arg0.getName(), annotation.value());
-          Logs.log(Log.INFO, msg);
-        }
-        return result;
+        return annotation;
       }
     });
     return requirements;
