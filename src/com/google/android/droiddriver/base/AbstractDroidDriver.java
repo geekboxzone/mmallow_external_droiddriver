@@ -100,22 +100,11 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
   @Override
   public boolean has(Finder finder, long timeoutMillis) {
     try {
-      checkExists(finder, timeoutMillis);
+      getPoller().pollFor(this, finder, EXISTS, timeoutMillis);
       return true;
     } catch (TimeoutException e) {
       return false;
     }
-  }
-
-  @Override
-  public void checkExists(Finder finder) {
-    checkExists(finder, getPoller().getTimeoutMillis());
-  }
-
-  @Override
-  public void checkExists(Finder finder, long timeoutMillis) {
-    Logs.call(this, "checkExists", finder, timeoutMillis);
-    getPoller().pollFor(this, finder, EXISTS, timeoutMillis);
   }
 
   @Override
@@ -125,14 +114,15 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
   }
 
   @Override
-  public void checkGone(Finder finder) {
-    checkGone(finder, getPoller().getTimeoutMillis());
+  public void checkExists(Finder finder) {
+    Logs.call(this, "checkExists", finder);
+    getPoller().pollFor(this, finder, EXISTS);
   }
 
   @Override
-  public void checkGone(Finder finder, long timeoutMillis) {
-    Logs.call(this, "checkGone", finder, timeoutMillis);
-    getPoller().pollFor(this, finder, GONE, timeoutMillis);
+  public void checkGone(Finder finder) {
+    Logs.call(this, "checkGone", finder);
+    getPoller().pollFor(this, finder, GONE);
   }
 
   @Override

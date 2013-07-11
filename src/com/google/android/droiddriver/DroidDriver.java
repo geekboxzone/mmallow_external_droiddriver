@@ -32,27 +32,6 @@ public interface DroidDriver {
   boolean has(Finder finder, long timeoutMillis);
 
   /**
-   * Polls until a {@link UiElement} is found using the given finder, or the
-   * default timeout is reached.
-   *
-   * @param finder The matching mechanism
-   * @throws TimeoutException If matching element does not appear within the
-   *         default timeout
-   */
-  void checkExists(Finder finder);
-
-  /**
-   * Polls until a {@link UiElement} is found using the given finder, or
-   * {@code timeoutMillis} is reached.
-   *
-   * @param finder The matching mechanism
-   * @param timeoutMillis The ad-hoc timeout for this method
-   * @throws TimeoutException If matching element does not appear within
-   *         {@code timeoutMillis}
-   */
-  void checkExists(Finder finder, long timeoutMillis);
-
-  /**
    * Returns the first {@link UiElement} found using the given finder. This
    * method will poll until a match is found, or the default timeout is reached.
    * <p>
@@ -79,6 +58,16 @@ public interface DroidDriver {
   UiElement find(Finder finder);
 
   /**
+   * Polls until a {@link UiElement} is found using the given finder, or the
+   * default timeout is reached.
+   *
+   * @param finder The matching mechanism
+   * @throws TimeoutException If matching element does not appear within the
+   *         default timeout
+   */
+  void checkExists(Finder finder);
+
+  /**
    * Polls until the {@link UiElement} found using the given finder is gone, or
    * the default timeout is reached.
    *
@@ -87,17 +76,6 @@ public interface DroidDriver {
    *         timeout
    */
   void checkGone(Finder finder);
-
-  /**
-   * Polls until the {@link UiElement} found using the given finder is gone, or
-   * {@code timeoutMillis} is reached.
-   *
-   * @param finder The matching mechanism
-   * @param timeoutMillis The ad-hoc timeout for this method
-   * @throws TimeoutException If matching element is not gone within
-   *         {@code timeoutMillis}
-   */
-  void checkGone(Finder finder, long timeoutMillis);
 
   /**
    * Returns the {@link Poller}.
