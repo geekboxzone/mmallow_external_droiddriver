@@ -17,7 +17,6 @@
 package com.google.android.droiddriver;
 
 import android.app.Instrumentation;
-import android.app.UiAutomation;
 import android.os.Build;
 
 import com.google.android.droiddriver.exceptions.DroidDriverException;

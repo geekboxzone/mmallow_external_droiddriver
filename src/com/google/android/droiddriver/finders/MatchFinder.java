@@ -46,6 +46,7 @@ public abstract class MatchFinder implements Finder {
   @Override
   public abstract String toString();
 
+  @Override
   public UiElement find(UiElement context) {
     if (matches(context)) {
       Logs.log(Log.INFO, "Found match: " + context);

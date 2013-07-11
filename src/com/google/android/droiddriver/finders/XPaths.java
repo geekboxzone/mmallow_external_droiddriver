@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.finders;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 
 /**
@@ -102,7 +103,8 @@ public class XPaths {
    * produce very long XPath expressions if a value contains a long run of
    * double quotes.
    */
-  private static String quoteXPathLiteral(String value) {
+  @VisibleForTesting
+  static String quoteXPathLiteral(String value) {
     // if the value contains only single or double quotes, construct an XPath
     // literal
     if (!value.contains("\"")) {

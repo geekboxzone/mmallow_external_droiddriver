@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-<!-- dummy resource to keep eclipse from complaining -->
-    <string name="dummy">dummy</string>
-</resources>
-
