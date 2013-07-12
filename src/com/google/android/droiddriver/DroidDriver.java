@@ -21,13 +21,33 @@ import com.google.android.droiddriver.finders.Finder;
 
 public interface DroidDriver {
   /**
-   * Returns whether a matching element exists without polling.
+   * Returns whether a matching element exists without polling. Use this if the
+   * UI is not in the progress of updating.
    */
   boolean has(Finder finder);
 
   /**
-   * Returns whether a matching element exists within up to
-   * {@code timeoutMillis}.
+   * Returns whether a matching element appears within {@code timeoutMillis}.
+   * Use this only if you have no way to determine the content of current page.
+   * There are very few occasions using this is justified. For instance, you are
+   * looking for UiElements in a scrollable view, whose content varies based on
+   * the scroll position. Refrain from using this method in these cases:
+   * <ul>
+   * <li>You know one of a set of UiElements will show, but are not sure which
+   * one. Use this instead:
+   *
+   * <pre>
+   * UiElement el = driver.on(By.anyOf(finder1, finder2, ...));
+   * // UI is stable now, find which one is returned
+   * if (finder1.matches(el)) ...
+   * </pre>
+   *
+   * </li>
+   * <li>You know the UiElement will appear, and want to optimize the speed by
+   * using a smaller timeout than the default timeout. It's not worth it -- on
+   * and checkExists return as soon as the finder is found. If it is not found,
+   * that's a test failure and should be rare.</li>
+   * </ul>
    */
   boolean has(Finder finder, long timeoutMillis);
 

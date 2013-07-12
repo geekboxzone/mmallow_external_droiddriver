@@ -180,8 +180,9 @@ public class By {
    * <p>
    * XPath is the domain-specific-language for navigating a node tree. It is
    * ideal if the UiElement to match has a complex relationship with surrounding
-   * nodes. For simple cases, consider {@link #withParent} or
-   * {@link #withAncestor}. For complex cases like below, XPath is superior:
+   * nodes. For simple cases, {@link #withParent} or {@link #withAncestor} are
+   * preferred, which can combine with other {@link MatchFinder}s in
+   * {@link #allOf}. For complex cases like below, XPath is superior:
    *
    * <pre>
    * {@code
@@ -209,7 +210,6 @@ public class By {
    * @param xPath The xpath to use
    * @return a finder which locates elements via XPath
    */
-  // TODO: add UiElement.findElements
   @Beta
   public static ByXPath xpath(String xPath) {
     return new ByXPath(xPath);
@@ -225,8 +225,8 @@ public class By {
 
   // Hamcrest style finder aggregators
   /**
-   * Evaluates given {@finders} in short-circuit fashion in the
-   * order they are passed. Costly finders (for example those returned by with*
+   * Evaluates given {@finders} in short-circuit fashion in the order
+   * they are passed. Costly finders (for example those returned by with*
    * methods that navigate the node tree) should be passed after cheap finders
    * (for example the ByAttribute finders).
    *
@@ -252,8 +252,8 @@ public class By {
   }
 
   /**
-   * Evaluates given {@finders} in short-circuit fashion in the
-   * order they are passed. Costly finders (for example those returned by with*
+   * Evaluates given {@finders} in short-circuit fashion in the order
+   * they are passed. Costly finders (for example those returned by with*
    * methods that navigate the node tree) should be passed after cheap finders
    * (for example the ByAttribute finders).
    *
