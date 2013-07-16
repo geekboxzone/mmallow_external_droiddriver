@@ -27,6 +27,7 @@ import android.util.Log;
 import com.android.internal.util.Predicate;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -45,6 +46,7 @@ import java.util.Set;
 public class TestRunner extends InstrumentationTestRunner {
   private final Set<Activity> activities = Sets.newIdentityHashSet();
   private final AndroidTestRunner androidTestRunner = new AndroidTestRunner();
+  private Activity runningActivity;
 
   /**
    * Returns an {@link AndroidTestRunner} that is shared by this and super, such
@@ -94,6 +96,14 @@ public class TestRunner extends InstrumentationTestRunner {
       @Override
       public void startTest(Test arg0) {}
     });
+
+    ActivityUtils.setRunningActivitySupplier(new Supplier<Activity>() {
+      @Override
+      public Activity get() {
+        return runningActivity;
+      }
+    });
+
     super.onStart();
   }
 
@@ -146,14 +156,14 @@ public class TestRunner extends InstrumentationTestRunner {
   @Override
   public void callActivityOnResume(Activity activity) {
     super.callActivityOnResume(activity);
-    ActivityUtils.setRunningActivity(activity);
+    runningActivity = activity;
   }
 
   @Override
   public void callActivityOnPause(Activity activity) {
     super.callActivityOnPause(activity);
     if (activity == ActivityUtils.getRunningActivity()) {
-      ActivityUtils.setRunningActivity(null);
+      runningActivity = null;
     }
   }
 }

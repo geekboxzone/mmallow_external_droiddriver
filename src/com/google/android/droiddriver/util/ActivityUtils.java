@@ -18,29 +18,32 @@ package com.google.android.droiddriver.util;
 
 import android.app.Activity;
 
+import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
+import com.google.common.base.Supplier;
+
 /**
  * Static helper methods for retrieving activities.
  */
 public class ActivityUtils {
-  private static Activity runningActivity;
+  private static Supplier<Activity> runningActivitySupplier;
 
   /**
-   * Sets the running (a.k.a. resumed or foreground) activity. Called from
-   * {@link com.google.android.droiddriver.runner.TestRunner}. If a custom
-   * runner is used, it must call this method at appropriate time, otherwise
-   * {@link com.google.android.droiddriver.instrumentation.InstrumentationDriver}
-   * won't work.
+   * Sets the Supplier for the running (a.k.a. resumed or foreground) activity.
+   * Called from {@link com.google.android.droiddriver.runner.TestRunner}. If a
+   * custom runner is used, this method must be called appropriately, otherwise
+   * {@link #getRunningActivity} won't work.
    */
-  public static synchronized void setRunningActivity(Activity activity) {
-    runningActivity = activity;
+  public static synchronized void setRunningActivitySupplier(Supplier<Activity> activitySupplier) {
+    runningActivitySupplier = activitySupplier;
   }
 
   /**
    * Gets the running (a.k.a. resumed or foreground) activity.
+   * {@link InstrumentationDriver} depends on this.
    *
    * @return the currently running activity, or null if no activity has focus.
    */
   public static synchronized Activity getRunningActivity() {
-    return runningActivity;
+    return runningActivitySupplier.get();
   }
 }
