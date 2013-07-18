@@ -73,8 +73,7 @@ public class ByXPath implements Finder {
 
   @Override
   public UiElement find(UiElement context) {
-    AbstractUiElement contextNode = (AbstractUiElement) context;
-    Element domNode = contextNode.getDomNode();
+    Element domNode = ((AbstractUiElement) context).getDomNode();
     try {
       getDocument().appendChild(domNode);
       Element foundNode = (Element) xPathExpression.evaluate(domNode, XPathConstants.NODE);
@@ -91,7 +90,8 @@ public class ByXPath implements Finder {
     } finally {
       try {
         getDocument().removeChild(domNode);
-      } catch (DOMException ignored) {
+      } catch (DOMException e) {
+        Logs.log(Log.ERROR, e, "Failed to clear document");
         document = null; // getDocument will create new
       }
     }
@@ -176,7 +176,7 @@ public class ByXPath implements Finder {
       transformer.transform(new DOMSource(uiElement.getDomNode()), new StreamResult(bos));
       Logs.log(Log.INFO, "Wrote dom to " + path);
     } catch (Exception e) {
-      Logs.log(Log.ERROR, e, "Fail to transform node");
+      Logs.log(Log.ERROR, e, "Failed to transform node");
       return false;
     } finally {
       if (bos != null) {

@@ -35,7 +35,7 @@ import java.util.Map;
 public class InstrumentationContext {
   private final Instrumentation instrumentation;
   private final InputInjector injector;
-  private final Map<View, ViewElement> map = new MapMaker().weakKeys().makeMap();
+  private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
 
   InstrumentationContext(Instrumentation instrumentation) {
     this.instrumentation = Preconditions.checkNotNull(instrumentation);

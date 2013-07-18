@@ -33,8 +33,9 @@ import java.util.Map;
 public class UiAutomationContext {
   private final Instrumentation instrumentation;
   private final InputInjector injector;
+  // Maybe we should use Cache instead of Map on memory-constrained devices
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
-      .makeMap();
+      .weakValues().makeMap();
 
   UiAutomationContext(Instrumentation instrumentation) {
     this.instrumentation = Preconditions.checkNotNull(instrumentation);
@@ -51,7 +52,7 @@ public class UiAutomationContext {
   }
 
   public UiAutomation getUiAutomation() {
-      return instrumentation.getUiAutomation();
+    return instrumentation.getUiAutomation();
   }
 
   public InputInjector getInjector() {
