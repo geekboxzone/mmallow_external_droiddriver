@@ -34,16 +34,28 @@ public class FileUtils {
    * not exist, they will be created. The file will be readable to all.
    */
   public static BufferedOutputStream open(String path) throws FileNotFoundException {
-    File file = new File(path);
-    if (!file.isAbsolute()) {
-      file = new File(System.getProperty("java.io.tmpdir"), path);
-    }
-    mkdirs(file.getParentFile());
+    File file = getAbsoluteFile(path);
 
     Logs.log(Log.INFO, "opening file " + file.getAbsolutePath());
     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
     file.setReadable(true /* readable */, false/* ownerOnly */);
     return stream;
+  }
+
+  /**
+   * Returns a new file constructed using the absolute path of {@code path}.
+   * Unlike {@link File#getAbsoluteFile()}, default parent is "java.io.tmpdir"
+   * instead of "user.dir".
+   * <p>
+   * If any directories on {@code path} do not exist, they will be created.
+   */
+  public static File getAbsoluteFile(String path) {
+    File file = new File(path);
+    if (!file.isAbsolute()) {
+      file = new File(System.getProperty("java.io.tmpdir"), path);
+    }
+    mkdirs(file.getParentFile());
+    return file;
   }
 
   private static void mkdirs(File dir) {

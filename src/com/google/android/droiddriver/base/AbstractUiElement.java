@@ -32,11 +32,13 @@ import com.google.common.base.Objects.ToStringHelper;
 
 import org.w3c.dom.Element;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Abstract implementation with common methods already implemented.
  */
 public abstract class AbstractUiElement implements UiElement {
-  private Element domNode;
+  private WeakReference<Element> domNode;
 
   @Override
   public <T> T get(Attribute attribute) {
@@ -120,11 +122,15 @@ public abstract class AbstractUiElement implements UiElement {
   /**
    * Used internally in {@link ByXPath}. Returns the DOM node representing this
    * UiElement. The DOM is constructed from the UiElement tree.
+   * <p>
+   * TODO: move this to {@link ByXPath}. This requires a BiMap using
+   * WeakReference for both keys and values, which is error-prone. This will be
+   * deferred until we decide whether to clear cache upon getRootElement.
    */
   public Element getDomNode() {
-    if (domNode == null) {
-      domNode = ByXPath.buildDomNode(this);
+    if (domNode == null || domNode.get() == null) {
+      domNode = new WeakReference<Element>(ByXPath.buildDomNode(this));
     }
-    return domNode;
+    return domNode.get();
   }
 }
