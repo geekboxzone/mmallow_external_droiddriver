@@ -65,24 +65,35 @@ public class Events {
   }
 
   /**
-   * Injects {@code event}, and recycles it. After calling this function you
-   * must not ever touch the event again.
-   */
-  public static boolean tryInjectEvent(InputInjector injector, MotionEvent event) {
-    Logs.call(injector, "injectInputEvent", event);
-    boolean injected = injector.injectInputEvent(event);
-    event.recycle();
-    return injected;
-  }
-
-  /**
-   * Calls {@link #tryInjectEvent}, and throws in case of failure.
+   * Injects {@code event}. {@code event} is recycled and should not be used
+   * after.
+   *
+   * @throws ActionException if injection failed
    */
   public static void injectEvent(InputInjector injector, MotionEvent event) {
-    String eventString = event.toString();
-    if (!tryInjectEvent(injector, event)) {
-      throw new ActionException("Failed to inject " + eventString);
+    Logs.call(injector, "injectInputEvent", event);
+    try {
+      if (!injector.injectInputEvent(event)) {
+        throw new ActionException("Failed to inject " + event);
+      }
+    } finally {
+      event.recycle();
     }
+  }
+
+  public static long touchDown(InputInjector injector, int x, int y) {
+    MotionEvent downEvent = newTouchDownEvent(x, y);
+    long downTime = downEvent.getDownTime();
+    injectEvent(injector, downEvent);
+    return downTime;
+  }
+
+  public static void touchUp(InputInjector injector, long downTime, int x, int y) {
+    injectEvent(injector, newTouchUpEvent(downTime, x, y));
+  }
+
+  public static void touchMove(InputInjector injector, long downTime, int x, int y) {
+    injectEvent(injector, newTouchMoveEvent(downTime, x, y));
   }
 
   private Events() {}

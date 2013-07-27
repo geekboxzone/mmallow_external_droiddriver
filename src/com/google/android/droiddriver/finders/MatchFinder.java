@@ -56,7 +56,7 @@ public abstract class MatchFinder implements Finder {
     for (int i = 0; i < childCount; i++) {
       UiElement child = context.getChild(i);
       if (child == null) {
-        Logs.log(Log.WARN, "Skip null child for " + context);
+        Logs.log(Log.INFO, "Skip null child for " + context);
         continue;
       }
       if (!child.isVisible()) {

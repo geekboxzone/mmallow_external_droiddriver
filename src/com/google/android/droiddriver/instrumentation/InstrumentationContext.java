@@ -23,7 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.MapMaker;
 
@@ -47,7 +47,7 @@ public class InstrumentationContext {
         } else if (event instanceof KeyEvent) {
           getInstrumentation().sendKeySync((KeyEvent) event);
         } else {
-          throw new DroidDriverException("Unknown input event type: " + event);
+          throw new ActionException("Unknown input event type: " + event);
         }
         return true;
       }

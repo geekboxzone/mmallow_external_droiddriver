@@ -29,10 +29,14 @@ import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 
 import org.w3c.dom.Element;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * Abstract implementation with common methods already implemented.
@@ -96,6 +100,20 @@ public abstract class AbstractUiElement implements UiElement {
     if (!isVisible()) {
       throw new ElementNotVisibleException(this);
     }
+  }
+
+  @Override
+  public List<UiElement> getChildren(Predicate<? super UiElement> predicate) {
+    predicate = Predicates.and(Predicates.notNull(), predicate);
+    // TODO: Use internal data when we take snapshot of current node tree.
+    ImmutableList.Builder<UiElement> builder = ImmutableList.builder();
+    for (int i = 0; i < getChildCount(); i++) {
+      UiElement child = getChild(i);
+      if (predicate.apply(child)) {
+        builder.add(child);
+      }
+    }
+    return builder.build();
   }
 
   @Override

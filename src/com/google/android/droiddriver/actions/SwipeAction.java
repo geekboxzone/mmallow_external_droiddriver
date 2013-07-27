@@ -16,15 +16,14 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.graphics.Rect;
+import android.os.SystemClock;
+import android.view.ViewConfiguration;
+
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.util.Events;
-
-import android.graphics.Rect;
-import android.os.SystemClock;
-import android.view.MotionEvent;
-import android.view.ViewConfiguration;
 
 /**
  * An action that does a swipe.
@@ -41,10 +40,10 @@ public class SwipeAction implements Action {
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
-    Rect elementRect = element.getBounds();
+    Rect elementRect = element.getVisibleBounds();
 
-    int swipeAreaHeightAdjust = (int)(elementRect.height() * 0.1);
-    int swipeAreaWidthAdjust = (int)(elementRect.width() * 0.1);
+    int swipeAreaHeightAdjust = (int) (elementRect.height() * 0.1);
+    int swipeAreaWidthAdjust = (int) (elementRect.width() * 0.1);
     int steps = 50;
     int startX;
     int startY;
@@ -80,25 +79,23 @@ public class SwipeAction implements Action {
         throw new ActionException("Unknown scroll direction: " + direction);
     }
 
-    double xStep = ((double)(endX - startX)) / steps;
-    double yStep = ((double)(endY - startY)) / steps;
+    double xStep = ((double) (endX - startX)) / steps;
+    double yStep = ((double) (endY - startY)) / steps;
 
     // First touch starts exactly at the point requested
-    MotionEvent downEvent = Events.newTouchDownEvent(startX, startY);
-    injector.injectInputEvent(downEvent);
+    long downTime = Events.touchDown(injector, startX, startY);
     if (drag) {
       SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5f));
     }
     for (int i = 1; i < steps; i++) {
-      injector.injectInputEvent(Events.newTouchMoveEvent(downEvent.getDownTime(),
-          startX + (int)(xStep * i), startY + (int)(yStep * i)));
+      Events.touchMove(injector, downTime, startX + (int) (xStep * i), startY + (int) (yStep * i));
       SystemClock.sleep(5);
     }
     if (drag) {
       // Hold final position for a little bit to simulate drag.
       SystemClock.sleep(100);
     }
-    return injector.injectInputEvent(
-        Events.newTouchUpEvent(downEvent.getDownTime(), endX, endY));
+    Events.touchUp(injector, downTime, endX, endY);
+    return true;
   }
 }

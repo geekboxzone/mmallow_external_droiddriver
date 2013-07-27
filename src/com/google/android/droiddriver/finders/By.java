@@ -216,11 +216,11 @@ public class By {
   }
 
   /**
-   * @return a finder that uses the UiElement returned by first Finder as
-   *         context for the second Finder
+   * @return a finder that uses the UiElement returned by parent Finder as
+   *         context for the child Finder
    */
-  public static ChainFinder chain(Finder first, Finder second) {
-    return new ChainFinder(first, second);
+  public static ChainFinder chain(Finder parent, Finder child) {
+    return new ChainFinder(parent, child);
   }
 
   // Hamcrest style finder aggregators

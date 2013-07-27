@@ -25,6 +25,8 @@ import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 public interface Finder {
   /**
    * Returns the matching UiElement. The implementing finder should not poll.
+   * <p>
+   * Invisible UiElements are skipped.
    *
    * @param context The starting UiElement, used as search context
    * @return The first matching element on the current context

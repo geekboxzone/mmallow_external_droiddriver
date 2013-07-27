@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver;
 
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
 
 /**
@@ -79,6 +80,43 @@ public interface Poller {
   @SuppressWarnings("serial")
   class UnsatisfiedConditionException extends Exception {
   }
+
+  /**
+   * A ConditionChecker that returns the matching {@link UiElement}.
+   */
+  ConditionChecker<UiElement> EXISTS = new ConditionChecker<UiElement>() {
+    @Override
+    public UiElement check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
+      try {
+        return driver.find(finder);
+      } catch (ElementNotFoundException e) {
+        throw new UnsatisfiedConditionException();
+      }
+    }
+
+    @Override
+    public String toString() {
+      return "to appear";
+    }
+  };
+  /**
+   * A ConditionChecker that does not throw only if the matching
+   * {@link UiElement} is gone.
+   */
+  ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
+    @Override
+    public Void check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
+      if (driver.has(finder)) {
+        throw new UnsatisfiedConditionException();
+      }
+      return null;
+    }
+
+    @Override
+    public String toString() {
+      return "to disappear";
+    }
+  };
 
   /**
    * Polls until {@code checker} does not throw

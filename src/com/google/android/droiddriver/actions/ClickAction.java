@@ -18,7 +18,6 @@ package com.google.android.droiddriver.actions;
 
 import android.graphics.Rect;
 import android.os.SystemClock;
-import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 import com.google.android.droiddriver.InputInjector;
@@ -35,11 +34,11 @@ public enum ClickAction implements Action {
     @Override
     public boolean perform(InputInjector injector, UiElement element) {
       Rect elementRect = element.getVisibleBounds();
-      long downTime = sendDown(injector, elementRect);
+      long downTime = Events.touchDown(injector, elementRect.centerX(), elementRect.centerY());
       // UiAutomator clickAndSync does this, while
       // android.test.TouchUtils#clickView sleep 1000
       SystemClock.sleep(CLICK_DURATION_MILLIS);
-      sendUp(injector, elementRect, downTime);
+      Events.touchUp(injector, downTime, elementRect.centerX(), elementRect.centerY());
       return true;
     }
   },
@@ -48,10 +47,10 @@ public enum ClickAction implements Action {
     @Override
     public boolean perform(InputInjector injector, UiElement element) {
       Rect elementRect = element.getVisibleBounds();
-      long downTime = sendDown(injector, elementRect);
+      long downTime = Events.touchDown(injector, elementRect.centerX(), elementRect.centerY());
       // see android.test.TouchUtils - *1.5 to make sure it's long press
       SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5));
-      sendUp(injector, elementRect, downTime);
+      Events.touchUp(injector, downTime, elementRect.centerX(), elementRect.centerY());
       return true;
     }
   },
@@ -66,17 +65,4 @@ public enum ClickAction implements Action {
   };
 
   private static final long CLICK_DURATION_MILLIS = 100;
-
-  private static long sendDown(InputInjector injector, Rect elementRect) {
-    MotionEvent downEvent = Events.newTouchDownEvent(elementRect.centerX(), elementRect.centerY());
-    long downTime = downEvent.getDownTime();
-    Events.injectEvent(injector, downEvent);
-    return downTime;
-  }
-
-  private static void sendUp(InputInjector injector, Rect elementRect, long downTime) {
-    MotionEvent upEvent =
-        Events.newTouchUpEvent(downTime, elementRect.centerX(), elementRect.centerY());
-    Events.injectEvent(injector, upEvent);
-  }
 }

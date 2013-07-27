@@ -141,7 +141,7 @@ public class ByXPath implements Finder {
     for (int i = 0; i < childCount; i++) {
       AbstractUiElement child = uiElement.getChild(i);
       if (child == null) {
-        Logs.log(Log.WARN, "Skip null child for " + uiElement);
+        Logs.log(Log.INFO, "Skip null child for " + uiElement);
         continue;
       }
       if (!child.isVisible()) {

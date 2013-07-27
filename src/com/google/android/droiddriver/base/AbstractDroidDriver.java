@@ -23,8 +23,6 @@ import android.util.Log;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.Screenshotter;
-import com.google.android.droiddriver.Poller.ConditionChecker;
-import com.google.android.droiddriver.Poller.UnsatisfiedConditionException;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
@@ -41,43 +39,6 @@ import java.io.BufferedOutputStream;
  * should not differ in implementations of {@link DroidDriver}.
  */
 public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter {
-
-  /**
-   * A ConditionChecker that does not throw only if the matching
-   * {@link UiElement} is gone.
-   */
-  private static final ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
-    @Override
-    public Void check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
-      if (driver.has(finder)) {
-        throw new UnsatisfiedConditionException();
-      }
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return "to disappear";
-    }
-  };
-  /**
-   * A ConditionChecker that returns the matching {@link UiElement}.
-   */
-  private static final ConditionChecker<UiElement> EXISTS = new ConditionChecker<UiElement>() {
-    @Override
-    public UiElement check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
-      try {
-        return driver.find(finder);
-      } catch (ElementNotFoundException e) {
-        throw new UnsatisfiedConditionException();
-      }
-    }
-
-    @Override
-    public String toString() {
-      return "to appear";
-    }
-  };
 
   private Poller poller = new DefaultPoller();
 
@@ -100,7 +61,7 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
   @Override
   public boolean has(Finder finder, long timeoutMillis) {
     try {
-      getPoller().pollFor(this, finder, EXISTS, timeoutMillis);
+      getPoller().pollFor(this, finder, Poller.EXISTS, timeoutMillis);
       return true;
     } catch (TimeoutException e) {
       return false;
@@ -110,19 +71,19 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
   @Override
   public UiElement on(Finder finder) {
     Logs.call(this, "on", finder);
-    return getPoller().pollFor(this, finder, EXISTS);
+    return getPoller().pollFor(this, finder, Poller.EXISTS);
   }
 
   @Override
   public void checkExists(Finder finder) {
     Logs.call(this, "checkExists", finder);
-    getPoller().pollFor(this, finder, EXISTS);
+    getPoller().pollFor(this, finder, Poller.EXISTS);
   }
 
   @Override
   public void checkGone(Finder finder) {
     Logs.call(this, "checkGone", finder);
-    getPoller().pollFor(this, finder, GONE);
+    getPoller().pollFor(this, finder, Poller.GONE);
   }
 
   @Override

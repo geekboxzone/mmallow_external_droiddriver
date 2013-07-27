@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver;
 
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.Finder;
 
@@ -54,9 +55,6 @@ public interface DroidDriver {
   /**
    * Returns the first {@link UiElement} found using the given finder. This
    * method will poll until a match is found, or the default timeout is reached.
-   * <p>
-   * Users are advised not to store the returned instance for later use -- the
-   * instance could be short-lived and become stale.
    *
    * @param finder The matching mechanism
    * @return The first matching element

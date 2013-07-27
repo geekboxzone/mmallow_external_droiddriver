@@ -20,25 +20,25 @@ import com.google.android.droiddriver.UiElement;
 import com.google.common.base.Preconditions;
 
 /**
- * Find UiElement by using the UiElement returned by first Finder as context
- * for the second Finder.
+ * Find UiElement by using the UiElement returned by parent Finder as context
+ * for the child Finder.
  */
 public class ChainFinder implements Finder {
-  private final Finder first;
-  private final Finder second;
+  private final Finder parent;
+  private final Finder child;
 
-  protected ChainFinder(Finder first, Finder second) {
-    this.first = Preconditions.checkNotNull(first);
-    this.second = Preconditions.checkNotNull(second);
+  protected ChainFinder(Finder parent, Finder child) {
+    this.parent = Preconditions.checkNotNull(parent);
+    this.child = Preconditions.checkNotNull(child);
   }
 
   @Override
   public String toString() {
-    return String.format("ChainFinder{%s, %s}", first, second);
+    return String.format("ChainFinder{%s, %s}", parent, child);
   }
 
   @Override
   public UiElement find(UiElement context) {
-    return second.find(first.find(context));
+    return child.find(parent.find(context));
   }
 }
