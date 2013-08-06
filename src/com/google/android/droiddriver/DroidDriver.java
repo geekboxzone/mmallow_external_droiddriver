@@ -106,7 +106,10 @@ public interface DroidDriver {
   void setPoller(Poller poller);
 
   /**
-   * Dumps the UiElement tree to a file to help debug.
+   * Dumps the UiElement tree to a file to help debug. The tree is based on the
+   * last used root UiElement if it exists. Screenshot is always current. If
+   * they do not match, the UiElement tree must be stale, indicating that you
+   * should use a fresh UiElement instead of an old instance.
    *
    * @param path the path of file to save the tree
    * @return whether the dumping succeeded

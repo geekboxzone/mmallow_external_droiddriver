@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver;
-
-import android.view.InputEvent;
+package com.google.android.droiddriver.actions;
 
 /**
- * Interface for interacting with the UI via InputEvent injection.
+ * Base class of {@link Action} that implements {@link #getTimeoutMillis}.
  */
-public interface InputInjector {
+public abstract class BaseAction implements Action {
+  private final long timeoutMillis;
 
-  /**
-   * Injects the {@code event}.
-   *
-   * @param event The event to inject.
-   * @return true if the injection succeeded.
-   */
-  boolean injectInputEvent(InputEvent event);
+  @Override
+  public long getTimeoutMillis() {
+    return timeoutMillis;
+  }
+
+  protected BaseAction(long timeoutMillis) {
+    this.timeoutMillis = timeoutMillis;
+  }
 }

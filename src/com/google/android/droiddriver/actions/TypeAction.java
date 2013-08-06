@@ -29,14 +29,22 @@ import android.view.KeyEvent;
 /**
  * An action to type text.
  */
-public class TypeAction implements Action {
+public class TypeAction extends KeyAction {
 
   private static final KeyCharacterMap KEY_CHAR_MAP = KeyCharacterMap
       .load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
   private final String text;
 
+  /**
+   * Defaults timeoutMillis to 0.
+   */
   public TypeAction(String text) {
+    this(text, 0L);
+  }
+
+  public TypeAction(String text, long timeoutMillis) {
+    super(timeoutMillis);
     this.text = Preconditions.checkNotNull(text);
   }
 

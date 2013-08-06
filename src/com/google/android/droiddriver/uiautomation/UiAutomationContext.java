@@ -16,13 +16,12 @@
 
 package com.google.android.droiddriver.uiautomation;
 
-import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.view.InputEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.InputInjector;
-import com.google.common.base.Preconditions;
+import com.google.android.droiddriver.base.AbstractContext;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
@@ -30,33 +29,20 @@ import java.util.Map;
 /**
  * Internal helper for managing all instances.
  */
-public class UiAutomationContext {
-  private final Instrumentation instrumentation;
-  private final InputInjector injector;
+public class UiAutomationContext extends AbstractContext {
   // Maybe we should use Cache instead of Map on memory-constrained devices
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
       .weakValues().makeMap();
+  private final UiAutomation uiAutomation;
 
-  UiAutomationContext(Instrumentation instrumentation) {
-    this.instrumentation = Preconditions.checkNotNull(instrumentation);
-    injector = new InputInjector() {
+  UiAutomationContext(final UiAutomation uiAutomation) {
+    super(new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
-        return getUiAutomation().injectInputEvent(event, true /* sync */);
+        return uiAutomation.injectInputEvent(event, true /* sync */);
       }
-    };
-  }
-
-  public Instrumentation getInstrumentation() {
-    return instrumentation;
-  }
-
-  public UiAutomation getUiAutomation() {
-    return instrumentation.getUiAutomation();
-  }
-
-  public InputInjector getInjector() {
-    return injector;
+    });
+    this.uiAutomation = uiAutomation;
   }
 
   public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {
@@ -66,5 +52,14 @@ public class UiAutomationContext {
       map.put(node, element);
     }
     return element;
+  }
+
+  @Override
+  public void clearData() {
+    map.clear();
+  }
+
+  public UiAutomation getUiAutomation() {
+    return uiAutomation;
   }
 }

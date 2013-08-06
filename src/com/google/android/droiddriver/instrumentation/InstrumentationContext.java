@@ -23,8 +23,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.base.AbstractContext;
 import com.google.android.droiddriver.exceptions.ActionException;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
@@ -32,34 +32,23 @@ import java.util.Map;
 /**
  * Internal helper for managing all instances.
  */
-public class InstrumentationContext {
-  private final Instrumentation instrumentation;
-  private final InputInjector injector;
+public class InstrumentationContext extends AbstractContext {
   private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
 
-  InstrumentationContext(Instrumentation instrumentation) {
-    this.instrumentation = Preconditions.checkNotNull(instrumentation);
-    injector = new InputInjector() {
+  InstrumentationContext(final Instrumentation instrumentation) {
+    super(new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
         if (event instanceof MotionEvent) {
-          getInstrumentation().sendPointerSync((MotionEvent) event);
+          instrumentation.sendPointerSync((MotionEvent) event);
         } else if (event instanceof KeyEvent) {
-          getInstrumentation().sendKeySync((KeyEvent) event);
+          instrumentation.sendKeySync((KeyEvent) event);
         } else {
           throw new ActionException("Unknown input event type: " + event);
         }
         return true;
       }
-    };
-  }
-
-  public Instrumentation getInstrumentation() {
-    return instrumentation;
-  }
-
-  public InputInjector getInjector() {
-    return injector;
+    });
   }
 
   public ViewElement getUiElement(View view) {
@@ -69,5 +58,10 @@ public class InstrumentationContext {
       map.put(view, element);
     }
     return element;
+  }
+
+  @Override
+  public void clearData() {
+    map.clear();
   }
 }

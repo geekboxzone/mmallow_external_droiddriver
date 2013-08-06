@@ -39,29 +39,34 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   private static final long QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE = 500;// ms
 
   private final UiAutomationContext context;
-  private final Instrumentation instrumentation;
+  private final UiAutomation uiAutomation;
 
   public UiAutomationDriver(Instrumentation instrumentation) {
-    this.instrumentation = instrumentation;
-    this.context = new UiAutomationContext(instrumentation);
+    super(instrumentation);
+    this.uiAutomation = instrumentation.getUiAutomation();
+    this.context = new UiAutomationContext(uiAutomation);
   }
 
   @Override
-  public UiAutomationElement getRootElement() {
+  protected UiAutomationElement getNewRootElement() {
     return context.getUiElement(getRootNode());
+  }
+
+  @Override
+  protected UiAutomationContext getContext() {
+    return context;
   }
 
   private AccessibilityNodeInfo getRootNode() {
     long timeoutMillis = getPoller().getTimeoutMillis();
     try {
-      getUiAutomation().waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE,
-              timeoutMillis);
+      uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
     } catch (java.util.concurrent.TimeoutException e) {
       throw new TimeoutException(e);
     }
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+      AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();
       if (root != null) {
         return root;
       }
@@ -77,10 +82,6 @@ public class UiAutomationDriver extends AbstractDroidDriver {
 
   @Override
   protected Bitmap takeScreenshot() {
-    return getUiAutomation().takeScreenshot();
-  }
-
-  private UiAutomation getUiAutomation() {
-      return instrumentation.getUiAutomation();
+    return uiAutomation.takeScreenshot();
   }
 }

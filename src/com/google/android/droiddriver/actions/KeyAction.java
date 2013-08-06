@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver;
-
-import android.view.InputEvent;
+package com.google.android.droiddriver.actions;
 
 /**
- * Interface for interacting with the UI via InputEvent injection.
+ * Base class for {@link Action} that injects key events.
  */
-public interface InputInjector {
-
-  /**
-   * Injects the {@code event}.
-   *
-   * @param event The event to inject.
-   * @return true if the injection succeeded.
-   */
-  boolean injectInputEvent(InputEvent event);
+public abstract class KeyAction extends BaseAction {
+  protected KeyAction(long timeoutMillis) {
+    super(timeoutMillis);
+  }
 }

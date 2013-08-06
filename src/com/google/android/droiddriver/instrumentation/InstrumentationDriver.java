@@ -31,16 +31,21 @@ import com.google.common.primitives.Longs;
  * Implementation of a UiDriver that is driven via instrumentation.
  */
 public class InstrumentationDriver extends AbstractDroidDriver {
-
   private final InstrumentationContext context;
 
   public InstrumentationDriver(Instrumentation instrumentation) {
+    super(instrumentation);
     this.context = new InstrumentationContext(instrumentation);
   }
 
   @Override
-  public ViewElement getRootElement() {
+  protected ViewElement getNewRootElement() {
     return context.getUiElement(findRootView());
+  }
+
+  @Override
+  protected InstrumentationContext getContext() {
+    return context;
   }
 
   private View findRootView() {
@@ -60,7 +65,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     long timeoutMillis = getPoller().getTimeoutMillis();
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      context.getInstrumentation().waitForIdleSync();
+      instrumentation.waitForIdleSync();
       Activity runningActivity = ActivityUtils.getRunningActivity();
       if (runningActivity != null) {
         return runningActivity;
@@ -94,7 +99,7 @@ public class InstrumentationDriver extends AbstractDroidDriver {
   @Override
   protected Bitmap takeScreenshot() {
     ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
-    context.getInstrumentation().runOnMainSync(screenshotRunnable);
+    instrumentation.runOnMainSync(screenshotRunnable);
     return screenshotRunnable.screenshot;
   }
 }

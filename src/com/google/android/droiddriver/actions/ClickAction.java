@@ -22,15 +22,53 @@ import android.view.ViewConfiguration;
 
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.util.Events;
 
 /**
  * An action that does clicks on an UiElement.
  */
-public enum ClickAction implements Action {
-  SINGLE {
-    /** @throws ActionException */
+public abstract class ClickAction extends BaseAction {
+
+  public static final ClickAction SINGLE = new SingleClick(1000L);
+  public static final ClickAction LONG = new LongClick(1000L);
+  public static final ClickAction DOUBLE = new DoubleClick(1000L);
+
+  private static final long CLICK_DURATION_MILLIS = 100L;
+
+  public static class DoubleClick extends ClickAction {
+    public DoubleClick(long timeoutMillis) {
+      super(timeoutMillis);
+    }
+
+    @Override
+    public boolean perform(InputInjector injector, UiElement element) {
+      SINGLE.perform(injector, element);
+      SINGLE.perform(injector, element);
+      return true;
+    }
+  }
+
+  private static class LongClick extends ClickAction {
+    public LongClick(long timeoutMillis) {
+      super(timeoutMillis);
+    }
+
+    @Override
+    public boolean perform(InputInjector injector, UiElement element) {
+      Rect elementRect = element.getVisibleBounds();
+      long downTime = Events.touchDown(injector, elementRect.centerX(), elementRect.centerY());
+      // see android.test.TouchUtils - *1.5 to make sure it's long press
+      SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5));
+      Events.touchUp(injector, downTime, elementRect.centerX(), elementRect.centerY());
+      return true;
+    }
+  }
+
+  public static class SingleClick extends ClickAction {
+    public SingleClick(long timeoutMillis) {
+      super(timeoutMillis);
+    }
+
     @Override
     public boolean perform(InputInjector injector, UiElement element) {
       Rect elementRect = element.getVisibleBounds();
@@ -41,28 +79,14 @@ public enum ClickAction implements Action {
       Events.touchUp(injector, downTime, elementRect.centerX(), elementRect.centerY());
       return true;
     }
-  },
-  LONG {
-    /** @throws ActionException */
-    @Override
-    public boolean perform(InputInjector injector, UiElement element) {
-      Rect elementRect = element.getVisibleBounds();
-      long downTime = Events.touchDown(injector, elementRect.centerX(), elementRect.centerY());
-      // see android.test.TouchUtils - *1.5 to make sure it's long press
-      SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5));
-      Events.touchUp(injector, downTime, elementRect.centerX(), elementRect.centerY());
-      return true;
-    }
-  },
-  DOUBLE {
-    /** @throws ActionException */
-    @Override
-    public boolean perform(InputInjector injector, UiElement element) {
-      SINGLE.perform(injector, element);
-      SINGLE.perform(injector, element);
-      return true;
-    }
-  };
+  }
 
-  private static final long CLICK_DURATION_MILLIS = 100;
+  protected ClickAction(long timeoutMillis) {
+    super(timeoutMillis);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
+  }
 }

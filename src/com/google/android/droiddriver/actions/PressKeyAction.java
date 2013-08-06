@@ -25,12 +25,20 @@ import com.google.android.droiddriver.util.Events;
 import com.google.common.base.Objects;
 
 /**
- * An general action to press any of the soft keys on the device.
+ * An action to press a single key. TODO: rename to SingleKeyAction
  */
-public class PressKeyAction implements Action {
+public class PressKeyAction extends KeyAction {
   private final int keyCode;
 
+  /**
+   * Defaults timeoutMillis to 0.
+   */
   public PressKeyAction(int keyCode) {
+    this(keyCode, 0L);
+  }
+
+  public PressKeyAction(int keyCode, long timeoutMillis) {
+    super(timeoutMillis);
     this.keyCode = keyCode;
   }
 

@@ -26,14 +26,22 @@ import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.util.Events;
 
 /**
- * An action that does a swipe.
+ * A {@link ScrollAction} that swipes the touch screen.
  */
-public class SwipeAction implements Action {
+public class SwipeAction extends ScrollAction {
 
   private final ScrollDirection direction;
   private final boolean drag;
 
+  /**
+   * Defaults timeoutMillis to 0.
+   */
   public SwipeAction(ScrollDirection direction, boolean drag) {
+    this(direction, drag, 0L);
+  }
+
+  public SwipeAction(ScrollDirection direction, boolean drag, long timeoutMillis) {
+    super(timeoutMillis);
     this.direction = direction;
     this.drag = drag;
   }

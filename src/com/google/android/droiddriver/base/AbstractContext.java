@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver;
+package com.google.android.droiddriver.base;
 
-import android.view.InputEvent;
+import com.google.android.droiddriver.InputInjector;
 
 /**
- * Interface for interacting with the UI via InputEvent injection.
+ * Internal helper for managing all instances.
  */
-public interface InputInjector {
+public abstract class AbstractContext {
+  protected final InputInjector injector;
 
-  /**
-   * Injects the {@code event}.
-   *
-   * @param event The event to inject.
-   * @return true if the injection succeeded.
-   */
-  boolean injectInputEvent(InputEvent event);
+  protected AbstractContext(InputInjector injector) {
+    this.injector = injector;
+  }
+
+  public InputInjector getInjector() {
+    return injector;
+  }
+
+  /** Clears data in the context */
+  public abstract void clearData();
 }

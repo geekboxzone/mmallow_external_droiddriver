@@ -16,23 +16,35 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.view.InputEvent;
+
 import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 
 /**
- * Interface for performing action on a UiElement.
+ * Interface for performing action on a UiElement. An action is a high-level
+ * user interaction that consists of a series of {@link InputEvent}s.
  */
 public interface Action {
   /**
    * Performs the action.
    *
-   * @param injector the injector to inject input events
+   * @param injector the injector to inject {@link InputEvent}s
    * @param element the Ui element to perform the action on
    * @return Whether the action is successful. Some actions throw exceptions in
    *         case of failure, when that behavior is more appropriate. For
    *         example, ClickAction.
    */
   boolean perform(InputInjector injector, UiElement element);
+
+  /**
+   * Gets the timeout to wait for an indicator that the action has been carried
+   * out. Different DroidDriver implementations use this value in different
+   * ways. For example, UiAutomationDriver waits for AccessibilityEvent up to
+   * this value. InstrumentationDriver ignores this value because it
+   * synchronizes on the event loop.
+   */
+  long getTimeoutMillis();
 
   /**
    * {@inheritDoc}

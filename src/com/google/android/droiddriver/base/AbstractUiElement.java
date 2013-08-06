@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 /**
  * Abstract implementation with common methods already implemented.
@@ -53,7 +55,37 @@ public abstract class AbstractUiElement implements UiElement {
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
     checkVisible();
+    return performAndWait(action);
+  }
+
+  protected boolean doPerform(Action action) {
     return action.perform(getInjector(), this);
+  }
+
+  protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
+    // ignores timeoutMillis; subclasses can override this behavior
+    futureTask.run();
+  }
+
+  private boolean performAndWait(final Action action) {
+    // timeoutMillis <= 0 means no need to wait
+    if (action.getTimeoutMillis() <= 0) {
+      return doPerform(action);
+    }
+
+    FutureTask<Boolean> futureTask = new FutureTask<Boolean>(new Callable<Boolean>() {
+      @Override
+      public Boolean call() {
+        return doPerform(action);
+      }
+    });
+    doPerformAndWait(futureTask, action.getTimeoutMillis());
+    try {
+      return futureTask.get();
+    } catch (Exception e) {
+      // should not reach here b/c futureTask has run
+      return false;
+    }
   }
 
   @Override
