@@ -16,11 +16,23 @@
 
 package com.google.android.droiddriver.actions;
 
+import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ActionException;
+
 /**
  * Base class for {@link Action} that injects key events.
  */
 public abstract class KeyAction extends BaseAction {
-  protected KeyAction(long timeoutMillis) {
+  private final boolean checkFocused;
+
+  protected KeyAction(long timeoutMillis, boolean checkFocused) {
     super(timeoutMillis);
+    this.checkFocused = checkFocused;
+  }
+
+  protected void maybeCheckFocused(UiElement element) {
+    if (checkFocused && element != null && !element.isFocused()) {
+      throw new ActionException(element + " is not focused");
+    }
   }
 }

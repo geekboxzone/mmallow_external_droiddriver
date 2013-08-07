@@ -37,19 +37,21 @@ public class TypeAction extends KeyAction {
   private final String text;
 
   /**
-   * Defaults timeoutMillis to 0.
+   * Defaults timeoutMillis to 100.
    */
   public TypeAction(String text) {
-    this(text, 0L);
+    this(text, 100L, false);
   }
 
-  public TypeAction(String text, long timeoutMillis) {
-    super(timeoutMillis);
+  public TypeAction(String text, long timeoutMillis, boolean checkFocused) {
+    super(timeoutMillis, checkFocused);
     this.text = Preconditions.checkNotNull(text);
   }
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
+    maybeCheckFocused(element);
+
     // TODO: recycle events?
     KeyEvent[] events = KEY_CHAR_MAP.getEvents(text.toCharArray());
     boolean success = false;

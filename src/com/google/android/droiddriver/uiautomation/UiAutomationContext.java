@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.view.InputEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -35,14 +36,14 @@ public class UiAutomationContext extends AbstractContext {
       .weakValues().makeMap();
   private final UiAutomation uiAutomation;
 
-  UiAutomationContext(final UiAutomation uiAutomation) {
-    super(new InputInjector() {
+  UiAutomationContext(final Instrumentation instrumentation, UiAutomationDriver driver) {
+    super(instrumentation, driver, new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
-        return uiAutomation.injectInputEvent(event, true /* sync */);
+        return instrumentation.getUiAutomation().injectInputEvent(event, true /* sync */);
       }
     });
-    this.uiAutomation = uiAutomation;
+    this.uiAutomation = instrumentation.getUiAutomation();
   }
 
   public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {

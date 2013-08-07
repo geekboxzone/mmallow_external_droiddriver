@@ -24,20 +24,43 @@ import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.util.Events;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 /**
  * A {@link ScrollAction} that swipes the touch screen.
  */
 public class SwipeAction extends ScrollAction {
+  /** Common instances for convenience */
+  public static final SwipeAction SCROLL_UP = new SwipeAction(ScrollDirection.UP, false);
+  public static final SwipeAction SCROLL_DOWN = new SwipeAction(ScrollDirection.DOWN, false);
+  public static final SwipeAction SCROLL_LEFT = new SwipeAction(ScrollDirection.LEFT, false);
+  public static final SwipeAction SCROLL_RIGHT = new SwipeAction(ScrollDirection.RIGHT, false);
+
+  /** Gets canned common instances */
+  public static SwipeAction toScroll(ScrollDirection direction) {
+    switch (direction) {
+      case UP:
+        return SCROLL_UP;
+      case DOWN:
+        return SCROLL_DOWN;
+      case LEFT:
+        return SCROLL_LEFT;
+      case RIGHT:
+        return SCROLL_RIGHT;
+      default:
+        throw new ActionException("Unknown scroll direction: " + direction);
+    }
+  }
 
   private final ScrollDirection direction;
   private final boolean drag;
 
   /**
-   * Defaults timeoutMillis to 0.
+   * Defaults timeoutMillis to 1000.
    */
   public SwipeAction(ScrollDirection direction, boolean drag) {
-    this(direction, drag, 0L);
+    this(direction, drag, 1000L);
   }
 
   public SwipeAction(ScrollDirection direction, boolean drag, long timeoutMillis) {
@@ -105,5 +128,14 @@ public class SwipeAction extends ScrollAction {
     }
     Events.touchUp(injector, downTime, endX, endY);
     return true;
+  }
+
+  @Override
+  public String toString() {
+    ToStringHelper toStringHelper = Objects.toStringHelper(this).addValue(direction);
+    if (drag) {
+      toStringHelper.addValue("drag");
+    }
+    return toStringHelper.toString();
   }
 }

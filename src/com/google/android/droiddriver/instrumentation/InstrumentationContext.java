@@ -35,8 +35,8 @@ import java.util.Map;
 public class InstrumentationContext extends AbstractContext {
   private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
 
-  InstrumentationContext(final Instrumentation instrumentation) {
-    super(new InputInjector() {
+  InstrumentationContext(final Instrumentation instrumentation, InstrumentationDriver driver) {
+    super(instrumentation, driver, new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
         if (event instanceof MotionEvent) {

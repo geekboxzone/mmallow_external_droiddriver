@@ -25,25 +25,39 @@ import com.google.android.droiddriver.util.Events;
 import com.google.common.base.Objects;
 
 /**
- * An action to press a single key. TODO: rename to SingleKeyAction
+ * An action to press a single key. While it is convenient for navigating the
+ * UI, do not overuse it -- the application may interpret key codes in a custom
+ * way and, more importantly, application users may not have access to it
+ * because the device (physical or virtual keyboard) may not support all key
+ * codes. TODO: rename to SingleKeyAction
  */
 public class PressKeyAction extends KeyAction {
+  /**
+   * Common instances for convenience and memory preservation.
+   */
+  public static final PressKeyAction MENU = new PressKeyAction(KeyEvent.KEYCODE_MENU);
+  public static final PressKeyAction SEARCH = new PressKeyAction(KeyEvent.KEYCODE_SEARCH);
+  public static final PressKeyAction BACK = new PressKeyAction(KeyEvent.KEYCODE_BACK);
+  public static final PressKeyAction DELETE = new PressKeyAction(KeyEvent.KEYCODE_DEL);
+
   private final int keyCode;
 
   /**
-   * Defaults timeoutMillis to 0.
+   * Defaults timeoutMillis to 100.
    */
   public PressKeyAction(int keyCode) {
-    this(keyCode, 0L);
+    this(keyCode, 100L, false);
   }
 
-  public PressKeyAction(int keyCode, long timeoutMillis) {
-    super(timeoutMillis);
+  public PressKeyAction(int keyCode, long timeoutMillis, boolean checkFocused) {
+    super(timeoutMillis, checkFocused);
     this.keyCode = keyCode;
   }
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
+    maybeCheckFocused(element);
+
     final long downTime = SystemClock.uptimeMillis();
     KeyEvent downEvent = Events.newKeyEvent(downTime, KeyEvent.ACTION_DOWN, keyCode);
     KeyEvent upEvent = Events.newKeyEvent(downTime, KeyEvent.ACTION_UP, keyCode);

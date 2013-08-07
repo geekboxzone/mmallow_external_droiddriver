@@ -90,7 +90,6 @@ public abstract class AbstractUiElement implements UiElement {
 
   @Override
   public void setText(String text) {
-    // TODO: Define common actions as a const.
     perform(new TypeAction(text));
     // TypeAction may not be effective immediately and reflected bygetText(),
     // so the following will fail.
@@ -120,7 +119,7 @@ public abstract class AbstractUiElement implements UiElement {
 
   @Override
   public void scroll(ScrollDirection direction) {
-    perform(new SwipeAction(direction, false));
+    perform(SwipeAction.toScroll(direction));
   }
 
   @Override

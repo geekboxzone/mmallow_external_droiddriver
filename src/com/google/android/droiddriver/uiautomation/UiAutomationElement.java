@@ -189,6 +189,13 @@ public class UiAutomationElement extends AbstractUiElement {
       // it is not reliable.
       // Exception is ignored here. Tests will fail anyways if this is
       // critical.
+      // Actions should usually trigger some AccessibilityEvent's, but some
+      // widgets fail to do so, resulting in stale AccessibilityNodeInfo's. As a
+      // work-around, force to clear the AccessibilityNodeInfoCache.
+      // A legitimate case of no AccessibilityEvent is when scrolling has
+      // reached the end, but we cannot tell whether it's legitimate or the
+      // widget has bugs, so clearAccessibilityNodeInfoCache anyways.
+      ((UiAutomationDriver) context.getDriver()).clearAccessibilityNodeInfoCacheHack();
     }
   }
 }

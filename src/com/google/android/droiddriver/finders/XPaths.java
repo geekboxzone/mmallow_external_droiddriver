@@ -95,6 +95,11 @@ public class XPaths {
     return attr(Attribute.TEXT, value);
   }
 
+  /** Shorthand for {@link #attr}{@code (Attribute.RESOURCE_ID, value)} */
+  public static String resourceId(String value) {
+    return attr(Attribute.RESOURCE_ID, value);
+  }
+
   /**
    * Adapted from http://stackoverflow.com/questions/1341847/.
    * <p>

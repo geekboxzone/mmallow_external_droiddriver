@@ -16,16 +16,31 @@
 
 package com.google.android.droiddriver.base;
 
+import android.app.Instrumentation;
+
 import com.google.android.droiddriver.InputInjector;
 
 /**
  * Internal helper for managing all instances.
  */
 public abstract class AbstractContext {
+  protected final Instrumentation instrumentation;
+  protected final AbstractDroidDriver driver;
   protected final InputInjector injector;
 
-  protected AbstractContext(InputInjector injector) {
+  protected AbstractContext(Instrumentation instrumentation, AbstractDroidDriver driver,
+      InputInjector injector) {
+    this.instrumentation = instrumentation;
+    this.driver = driver;
     this.injector = injector;
+  }
+
+  public Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
+  public AbstractDroidDriver getDriver() {
+    return driver;
   }
 
   public InputInjector getInjector() {

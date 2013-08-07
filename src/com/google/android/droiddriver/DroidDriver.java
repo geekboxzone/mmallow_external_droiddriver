@@ -20,6 +20,9 @@ import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.Finder;
 
+/**
+ * The entry interface for using droiddriver.
+ */
 public interface DroidDriver {
   /**
    * Returns whether a matching element exists without polling. Use this if the
@@ -104,6 +107,11 @@ public interface DroidDriver {
    * Sets the {@link Poller}.
    */
   void setPoller(Poller poller);
+
+  /**
+   * Returns a {@link UiDevice} for device-wide interaction.
+   */
+  UiDevice getUiDevice();
 
   /**
    * Dumps the UiElement tree to a file to help debug. The tree is based on the

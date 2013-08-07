@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver.base;
 
-import android.app.Instrumentation;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.util.Log;
@@ -32,7 +31,6 @@ import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.util.DefaultPoller;
 import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Preconditions;
 
 import java.io.BufferedOutputStream;
 
@@ -42,13 +40,8 @@ import java.io.BufferedOutputStream;
  */
 public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter {
 
-  protected final Instrumentation instrumentation;
   private Poller poller = new DefaultPoller();
   private AbstractUiElement rootElement;
-
-  protected AbstractDroidDriver(Instrumentation instrumentation) {
-    this.instrumentation = Preconditions.checkNotNull(instrumentation);
-  }
 
   @Override
   public UiElement find(Finder finder) {

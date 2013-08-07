@@ -88,6 +88,15 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
 
     @Override
     public boolean isSentinelUpdated(UiElement newSentinel, UiElement oldSentinel) {
+      // If the sentinel moved, scrolling has some effect. This is both an
+      // optimization - getBounds is cheaper than find - and necessary in
+      // certain cases, e.g. user is looking for a sibling of the unique string;
+      // the scroll is close to the end therefore the unique string does not
+      // change, but the target could be revealed.
+      if (!newSentinel.getBounds().equals(oldSentinel.getBounds())) {
+        return true;
+      }
+
       String newString = getUniqueStringFromSentinel(newSentinel);
       // If newString is null, newSentinel must be partially shown. In this case
       // we return true to allow further scrolling. But program error could also

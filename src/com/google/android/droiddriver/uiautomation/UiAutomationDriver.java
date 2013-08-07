@@ -16,13 +16,18 @@
 
 package com.google.android.droiddriver.uiautomation;
 
-import android.app.UiAutomation;
 import android.app.Instrumentation;
+import android.app.UiAutomation;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.google.android.droiddriver.UiDevice;
 import com.google.android.droiddriver.base.AbstractDroidDriver;
+import com.google.android.droiddriver.base.BaseUiDevice;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.common.primitives.Longs;
 
@@ -40,11 +45,12 @@ public class UiAutomationDriver extends AbstractDroidDriver {
 
   private final UiAutomationContext context;
   private final UiAutomation uiAutomation;
+  private final BaseUiDevice uiDevice;
 
   public UiAutomationDriver(Instrumentation instrumentation) {
-    super(instrumentation);
     this.uiAutomation = instrumentation.getUiAutomation();
-    this.context = new UiAutomationContext(uiAutomation);
+    this.context = new UiAutomationContext(instrumentation, this);
+    uiDevice = new BaseUiDevice(context);
   }
 
   @Override
@@ -83,5 +89,34 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   @Override
   protected Bitmap takeScreenshot() {
     return uiAutomation.takeScreenshot();
+  }
+
+  /**
+   * Some widgets fail to trigger some AccessibilityEvent's after actions,
+   * resulting in stale AccessibilityNodeInfo's. As a work-around, force to
+   * clear the AccessibilityNodeInfoCache.
+   */
+  public void clearAccessibilityNodeInfoCache() {
+    uiDevice.sleep();
+    uiDevice.wakeUp();
+  }
+
+  /**
+   * {@link #clearAccessibilityNodeInfoCache} causes the screen to blink. This
+   * method clears the cache without blinking by employing an implementation
+   * detail of AccessibilityNodeInfoCache. This is a hack; use it at your own
+   * discretion.
+   */
+  public void clearAccessibilityNodeInfoCacheHack() {
+    AccessibilityManager accessibilityManager =
+        (AccessibilityManager) context.getInstrumentation().getTargetContext()
+            .getSystemService(Context.ACCESSIBILITY_SERVICE);
+    accessibilityManager.sendAccessibilityEvent(AccessibilityEvent
+        .obtain(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED));
+  }
+
+  @Override
+  public UiDevice getUiDevice() {
+    return uiDevice;
   }
 }
