@@ -16,9 +16,9 @@
 package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.scroll.Direction.LogicalDirection;
 import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -118,7 +118,7 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     this.physicalToLogicalConverter = physicalToLogicalConverter;
   }
 
-  protected UiElement getSentinel(UiElement parent, ScrollDirection direction) {
+  protected UiElement getSentinel(UiElement parent, PhysicalDirection direction) {
     LogicalDirection logicalDirection = physicalToLogicalConverter.toLogicalDirection(direction);
     if (logicalDirection == LogicalDirection.BACKWARD) {
       return backwardGetStrategy.getSentinel(parent);

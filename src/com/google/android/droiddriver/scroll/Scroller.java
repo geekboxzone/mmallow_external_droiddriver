@@ -17,9 +17,9 @@ package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
  * Interface for scrolling to the desired child in a scrollable parent view.
@@ -53,5 +53,5 @@ public interface Scroller {
    * @throws ElementNotFoundException If no match is found
    */
   UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder,
-      ScrollDirection direction);
+      PhysicalDirection direction);
 }

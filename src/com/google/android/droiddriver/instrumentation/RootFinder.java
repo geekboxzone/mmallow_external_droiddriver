@@ -16,12 +16,12 @@
 
 package com.google.android.droiddriver.instrumentation;
 
-import com.google.android.droiddriver.exceptions.DroidDriverException;
-import com.google.android.droiddriver.util.Logs;
-
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
+
+import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.util.Logs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

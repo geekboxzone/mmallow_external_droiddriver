@@ -19,10 +19,10 @@ import android.util.Log;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 
@@ -186,7 +186,7 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
   }
 
   @Override
-  public boolean scroll(DroidDriver driver, Finder parentFinder, ScrollDirection direction) {
+  public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
     UiElement parent = driver.on(parentFinder);
     UiElement oldSentinel = getSentinel(parent, direction);
     parent.scroll(direction);

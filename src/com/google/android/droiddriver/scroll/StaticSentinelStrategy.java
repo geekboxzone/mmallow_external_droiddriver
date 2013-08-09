@@ -19,10 +19,10 @@ import android.graphics.Rect;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
 import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
  * Determines whether scrolling is possible by checking whether the last child
@@ -46,7 +46,7 @@ public class StaticSentinelStrategy extends AbstractSentinelStrategy {
   }
 
   @Override
-  public boolean scroll(DroidDriver driver, Finder parentFinder, ScrollDirection direction) {
+  public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
     UiElement parent = driver.on(parentFinder);
     // If the last child in the logical scroll direction is fully visible, no
     // more scrolling is possible

@@ -20,11 +20,11 @@ import android.util.Log;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.Axis;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 
 /**
@@ -67,7 +67,7 @@ public class SentinelScroller implements Scroller {
 
   @Override
   public UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder,
-      ScrollDirection direction) {
+      PhysicalDirection direction) {
     Logs.call(this, "scrollTo", driver, parentFinder, childFinder, direction);
     // TODO: enforce childFinder is relative to parentFinder.
     // Combine with parentFinder to make childFinder absolute
@@ -99,7 +99,7 @@ public class SentinelScroller implements Scroller {
   @Override
   public UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder) {
     // TODO: start searching from beginning instead of the current location.
-    for (ScrollDirection direction : axis.getDirections()) {
+    for (PhysicalDirection direction : axis.getPhysicalDirections()) {
       try {
         return scrollTo(driver, parentFinder, childFinder, direction);
       } catch (ElementNotFoundException e) {

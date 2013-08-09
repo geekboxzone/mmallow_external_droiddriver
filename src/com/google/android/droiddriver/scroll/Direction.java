@@ -15,7 +15,6 @@
  */
 package com.google.android.droiddriver.scroll;
 
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ActionException;
 
 /**
@@ -27,24 +26,30 @@ public interface Direction {
     FORWARD, BACKWARD;
   }
 
+  /** Physical directions */
+  public enum PhysicalDirection {
+    UP, DOWN, LEFT, RIGHT
+  }
+
   public enum Axis {
     HORIZONTAL {
-      private final ScrollDirection[] directions = {ScrollDirection.LEFT, ScrollDirection.RIGHT};
+      private final PhysicalDirection[] directions = {PhysicalDirection.LEFT,
+          PhysicalDirection.RIGHT};
 
       @Override
-      public ScrollDirection[] getDirections() {
+      public PhysicalDirection[] getPhysicalDirections() {
         return directions;
       }
     },
     VERTICAL {
-      private final ScrollDirection[] directions = {ScrollDirection.UP, ScrollDirection.DOWN};
+      private final PhysicalDirection[] directions = {PhysicalDirection.UP, PhysicalDirection.DOWN};
 
       @Override
-      public ScrollDirection[] getDirections() {
+      public PhysicalDirection[] getPhysicalDirections() {
         return directions;
       }
     };
-    public abstract ScrollDirection[] getDirections();
+    public abstract PhysicalDirection[] getPhysicalDirections();
   }
 
   /**
@@ -55,12 +60,12 @@ public interface Direction {
      * Converts ScrollDirection to LogicalDirection. It's possible to override
      * this for RTL (right-to-left) views, for example.
      */
-    LogicalDirection toLogicalDirection(ScrollDirection direction);
+    LogicalDirection toLogicalDirection(PhysicalDirection direction);
 
-    /** Follows standard directions: up-to-down, left-to-right */
+    /** Follows standard convention: up-to-down, left-to-right */
     PhysicalToLogicalConverter STANDARD_CONVERTER = new PhysicalToLogicalConverter() {
       @Override
-      public LogicalDirection toLogicalDirection(ScrollDirection direction) {
+      public LogicalDirection toLogicalDirection(PhysicalDirection direction) {
         switch (direction) {
           case UP:
             return LogicalDirection.BACKWARD;

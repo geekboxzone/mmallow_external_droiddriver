@@ -19,10 +19,10 @@ package com.google.android.droiddriver;
 import android.graphics.Rect;
 
 import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.uiautomation.UiAutomationDriver;
 import com.google.common.base.Predicate;
 
@@ -181,7 +181,7 @@ public interface UiElement {
   /**
    * Scrolls in the given direction. Scrolling down means swiping upwards.
    */
-  void scroll(ScrollDirection direction);
+  void scroll(PhysicalDirection direction);
 
   /**
    * Gets an immutable {@link List} of immediate children that satisfy

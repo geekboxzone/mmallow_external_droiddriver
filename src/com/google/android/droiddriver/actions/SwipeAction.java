@@ -22,6 +22,7 @@ import android.view.ViewConfiguration;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Events;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -31,13 +32,13 @@ import com.google.common.base.Objects.ToStringHelper;
  */
 public class SwipeAction extends ScrollAction {
   /** Common instances for convenience */
-  public static final SwipeAction SCROLL_UP = new SwipeAction(ScrollDirection.UP, false);
-  public static final SwipeAction SCROLL_DOWN = new SwipeAction(ScrollDirection.DOWN, false);
-  public static final SwipeAction SCROLL_LEFT = new SwipeAction(ScrollDirection.LEFT, false);
-  public static final SwipeAction SCROLL_RIGHT = new SwipeAction(ScrollDirection.RIGHT, false);
+  public static final SwipeAction SCROLL_UP = new SwipeAction(PhysicalDirection.UP, false);
+  public static final SwipeAction SCROLL_DOWN = new SwipeAction(PhysicalDirection.DOWN, false);
+  public static final SwipeAction SCROLL_LEFT = new SwipeAction(PhysicalDirection.LEFT, false);
+  public static final SwipeAction SCROLL_RIGHT = new SwipeAction(PhysicalDirection.RIGHT, false);
 
   /** Gets canned common instances */
-  public static SwipeAction toScroll(ScrollDirection direction) {
+  public static SwipeAction toScroll(PhysicalDirection direction) {
     switch (direction) {
       case UP:
         return SCROLL_UP;
@@ -52,17 +53,17 @@ public class SwipeAction extends ScrollAction {
     }
   }
 
-  private final ScrollDirection direction;
+  private final PhysicalDirection direction;
   private final boolean drag;
 
   /**
    * Defaults timeoutMillis to 1000.
    */
-  public SwipeAction(ScrollDirection direction, boolean drag) {
+  public SwipeAction(PhysicalDirection direction, boolean drag) {
     this(direction, drag, 1000L);
   }
 
-  public SwipeAction(ScrollDirection direction, boolean drag, long timeoutMillis) {
+  public SwipeAction(PhysicalDirection direction, boolean drag, long timeoutMillis) {
     super(timeoutMillis);
     this.direction = direction;
     this.drag = drag;

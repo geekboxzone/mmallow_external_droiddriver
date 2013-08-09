@@ -20,12 +20,12 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
 import com.google.android.droiddriver.actions.InputInjector;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
-import com.google.android.droiddriver.actions.TypeAction;
+import com.google.android.droiddriver.actions.TextAction;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.ByXPath;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -90,7 +90,7 @@ public abstract class BaseUiElement implements UiElement {
 
   @Override
   public void setText(String text) {
-    perform(new TypeAction(text));
+    perform(new TextAction(text));
     // TypeAction may not be effective immediately and reflected bygetText(),
     // so the following will fail.
     // if (Logs.DEBUG) {
@@ -118,7 +118,7 @@ public abstract class BaseUiElement implements UiElement {
   }
 
   @Override
-  public void scroll(ScrollDirection direction) {
+  public void scroll(PhysicalDirection direction) {
     perform(SwipeAction.toScroll(direction));
   }
 

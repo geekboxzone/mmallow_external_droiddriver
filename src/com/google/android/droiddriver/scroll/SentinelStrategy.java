@@ -16,8 +16,8 @@
 package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
  * Interface for determining whether scrolling is possible based on a sentinel.
@@ -33,7 +33,7 @@ public interface SentinelStrategy {
    * @param direction
    * @return whether scrolling is effective
    */
-  boolean scroll(DroidDriver driver, Finder parentFinder, ScrollDirection direction);
+  boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction);
 
   /**
    * {@inheritDoc}

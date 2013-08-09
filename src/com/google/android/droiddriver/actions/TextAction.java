@@ -16,19 +16,19 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.os.SystemClock;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
+
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-import android.os.SystemClock;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
-
 /**
  * An action to type text.
  */
-public class TypeAction extends KeyAction {
+public class TextAction extends KeyAction {
 
   private static final KeyCharacterMap KEY_CHAR_MAP = KeyCharacterMap
       .load(KeyCharacterMap.VIRTUAL_KEYBOARD);
@@ -38,11 +38,11 @@ public class TypeAction extends KeyAction {
   /**
    * Defaults timeoutMillis to 100.
    */
-  public TypeAction(String text) {
+  public TextAction(String text) {
     this(text, 100L, false);
   }
 
-  public TypeAction(String text, long timeoutMillis, boolean checkFocused) {
+  public TextAction(String text, long timeoutMillis, boolean checkFocused) {
     super(timeoutMillis, checkFocused);
     this.text = Preconditions.checkNotNull(text);
   }
