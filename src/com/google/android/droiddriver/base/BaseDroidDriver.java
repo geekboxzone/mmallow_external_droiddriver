@@ -16,32 +16,23 @@
 
 package com.google.android.droiddriver.base;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.util.Log;
-
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
-import com.google.android.droiddriver.Screenshotter;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.finders.Finder;
-import com.google.android.droiddriver.util.DefaultPoller;
-import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
-
-import java.io.BufferedOutputStream;
 
 /**
  * Abstract implementation of DroidDriver that does the common actions, and
  * should not differ in implementations of {@link DroidDriver}.
  */
-public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter {
+public abstract class BaseDroidDriver implements DroidDriver {
 
   private Poller poller = new DefaultPoller();
-  private AbstractUiElement rootElement;
+  private BaseUiElement rootElement;
 
   @Override
   public UiElement find(Finder finder) {
@@ -97,18 +88,18 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
     this.poller = poller;
   }
 
-  protected abstract AbstractUiElement getNewRootElement();
+  protected abstract BaseUiElement getNewRootElement();
 
-  protected abstract AbstractContext getContext();
+  protected abstract DroidDriverContext getContext();
 
-  protected AbstractUiElement getRootElement() {
+  protected BaseUiElement getRootElement() {
     if (rootElement == null) {
       refreshRootElement();
     }
     return rootElement;
   }
 
-  private AbstractUiElement refreshRootElement() {
+  private BaseUiElement refreshRootElement() {
     getContext().clearData();
     rootElement = getNewRootElement();
     return rootElement;
@@ -119,38 +110,4 @@ public abstract class AbstractDroidDriver implements DroidDriver, Screenshotter 
     Logs.call(this, "dumpUiElementTree", path);
     return ByXPath.dumpDom(path, getRootElement());
   }
-
-  @Override
-  public boolean takeScreenshot(String path) {
-    return takeScreenshot(path, Bitmap.CompressFormat.PNG, 0);
-  }
-
-  @Override
-  public boolean takeScreenshot(String path, CompressFormat format, int quality) {
-    Logs.call(this, "takeScreenshot", path, quality);
-    Bitmap screenshot = takeScreenshot();
-    if (screenshot == null) {
-      return false;
-    }
-    BufferedOutputStream bos = null;
-    try {
-      bos = FileUtils.open(path);
-      screenshot.compress(format, quality, bos);
-      return true;
-    } catch (Exception e) {
-      Logs.log(Log.WARN, e);
-      return false;
-    } finally {
-      if (bos != null) {
-        try {
-          bos.close();
-        } catch (Exception e) {
-          // ignore
-        }
-      }
-      screenshot.recycle();
-    }
-  }
-
-  protected abstract Bitmap takeScreenshot();
 }

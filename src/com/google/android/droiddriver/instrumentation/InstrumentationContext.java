@@ -22,21 +22,23 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.base.AbstractContext;
+import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
 
-/**
- * Internal helper for managing all instances.
- */
-public class InstrumentationContext extends AbstractContext {
+class InstrumentationContext implements DroidDriverContext {
   private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
+  private final Instrumentation instrumentation;
+  private final InstrumentationDriver driver;
+  private final InputInjector injector;
 
   InstrumentationContext(final Instrumentation instrumentation, InstrumentationDriver driver) {
-    super(instrumentation, driver, new InputInjector() {
+    this.instrumentation = instrumentation;
+    this.driver = driver;
+    this.injector = new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
         if (event instanceof MotionEvent) {
@@ -48,7 +50,22 @@ public class InstrumentationContext extends AbstractContext {
         }
         return true;
       }
-    });
+    };
+  }
+
+  @Override
+  public Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
+  @Override
+  public InstrumentationDriver getDriver() {
+    return driver;
+  }
+
+  @Override
+  public InputInjector getInjector() {
+    return injector;
   }
 
   public ViewElement getUiElement(View view) {

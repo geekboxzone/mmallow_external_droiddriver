@@ -18,15 +18,14 @@ package com.google.android.droiddriver.uiautomation;
 
 import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
 
-import android.app.UiAutomation;
 import android.app.UiAutomation.AccessibilityEventFilter;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.base.AbstractUiElement;
+import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 
@@ -36,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * A UiElement that is backed by the UiAutomation object.
  */
-public class UiAutomationElement extends AbstractUiElement {
+public class UiAutomationElement extends BaseUiElement {
   private static final AccessibilityEventFilter ANY_EVENT_FILTER = new AccessibilityEventFilter() {
     @Override
     public boolean accept(AccessibilityEvent arg0) {
@@ -46,12 +45,10 @@ public class UiAutomationElement extends AbstractUiElement {
 
   private final UiAutomationContext context;
   private final AccessibilityNodeInfo node;
-  private final UiAutomation uiAutomation;
 
   public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node) {
     this.context = Preconditions.checkNotNull(context);
     this.node = Preconditions.checkNotNull(node);
-    this.uiAutomation = context.getUiAutomation();
   }
 
   @Override
@@ -183,7 +180,7 @@ public class UiAutomationElement extends AbstractUiElement {
   @Override
   protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
     try {
-      uiAutomation.executeAndWaitForEvent(futureTask, ANY_EVENT_FILTER, timeoutMillis);
+      context.getUiAutomation().executeAndWaitForEvent(futureTask, ANY_EVENT_FILTER, timeoutMillis);
     } catch (TimeoutException e) {
       // This is for sync'ing with Accessibility API on best-effort because
       // it is not reliable.

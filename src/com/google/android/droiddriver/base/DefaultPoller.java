@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.util;
+package com.google.android.droiddriver.base;
 
 import android.os.SystemClock;
 

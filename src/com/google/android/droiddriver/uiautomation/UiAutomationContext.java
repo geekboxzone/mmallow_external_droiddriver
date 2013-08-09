@@ -21,29 +21,46 @@ import android.app.UiAutomation;
 import android.view.InputEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.base.AbstractContext;
+import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
 
-/**
- * Internal helper for managing all instances.
- */
-public class UiAutomationContext extends AbstractContext {
+class UiAutomationContext implements DroidDriverContext {
   // Maybe we should use Cache instead of Map on memory-constrained devices
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
       .weakValues().makeMap();
   private final UiAutomation uiAutomation;
+  private final Instrumentation instrumentation;
+  private final UiAutomationDriver driver;
+  private final InputInjector injector;
 
   UiAutomationContext(final Instrumentation instrumentation, UiAutomationDriver driver) {
-    super(instrumentation, driver, new InputInjector() {
+    this.instrumentation = instrumentation;
+    this.uiAutomation = instrumentation.getUiAutomation();
+    this.driver = driver;
+    this.injector = new InputInjector() {
       @Override
       public boolean injectInputEvent(InputEvent event) {
-        return instrumentation.getUiAutomation().injectInputEvent(event, true /* sync */);
+        return uiAutomation.injectInputEvent(event, true /* sync */);
       }
-    });
-    this.uiAutomation = instrumentation.getUiAutomation();
+    };
+  }
+
+  @Override
+  public Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
+  @Override
+  public UiAutomationDriver getDriver() {
+    return driver;
+  }
+
+  @Override
+  public InputInjector getInjector() {
+    return injector;
   }
 
   public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {

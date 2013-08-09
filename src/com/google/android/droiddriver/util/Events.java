@@ -21,7 +21,7 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
-import com.google.android.droiddriver.InputInjector;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.ActionException;
 
 /**

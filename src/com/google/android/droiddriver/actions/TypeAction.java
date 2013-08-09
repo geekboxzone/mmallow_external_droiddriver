@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver.actions;
 
-import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.common.base.Objects;

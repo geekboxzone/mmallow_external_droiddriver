@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver;
+package com.google.android.droiddriver.uiautomation;
 
-import android.view.InputEvent;
+import android.graphics.Bitmap;
 
-/**
- * Interface for interacting with the UI via InputEvent injection.
- */
-public interface InputInjector {
+import com.google.android.droiddriver.base.BaseUiDevice;
 
-  /**
-   * Injects the {@code event}.
-   *
-   * @param event The event to inject.
-   * @return true if the injection succeeded.
-   */
-  boolean injectInputEvent(InputEvent event);
+class UiAutomationUiDevice extends BaseUiDevice {
+  private final UiAutomationContext context;
+
+  UiAutomationUiDevice(UiAutomationContext context) {
+    this.context = context;
+  }
+
+  @Override
+  protected Bitmap takeScreenshot() {
+    return context.getUiAutomation().takeScreenshot();
+  }
+
+  @Override
+  protected UiAutomationContext getContext() {
+    return context;
+  }
 }

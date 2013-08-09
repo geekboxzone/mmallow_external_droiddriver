@@ -16,10 +16,10 @@
 
 package com.google.android.droiddriver.base;
 
-import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.actions.ScrollDirection;
 import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TypeAction;
@@ -31,7 +31,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.w3c.dom.Element;
 
@@ -43,7 +43,7 @@ import java.util.concurrent.FutureTask;
 /**
  * Abstract implementation with common methods already implemented.
  */
-public abstract class AbstractUiElement implements UiElement {
+public abstract class BaseUiElement implements UiElement {
   private WeakReference<Element> domNode;
 
   @Override
@@ -123,7 +123,7 @@ public abstract class AbstractUiElement implements UiElement {
   }
 
   @Override
-  public abstract AbstractUiElement getChild(int index);
+  public abstract BaseUiElement getChild(int index);
 
   protected abstract InputInjector getInjector();
 
@@ -135,16 +135,20 @@ public abstract class AbstractUiElement implements UiElement {
 
   @Override
   public List<UiElement> getChildren(Predicate<? super UiElement> predicate) {
-    predicate = Predicates.and(Predicates.notNull(), predicate);
-    // TODO: Use internal data when we take snapshot of current node tree.
-    ImmutableList.Builder<UiElement> builder = ImmutableList.builder();
+    if (predicate == null) {
+      predicate = Predicates.notNull();
+    } else {
+      predicate = Predicates.and(Predicates.notNull(), predicate);
+    }
+
+    List<UiElement> list = Lists.newArrayList();
     for (int i = 0; i < getChildCount(); i++) {
       UiElement child = getChild(i);
       if (predicate.apply(child)) {
-        builder.add(child);
+        list.add(child);
       }
     }
-    return builder.build();
+    return list;
   }
 
   @Override

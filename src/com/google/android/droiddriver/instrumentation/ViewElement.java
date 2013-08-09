@@ -28,8 +28,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Checkable;
 import android.widget.TextView;
 
-import com.google.android.droiddriver.InputInjector;
-import com.google.android.droiddriver.base.AbstractUiElement;
+import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -41,7 +41,7 @@ import java.util.Map;
  */
 // TODO: always accessing view on the UI thread even when only get access is
 // needed -- the field may be in the middle of updating.
-public class ViewElement extends AbstractUiElement {
+public class ViewElement extends BaseUiElement {
   private static final Map<String, String> CLASS_NAME_OVERRIDES = Maps.newHashMap();
 
   private final InstrumentationContext context;

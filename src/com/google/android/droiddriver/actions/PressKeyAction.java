@@ -19,7 +19,6 @@ package com.google.android.droiddriver.actions;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
-import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.util.Events;
 import com.google.common.base.Objects;

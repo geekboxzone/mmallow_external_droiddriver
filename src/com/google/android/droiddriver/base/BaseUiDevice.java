@@ -17,17 +17,24 @@
 package com.google.android.droiddriver.base;
 
 import android.app.Service;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiDevice;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.PressKeyAction;
+import com.google.android.droiddriver.util.FileUtils;
+import com.google.android.droiddriver.util.Logs;
+
+import java.io.BufferedOutputStream;
 
 /**
  * Base implementation of {@link UiDevice}.
  */
-public class BaseUiDevice implements UiDevice {
+public abstract class BaseUiDevice implements UiDevice {
   // power off may not trigger new events
   private static final PressKeyAction POWER_OFF = new PressKeyAction(KeyEvent.KEYCODE_POWER, 0,
       false);
@@ -35,17 +42,11 @@ public class BaseUiDevice implements UiDevice {
   private static final PressKeyAction POWER_ON = new PressKeyAction(KeyEvent.KEYCODE_POWER, 1000L,
       false);
 
-  private final AbstractContext abstractContext;
-
-  public BaseUiDevice(AbstractContext abstractContext) {
-    this.abstractContext = abstractContext;
-  }
-
   @Override
   public boolean isScreenOn() {
     PowerManager pm =
-        (PowerManager) abstractContext.instrumentation.getTargetContext().getSystemService(
-            Service.POWER_SERVICE);
+        (PowerManager) getContext().getInstrumentation().getTargetContext()
+            .getSystemService(Service.POWER_SERVICE);
     return pm.isScreenOn();
   }
 
@@ -65,6 +66,42 @@ public class BaseUiDevice implements UiDevice {
 
   @Override
   public boolean perform(Action action) {
-    return abstractContext.driver.getRootElement().perform(action);
+    return getContext().getDriver().getRootElement().perform(action);
   }
+
+  @Override
+  public boolean takeScreenshot(String path) {
+    return takeScreenshot(path, Bitmap.CompressFormat.PNG, 0);
+  }
+
+  @Override
+  public boolean takeScreenshot(String path, CompressFormat format, int quality) {
+    Logs.call(this, "takeScreenshot", path, quality);
+    Bitmap screenshot = takeScreenshot();
+    if (screenshot == null) {
+      return false;
+    }
+    BufferedOutputStream bos = null;
+    try {
+      bos = FileUtils.open(path);
+      screenshot.compress(format, quality, bos);
+      return true;
+    } catch (Exception e) {
+      Logs.log(Log.WARN, e);
+      return false;
+    } finally {
+      if (bos != null) {
+        try {
+          bos.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      screenshot.recycle();
+    }
+  }
+
+  protected abstract Bitmap takeScreenshot();
+
+  protected abstract DroidDriverContext getContext();
 }

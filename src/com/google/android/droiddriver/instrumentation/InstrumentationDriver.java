@@ -22,9 +22,7 @@ import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.view.View;
 
-import com.google.android.droiddriver.UiDevice;
-import com.google.android.droiddriver.base.AbstractDroidDriver;
-import com.google.android.droiddriver.base.BaseUiDevice;
+import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.common.base.Preconditions;
@@ -33,15 +31,15 @@ import com.google.common.primitives.Longs;
 /**
  * Implementation of a UiDriver that is driven via instrumentation.
  */
-public class InstrumentationDriver extends AbstractDroidDriver {
+public class InstrumentationDriver extends BaseDroidDriver {
   private final InstrumentationContext context;
   private final Instrumentation instrumentation;
-  private final BaseUiDevice uiDevice;
+  private final InstrumentationUiDevice uiDevice;
 
   public InstrumentationDriver(Instrumentation instrumentation) {
     this.instrumentation = Preconditions.checkNotNull(instrumentation);
     this.context = new InstrumentationContext(instrumentation, this);
-    uiDevice = new BaseUiDevice(context);
+    uiDevice = new InstrumentationUiDevice(context);
   }
 
   @Override
@@ -102,15 +100,14 @@ public class InstrumentationDriver extends AbstractDroidDriver {
     }
   }
 
-  @Override
-  protected Bitmap takeScreenshot() {
+  Bitmap takeScreenshot() {
     ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
     instrumentation.runOnMainSync(screenshotRunnable);
     return screenshotRunnable.screenshot;
   }
 
   @Override
-  public UiDevice getUiDevice() {
+  public InstrumentationUiDevice getUiDevice() {
     return uiDevice;
   }
 }

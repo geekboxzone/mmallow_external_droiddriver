@@ -20,7 +20,6 @@ import android.graphics.Rect;
 import android.os.SystemClock;
 import android.view.ViewConfiguration;
 
-import com.google.android.droiddriver.InputInjector;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.util.Events;

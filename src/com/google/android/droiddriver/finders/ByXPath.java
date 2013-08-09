@@ -18,7 +18,7 @@ package com.google.android.droiddriver.finders;
 import android.util.Log;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.base.AbstractUiElement;
+import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.FileUtils;
@@ -73,7 +73,7 @@ public class ByXPath implements Finder {
 
   @Override
   public UiElement find(UiElement context) {
-    Element domNode = ((AbstractUiElement) context).getDomNode();
+    Element domNode = ((BaseUiElement) context).getDomNode();
     try {
       getDocument().appendChild(domNode);
       Element foundNode = (Element) xPathExpression.evaluate(domNode, XPathConstants.NODE);
@@ -109,9 +109,9 @@ public class ByXPath implements Finder {
   }
 
   /**
-   * Used internally in {@link AbstractUiElement}.
+   * Used internally in {@link BaseUiElement}.
    */
-  public static Element buildDomNode(AbstractUiElement uiElement) {
+  public static Element buildDomNode(BaseUiElement uiElement) {
     String className = uiElement.getClassName();
     if (className == null) {
       className = "UNKNOWN";
@@ -139,7 +139,7 @@ public class ByXPath implements Finder {
     // TODO: visitor pattern
     int childCount = uiElement.getChildCount();
     for (int i = 0; i < childCount; i++) {
-      AbstractUiElement child = uiElement.getChild(i);
+      BaseUiElement child = uiElement.getChild(i);
       if (child == null) {
         Logs.log(Log.INFO, "Skip null child for " + uiElement);
         continue;
@@ -167,7 +167,7 @@ public class ByXPath implements Finder {
     }
   }
 
-  public static boolean dumpDom(String path, AbstractUiElement uiElement) {
+  public static boolean dumpDom(String path, BaseUiElement uiElement) {
     BufferedOutputStream bos = null;
     try {
       bos = FileUtils.open(path);

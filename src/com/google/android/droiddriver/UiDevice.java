@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver;
 
+import android.graphics.Bitmap.CompressFormat;
+
 import com.google.android.droiddriver.actions.Action;
 
 /**
@@ -40,4 +42,26 @@ public interface UiDevice {
    * @return true if the action is successful
    */
   boolean perform(Action action);
+
+  /**
+   * Takes a screenshot of current window and stores it in {@code path} as PNG.
+   *
+   * @param path the path of file to save screenshot
+   * @return true if screen shot is created successfully
+   */
+  boolean takeScreenshot(String path);
+
+  /**
+   * Takes a screenshot of current window and stores it in {@code path}. Note
+   * some implementations may not capture everything on the screen, for example
+   * InstrumentationDriver may not see the IME soft keyboard or system content.
+   *
+   * @param path the path of file to save screenshot
+   * @param format The format of the compressed image
+   * @param quality Hint to the compressor, 0-100. 0 meaning compress for small
+   *        size, 100 meaning compress for max quality. Some formats, like PNG
+   *        which is lossless, will ignore the quality setting
+   * @return true if screen shot is created successfully
+   */
+  boolean takeScreenshot(String path, CompressFormat format, int quality);
 }

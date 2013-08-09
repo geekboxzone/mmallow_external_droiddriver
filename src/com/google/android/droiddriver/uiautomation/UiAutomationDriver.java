@@ -19,22 +19,19 @@ package com.google.android.droiddriver.uiautomation;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.UiDevice;
-import com.google.android.droiddriver.base.AbstractDroidDriver;
-import com.google.android.droiddriver.base.BaseUiDevice;
+import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.common.primitives.Longs;
 
 /**
  * Implementation of a DroidDriver that is driven via the accessibility layer.
  */
-public class UiAutomationDriver extends AbstractDroidDriver {
+public class UiAutomationDriver extends BaseDroidDriver {
   // TODO: magic const from UiAutomator, but may not be useful
   /**
    * This value has the greatest bearing on the appearance of test execution
@@ -45,12 +42,12 @@ public class UiAutomationDriver extends AbstractDroidDriver {
 
   private final UiAutomationContext context;
   private final UiAutomation uiAutomation;
-  private final BaseUiDevice uiDevice;
+  private final UiAutomationUiDevice uiDevice;
 
   public UiAutomationDriver(Instrumentation instrumentation) {
     this.uiAutomation = instrumentation.getUiAutomation();
     this.context = new UiAutomationContext(instrumentation, this);
-    uiDevice = new BaseUiDevice(context);
+    this.uiDevice = new UiAutomationUiDevice(context);
   }
 
   @Override
@@ -86,11 +83,6 @@ public class UiAutomationDriver extends AbstractDroidDriver {
     }
   }
 
-  @Override
-  protected Bitmap takeScreenshot() {
-    return uiAutomation.takeScreenshot();
-  }
-
   /**
    * Some widgets fail to trigger some AccessibilityEvent's after actions,
    * resulting in stale AccessibilityNodeInfo's. As a work-around, force to
@@ -116,7 +108,7 @@ public class UiAutomationDriver extends AbstractDroidDriver {
   }
 
   @Override
-  public UiDevice getUiDevice() {
+  public UiAutomationUiDevice getUiDevice() {
     return uiDevice;
   }
 }
