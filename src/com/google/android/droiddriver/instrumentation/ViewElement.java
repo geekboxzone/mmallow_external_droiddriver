@@ -199,7 +199,7 @@ public class ViewElement extends BaseUiElement {
   }
 
   @Override
-  public int getChildCount() {
+  protected int getChildCount() {
     if (!(view instanceof ViewGroup)) {
       return 0;
     }
@@ -207,7 +207,7 @@ public class ViewElement extends BaseUiElement {
   }
 
   @Override
-  public ViewElement getChild(int index) {
+  protected ViewElement getChild(int index) {
     if (!(view instanceof ViewGroup)) {
       return null;
     }

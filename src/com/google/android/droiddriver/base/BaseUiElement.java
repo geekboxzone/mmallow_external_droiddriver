@@ -122,8 +122,9 @@ public abstract class BaseUiElement implements UiElement {
     perform(SwipeAction.toScroll(direction));
   }
 
-  @Override
-  public abstract BaseUiElement getChild(int index);
+  protected abstract int getChildCount();
+
+  protected abstract BaseUiElement getChild(int index);
 
   protected abstract InputInjector getInjector();
 
@@ -134,16 +135,16 @@ public abstract class BaseUiElement implements UiElement {
   }
 
   @Override
-  public List<UiElement> getChildren(Predicate<? super UiElement> predicate) {
+  public List<BaseUiElement> getChildren(Predicate<? super UiElement> predicate) {
     if (predicate == null) {
       predicate = Predicates.notNull();
     } else {
       predicate = Predicates.and(Predicates.notNull(), predicate);
     }
 
-    List<UiElement> list = Lists.newArrayList();
+    List<BaseUiElement> list = Lists.newArrayList();
     for (int i = 0; i < getChildCount(); i++) {
-      UiElement child = getChild(i);
+      BaseUiElement child = getChild(i);
       if (predicate.apply(child)) {
         list.add(child);
       }

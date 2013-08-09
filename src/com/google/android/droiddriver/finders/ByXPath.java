@@ -137,18 +137,7 @@ public class ByXPath implements Finder {
     element.setAttribute(Attribute.BOUNDS.getName(), uiElement.getBounds().toShortString());
 
     // TODO: visitor pattern
-    int childCount = uiElement.getChildCount();
-    for (int i = 0; i < childCount; i++) {
-      BaseUiElement child = uiElement.getChild(i);
-      if (child == null) {
-        Logs.log(Log.INFO, "Skip null child for " + uiElement);
-        continue;
-      }
-      if (!child.isVisible()) {
-        Logs.log(Log.VERBOSE, "Skip invisible child: " + child);
-        continue;
-      }
-
+    for (BaseUiElement child : uiElement.getChildren(UiElement.VISIBLE)) {
       element.appendChild(child.getDomNode());
     }
     return element;

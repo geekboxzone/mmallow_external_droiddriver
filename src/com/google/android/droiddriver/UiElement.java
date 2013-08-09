@@ -185,9 +185,19 @@ public interface UiElement {
 
   /**
    * Gets an immutable {@link List} of immediate children that satisfy
-   * {@code predicate}. It always filters children that are null.
+   * {@code predicate}. It always filters children that are null. This gives a
+   * low level access to the underlying data. Do not use it unless you are sure
+   * about the subtle details. Note the count may not be what you expect. For
+   * instance, a dynamic list may show more items when scrolling beyond the end,
+   * varying the count. The count also depends on the driver implementation:
+   * <ul>
+   * <li>{@link InstrumentationDriver} includes all.</li>
+   * <li>the Accessibility API (which {@link UiAutomationDriver} depends on)
+   * does not include off-screen children, but may include invisible on-screen
+   * children.</li>
+   * </ul>
    */
-  List<UiElement> getChildren(Predicate<? super UiElement> predicate);
+  List<? extends UiElement> getChildren(Predicate<? super UiElement> predicate);
 
   /**
    * Filters out invisible children.
@@ -203,27 +213,6 @@ public interface UiElement {
       return "VISIBLE";
     }
   };
-
-  // TODO: remove getChildCount and getChild.
-  /**
-   * Gets the child at given index.
-   */
-  UiElement getChild(int index);
-
-  /**
-   * Gets the child count. This gives a low level access to the underlying data.
-   * Do not use it unless you are sure about the subtle details. Note the count
-   * may not be what you expect. For instance, a dynamic list may show more
-   * items when scrolling beyond the end, varying the count. The count also
-   * depends on the driver implementation:
-   * <ul>
-   * <li>{@link InstrumentationDriver} includes all.</li>
-   * <li>the Accessibility API (which {@link UiAutomationDriver} depends on)
-   * does not include off-screen children, but may include invisible on-screen
-   * children.</li>
-   * </ul>
-   */
-  int getChildCount();
 
   /**
    * Gets the parent.

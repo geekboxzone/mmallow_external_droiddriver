@@ -337,8 +337,9 @@ public class By {
         if (parent == null) {
           return false;
         }
-        for (int i = 0; i < parent.getChildCount(); i++) {
-          if (siblingFinder.matches(parent.getChild(i))) {
+        // Do not care if the sibling is visible
+        for (UiElement child : parent.getChildren(null)) {
+          if (siblingFinder.matches(child)) {
             return true;
           }
         }

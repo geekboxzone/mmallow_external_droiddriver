@@ -26,10 +26,12 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
  * Determines whether scrolling is possible by checking whether the last child
- * in the logical scroll direction is fully visible. Use this when the count of
- * children is static, and {@link UiElement#getChildCount()} includes all
- * children no matter if it is visible. Currently {@link InstrumentationDriver}
- * behaves this way.
+ * in the logical scroll direction is fully visible. This assumes the count of
+ * children is static, and {@link UiElement#getChildren} includes all children
+ * no matter if it is visible. Currently {@link InstrumentationDriver} behaves
+ * this way.
+ * <p>
+ * This does not work if a child is larger than the physical size of the parent.
  */
 public class StaticSentinelStrategy extends AbstractSentinelStrategy {
   /**
@@ -47,11 +49,12 @@ public class StaticSentinelStrategy extends AbstractSentinelStrategy {
 
   @Override
   public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
-    UiElement parent = driver.on(parentFinder);
+    UiElement sentinel = getSentinel(driver, parentFinder, direction);
+    UiElement parent = sentinel.getParent();
     // If the last child in the logical scroll direction is fully visible, no
     // more scrolling is possible
     Rect visibleBounds = parent.getVisibleBounds();
-    if (visibleBounds.contains(getSentinel(parent, direction).getBounds())) {
+    if (visibleBounds.contains(sentinel.getBounds())) {
       return false;
     }
 

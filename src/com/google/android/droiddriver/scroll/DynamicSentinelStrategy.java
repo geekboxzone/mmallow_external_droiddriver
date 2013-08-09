@@ -187,10 +187,9 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
 
   @Override
   public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
-    UiElement parent = driver.on(parentFinder);
-    UiElement oldSentinel = getSentinel(parent, direction);
-    parent.scroll(direction);
-    UiElement newSentinel = getSentinel(driver.on(parentFinder), direction);
+    UiElement oldSentinel = getSentinel(driver, parentFinder, direction);
+    oldSentinel.getParent().scroll(direction);
+    UiElement newSentinel = getSentinel(driver, parentFinder, direction);
     return isUpdatedStrategy.isSentinelUpdated(newSentinel, oldSentinel);
   }
 

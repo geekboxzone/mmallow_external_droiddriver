@@ -15,7 +15,11 @@
  */
 package com.google.android.droiddriver.scroll;
 
+import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.finders.By;
+import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.LogicalDirection;
 import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
@@ -41,11 +45,16 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
       this.description = description;
     }
 
+    /**
+     * Gets the sentinel, which must be an immediate child of {@code parent} --
+     * not a descendant. Note this could be null if {@code parent} has not
+     * finished updating.
+     */
     public UiElement getSentinel(UiElement parent) {
       return getSentinel(parent.getChildren(predicate));
     }
 
-    protected abstract UiElement getSentinel(List<UiElement> children);
+    protected abstract UiElement getSentinel(List<? extends UiElement> children);
 
     @Override
     public String toString() {
@@ -68,7 +77,7 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     }
 
     @Override
-    protected UiElement getSentinel(List<UiElement> children) {
+    protected UiElement getSentinel(List<? extends UiElement> children) {
       return original.getSentinel(children);
     }
   }
@@ -79,8 +88,8 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
   public static final GetStrategy FIRST_CHILD_GETTER = new GetStrategy(Predicates.alwaysTrue(),
       "FIRST_CHILD") {
     @Override
-    protected UiElement getSentinel(List<UiElement> children) {
-      return children.get(0);
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.isEmpty() ? null : children.get(0);
     }
   };
 
@@ -90,8 +99,8 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
   public static final GetStrategy LAST_CHILD_GETTER = new GetStrategy(Predicates.alwaysTrue(),
       "LAST_CHILD") {
     @Override
-    protected UiElement getSentinel(List<UiElement> children) {
-      return children.get(children.size() - 1);
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.isEmpty() ? null : children.get(children.size() - 1);
     }
   };
 
@@ -102,29 +111,59 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
   public static final GetStrategy SECOND_CHILD_GETTER = new GetStrategy(Predicates.alwaysTrue(),
       "SECOND_CHILD") {
     @Override
-    protected UiElement getSentinel(List<UiElement> children) {
-      return children.get(1);
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.size() <= 1 ? null : children.get(1);
     }
   };
+
+  private static class SentinelFinder implements Finder {
+    private final GetStrategy getStrategy;
+
+    public SentinelFinder(GetStrategy getStrategy) {
+      this.getStrategy = getStrategy;
+    }
+
+    @Override
+    public UiElement find(UiElement parent) {
+      UiElement sentinel = getStrategy.getSentinel(parent);
+      if (sentinel == null) {
+        throw new ElementNotFoundException(this);
+      }
+      return sentinel;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("SentinelFinder{%s}", getStrategy);
+    }
+  }
 
   protected final GetStrategy backwardGetStrategy;
   protected final GetStrategy forwardGetStrategy;
   protected final PhysicalToLogicalConverter physicalToLogicalConverter;
+  private final SentinelFinder backwardSentinelFinder;
+  private final SentinelFinder forwardSentinelFinder;
 
   public AbstractSentinelStrategy(GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy,
       PhysicalToLogicalConverter physicalToLogicalConverter) {
     this.backwardGetStrategy = backwardGetStrategy;
     this.forwardGetStrategy = forwardGetStrategy;
     this.physicalToLogicalConverter = physicalToLogicalConverter;
+    this.backwardSentinelFinder = new SentinelFinder(backwardGetStrategy);
+    this.forwardSentinelFinder = new SentinelFinder(forwardGetStrategy);
   }
 
-  protected UiElement getSentinel(UiElement parent, PhysicalDirection direction) {
+  protected UiElement getSentinel(DroidDriver driver, Finder parentFinder,
+      PhysicalDirection direction) {
+    // Make sure sentinel exists in parent
+    Finder chainFinder;
     LogicalDirection logicalDirection = physicalToLogicalConverter.toLogicalDirection(direction);
     if (logicalDirection == LogicalDirection.BACKWARD) {
-      return backwardGetStrategy.getSentinel(parent);
+      chainFinder = By.chain(parentFinder, backwardSentinelFinder);
     } else {
-      return forwardGetStrategy.getSentinel(parent);
+      chainFinder = By.chain(parentFinder, forwardSentinelFinder);
     }
+    return driver.on(chainFinder);
   }
 
   @Override

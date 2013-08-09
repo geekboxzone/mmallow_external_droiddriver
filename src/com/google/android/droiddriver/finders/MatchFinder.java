@@ -52,17 +52,7 @@ public abstract class MatchFinder implements Finder {
       Logs.log(Log.INFO, "Found match: " + context);
       return context;
     }
-    int childCount = context.getChildCount();
-    for (int i = 0; i < childCount; i++) {
-      UiElement child = context.getChild(i);
-      if (child == null) {
-        Logs.log(Log.INFO, "Skip null child for " + context);
-        continue;
-      }
-      if (!child.isVisible()) {
-        Logs.log(Log.VERBOSE, "Skip invisible child: " + child);
-        continue;
-      }
+    for (UiElement child : context.getChildren(UiElement.VISIBLE)) {
       try {
         return find(child);
       } catch (ElementNotFoundException enfe) {

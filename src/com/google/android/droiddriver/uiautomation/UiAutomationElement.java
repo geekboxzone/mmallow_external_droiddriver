@@ -161,12 +161,12 @@ public class UiAutomationElement extends BaseUiElement {
   }
 
   @Override
-  public int getChildCount() {
+  protected int getChildCount() {
     return node.getChildCount();
   }
 
   @Override
-  public UiAutomationElement getChild(int index) {
+  protected UiAutomationElement getChild(int index) {
     AccessibilityNodeInfo child = node.getChild(index);
     return child == null ? null : context.getUiElement(child);
   }
