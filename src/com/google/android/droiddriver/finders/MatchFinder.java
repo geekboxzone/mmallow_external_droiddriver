@@ -21,20 +21,23 @@ import android.util.Log;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.Logs;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 /**
  * Traverses the UiElement tree and returns the first UiElement satisfying
- * {@link #matches(UiElement)}.
+ * {@link #predicate}.
  */
 public abstract class MatchFinder implements Finder {
-  /**
-   * Returns true if the {@code element} matches the implementing finder. The
-   * implementing finder should not poll.
-   *
-   * @param element The element to validate against
-   * @return true if the element matches
-   */
-  public abstract boolean matches(UiElement element);
+  protected final Predicate<? super UiElement> predicate;
+
+  protected MatchFinder(Predicate<? super UiElement> predicate) {
+    if (predicate == null) {
+      this.predicate = Predicates.alwaysTrue();
+    } else {
+      this.predicate = predicate;
+    }
+  }
 
   /**
    * {@inheritDoc}
@@ -60,5 +63,17 @@ public abstract class MatchFinder implements Finder {
       }
     }
     throw new ElementNotFoundException(this);
+  }
+
+  /**
+   * Returns true if the {@code element} matches this finder. This can be used
+   * to test the exact match of {@code element} when this finder is used in
+   * {@link By#anyOf(MatchFinder...)}.
+   *
+   * @param element The element to validate against
+   * @return true if the element matches
+   */
+  public final boolean matches(UiElement element) {
+    return predicate.apply(element);
   }
 }

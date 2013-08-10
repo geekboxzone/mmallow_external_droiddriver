@@ -18,6 +18,7 @@ package com.google.android.droiddriver.finders;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.android.droiddriver.UiElement;
+import com.google.common.base.Predicate;
 
 /**
  * Matches UiElement by a single attribute.
@@ -27,20 +28,22 @@ public class ByAttribute<T> extends MatchFinder {
   private final MatchStrategy<? super T> strategy;
   private final T expected;
 
-  protected ByAttribute(Attribute attribute, MatchStrategy<? super T> strategy, T expected) {
+  protected ByAttribute(final Attribute attribute, final MatchStrategy<? super T> strategy,
+      final T expected) {
+    super(new Predicate<UiElement>() {
+      @Override
+      public boolean apply(UiElement element) {
+        T value = attribute.getValue(element);
+        return strategy.match(expected, value);
+      }
+    });
     this.attribute = checkNotNull(attribute);
     this.strategy = checkNotNull(strategy);
     this.expected = checkNotNull(expected);
   }
 
   @Override
-  public boolean matches(UiElement element) {
-    T value = attribute.getValue(element);
-    return strategy.match(expected, value);
-  }
-
-  @Override
   public String toString() {
-    return String.format("ByAttribute{%s %s %s}", attribute, strategy, expected);
+    return String.format("{%s %s %s}", attribute, strategy, expected);
   }
 }

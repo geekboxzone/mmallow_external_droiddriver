@@ -21,8 +21,8 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
-import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
+import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 

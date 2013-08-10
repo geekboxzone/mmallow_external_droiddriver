@@ -22,6 +22,11 @@ import com.google.android.droiddriver.UiElement;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 /**
  * Convenience methods to create commonly used finders.
@@ -223,6 +228,15 @@ public class By {
     return new ChainFinder(parent, child);
   }
 
+  private static List<Predicate<? super UiElement>> getPredicates(MatchFinder... finders) {
+    List<Predicate<? super UiElement>> predicates =
+        Lists.newArrayListWithExpectedSize(finders.length);
+    for (MatchFinder finder : finders) {
+      predicates.add(finder.predicate);
+    }
+    return predicates;
+  }
+
   // Hamcrest style finder aggregators
   /**
    * Evaluates given {@finders} in short-circuit fashion in the order
@@ -233,17 +247,7 @@ public class By {
    * @return a finder that is the logical conjunction of given finders
    */
   public static MatchFinder allOf(final MatchFinder... finders) {
-    return new MatchFinder() {
-      @Override
-      public boolean matches(UiElement element) {
-        for (MatchFinder finder : finders) {
-          if (!finder.matches(element)) {
-            return false;
-          }
-        }
-        return true;
-      }
-
+    return new MatchFinder(Predicates.and(getPredicates(finders))) {
       @Override
       public String toString() {
         return "allOf(" + Joiner.on(",").join(finders) + ")";
@@ -260,17 +264,7 @@ public class By {
    * @return a finder that is the logical disjunction of given finders
    */
   public static MatchFinder anyOf(final MatchFinder... finders) {
-    return new MatchFinder() {
-      @Override
-      public boolean matches(UiElement element) {
-        for (MatchFinder finder : finders) {
-          if (finder.matches(element)) {
-            return true;
-          }
-        }
-        return false;
-      }
-
+    return new MatchFinder(Predicates.or(getPredicates(finders))) {
       @Override
       public String toString() {
         return "anyOf(" + Joiner.on(",").join(finders) + ")";
@@ -284,13 +278,13 @@ public class By {
    */
   public static MatchFinder withParent(final MatchFinder parentFinder) {
     checkNotNull(parentFinder);
-    return new MatchFinder() {
+    return new MatchFinder(new Predicate<UiElement>() {
       @Override
-      public boolean matches(UiElement element) {
+      public boolean apply(UiElement element) {
         UiElement parent = element.getParent();
         return parent != null && parentFinder.matches(parent);
       }
-
+    }) {
       @Override
       public String toString() {
         return "withParent(" + parentFinder + ")";
@@ -304,9 +298,9 @@ public class By {
    */
   public static MatchFinder withAncestor(final MatchFinder ancestorFinder) {
     checkNotNull(ancestorFinder);
-    return new MatchFinder() {
+    return new MatchFinder(new Predicate<UiElement>() {
       @Override
-      public boolean matches(UiElement element) {
+      public boolean apply(UiElement element) {
         UiElement parent = element.getParent();
         while (parent != null) {
           if (ancestorFinder.matches(parent)) {
@@ -316,7 +310,7 @@ public class By {
         }
         return false;
       }
-
+    }) {
       @Override
       public String toString() {
         return "withAncestor(" + ancestorFinder + ")";
@@ -330,9 +324,9 @@ public class By {
    */
   public static MatchFinder withSibling(final MatchFinder siblingFinder) {
     checkNotNull(siblingFinder);
-    return new MatchFinder() {
+    return new MatchFinder(new Predicate<UiElement>() {
       @Override
-      public boolean matches(UiElement element) {
+      public boolean apply(UiElement element) {
         UiElement parent = element.getParent();
         if (parent == null) {
           return false;
@@ -345,7 +339,7 @@ public class By {
         }
         return false;
       }
-
+    }) {
       @Override
       public String toString() {
         return "withSibling(" + siblingFinder + ")";
