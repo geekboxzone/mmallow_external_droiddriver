@@ -80,7 +80,8 @@ public interface DroidDriver {
 
   /**
    * Polls until a {@link UiElement} is found using the given finder, or the
-   * default timeout is reached.
+   * default timeout is reached. This behaves the same as {@link #on} except
+   * that it does not return the {@link UiElement}.
    *
    * @param finder The matching mechanism
    * @throws TimeoutException If matching element does not appear within the

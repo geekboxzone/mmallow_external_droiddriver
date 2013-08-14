@@ -47,7 +47,7 @@ public abstract class ClickAction extends BaseAction {
     }
   }
 
-  private static class LongClick extends ClickAction {
+  public static class LongClick extends ClickAction {
     public LongClick(long timeoutMillis) {
       super(timeoutMillis);
     }

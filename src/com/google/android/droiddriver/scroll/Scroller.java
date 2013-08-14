@@ -22,36 +22,36 @@ import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
- * Interface for scrolling to the desired child in a scrollable parent view.
+ * Interface for scrolling to the desired item in a scrollable container view.
  */
 public interface Scroller {
   /**
-   * Scrolls {@code parentFinder} in both directions if necessary to find
-   * {@code childFinder}.
+   * Scrolls {@code containerFinder} in both directions if necessary to find
+   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
    *
    * @param driver
-   * @param parentFinder Finder for the container that can scroll, for instance
-   *        a ListView
-   * @param childFinder Finder for the desired child; relative to
-   *        {@code parentFinder}
-   * @return the UiElement matching {@code childFinder}
+   * @param containerFinder Finder for the container that can scroll, for
+   *        instance a ListView
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
+   * @return the UiElement matching {@code itemFinder}
    * @throws ElementNotFoundException If no match is found
    */
-  UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder);
+  UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder);
 
   /**
-   * Scrolls {@code parentFinder} in {@code direction} if necessary to find
-   * {@code childFinder}.
+   * Scrolls {@code containerFinder} in {@code direction} if necessary to find
+   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
    *
    * @param driver
-   * @param parentFinder Finder for the container that can scroll, for instance
-   *        a ListView
-   * @param childFinder Finder for the desired child; relative to
-   *        {@code parentFinder}
+   * @param containerFinder Finder for the container that can scroll, for
+   *        instance a ListView
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
    * @param direction
-   * @return the UiElement matching {@code childFinder}
+   * @return the UiElement matching {@code itemFinder}
    * @throws ElementNotFoundException If no match is found
    */
-  UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder,
+  UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction);
 }

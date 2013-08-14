@@ -221,11 +221,14 @@ public class By {
   }
 
   /**
-   * @return a finder that uses the UiElement returned by parent Finder as
-   *         context for the child Finder
+   * Returns a finder that uses the UiElement returned by first Finder as
+   * context for the second Finder.
+   * <p>
+   * Note typically first Finder finds the ancestor, then second Finder finds
+   * the target UiElement, which is a descendant.
    */
-  public static ChainFinder chain(Finder parent, Finder child) {
-    return new ChainFinder(parent, child);
+  public static ChainFinder chain(Finder first, Finder second) {
+    return new ChainFinder(first, second);
   }
 
   private static List<Predicate<? super UiElement>> getPredicates(MatchFinder... finders) {
@@ -250,7 +253,7 @@ public class By {
     return new MatchFinder(Predicates.and(getPredicates(finders))) {
       @Override
       public String toString() {
-        return "allOf(" + Joiner.on(",").join(finders) + ")";
+        return "allOf(" + Joiner.on(", ").join(finders) + ")";
       }
     };
   }
@@ -267,7 +270,7 @@ public class By {
     return new MatchFinder(Predicates.or(getPredicates(finders))) {
       @Override
       public String toString() {
-        return "anyOf(" + Joiner.on(",").join(finders) + ")";
+        return "anyOf(" + Joiner.on(", ").join(finders) + ")";
       }
     };
   }
@@ -332,8 +335,8 @@ public class By {
           return false;
         }
         // Do not care if the sibling is visible
-        for (UiElement child : parent.getChildren(null)) {
-          if (siblingFinder.matches(child)) {
+        for (UiElement sibling : parent.getChildren(null)) {
+          if (sibling != element && siblingFinder.matches(sibling)) {
             return true;
           }
         }

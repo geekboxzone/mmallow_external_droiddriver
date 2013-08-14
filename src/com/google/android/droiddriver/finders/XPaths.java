@@ -101,6 +101,14 @@ public class XPaths {
   }
 
   /**
+   * @return XPath predicate (with enclosing []) that filters nodes with
+   *         descendants satisfying {@code descendantPredicate}.
+   */
+  public static String withDescendant(String descendantPredicate) {
+    return "[.//*" + descendantPredicate + "]";
+  }
+
+  /**
    * Adapted from http://stackoverflow.com/questions/1341847/.
    * <p>
    * Produce an XPath literal equal to the value if possible; if not, produce an

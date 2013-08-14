@@ -31,7 +31,8 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverte
  * no matter if it is visible. Currently {@link InstrumentationDriver} behaves
  * this way.
  * <p>
- * This does not work if a child is larger than the physical size of the parent.
+ * This does not work if a child is larger than the physical size of the
+ * container.
  */
 public class StaticSentinelStrategy extends AbstractSentinelStrategy {
   /**
@@ -48,17 +49,17 @@ public class StaticSentinelStrategy extends AbstractSentinelStrategy {
   }
 
   @Override
-  public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
-    UiElement sentinel = getSentinel(driver, parentFinder, direction);
-    UiElement parent = sentinel.getParent();
+  public boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction) {
+    UiElement sentinel = getSentinel(driver, containerFinder, direction);
+    UiElement container = sentinel.getParent();
     // If the last child in the logical scroll direction is fully visible, no
     // more scrolling is possible
-    Rect visibleBounds = parent.getVisibleBounds();
+    Rect visibleBounds = container.getVisibleBounds();
     if (visibleBounds.contains(sentinel.getBounds())) {
       return false;
     }
 
-    parent.scroll(direction);
+    container.scroll(direction);
     return true;
   }
 }

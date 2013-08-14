@@ -28,11 +28,10 @@ import com.google.common.base.Objects;
 
 /**
  * Determines whether scrolling is possible by checking whether the sentinel
- * child is updated after scrolling. Use this when
- * {@link UiElement#getChildCount()} is not reliable. This can happen, for
- * instance, when UiAutomationDriver is used, which skips invisible children, or
- * in the case of dynamic list, which shows more items when scrolling beyond the
- * end.
+ * child is updated after scrolling. Use this when {@link UiElement#getChildren}
+ * is not reliable. This can happen, for instance, when UiAutomationDriver is
+ * used, which skips invisible children, or in the case of dynamic list, which
+ * shows more items when scrolling beyond the end.
  */
 public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
 
@@ -58,25 +57,25 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
 
   /**
    * Determines whether the sentinel is updated by checking a single unique
-   * String attribute of a child element of the sentinel (or itself).
+   * String attribute of a descendant element of the sentinel (or itself).
    */
   public static abstract class SingleStringUpdated implements IsUpdatedStrategy {
     private final Finder uniqueStringFinder;
 
     /**
      * @param uniqueStringFinder a Finder relative to the sentinel that finds
-     *        its child element which contains a unique String.
+     *        its descendant or self which contains a unique String.
      */
     public SingleStringUpdated(Finder uniqueStringFinder) {
       this.uniqueStringFinder = uniqueStringFinder;
     }
 
     /**
-     * @param uniqueStringChild the child of sentinel (or itself) that contains
-     *        the unique String
+     * @param uniqueStringElement the descendant or self that contains the
+     *        unique String
      * @return the unique String
      */
-    protected abstract String getUniqueString(UiElement uniqueStringChild);
+    protected abstract String getUniqueString(UiElement uniqueStringElement);
 
     private String getUniqueStringFromSentinel(UiElement sentinel) {
       try {
@@ -119,8 +118,8 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
   }
 
   /**
-   * Determines whether the sentinel is updated by checking the text of a child
-   * element of the sentinel (or itself).
+   * Determines whether the sentinel is updated by checking the text of a
+   * descendant element of the sentinel (or itself).
    */
   public static class TextUpdated extends SingleStringUpdated {
     public TextUpdated(Finder uniqueStringFinder) {
@@ -128,14 +127,14 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
     }
 
     @Override
-    protected String getUniqueString(UiElement uniqueStringChild) {
-      return uniqueStringChild.getText();
+    protected String getUniqueString(UiElement uniqueStringElement) {
+      return uniqueStringElement.getText();
     }
   }
 
   /**
    * Determines whether the sentinel is updated by checking the content
-   * description of a child element of the sentinel (or itself).
+   * description of a descendant element of the sentinel (or itself).
    */
   public static class ContentDescriptionUpdated extends SingleStringUpdated {
     public ContentDescriptionUpdated(Finder uniqueStringFinder) {
@@ -143,8 +142,8 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
     }
 
     @Override
-    protected String getUniqueString(UiElement uniqueStringChild) {
-      return uniqueStringChild.getContentDescription();
+    protected String getUniqueString(UiElement uniqueStringElement) {
+      return uniqueStringElement.getContentDescription();
     }
   }
 
@@ -186,10 +185,10 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
   }
 
   @Override
-  public boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction) {
-    UiElement oldSentinel = getSentinel(driver, parentFinder, direction);
+  public boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction) {
+    UiElement oldSentinel = getSentinel(driver, containerFinder, direction);
     oldSentinel.getParent().scroll(direction);
-    UiElement newSentinel = getSentinel(driver, parentFinder, direction);
+    UiElement newSentinel = getSentinel(driver, containerFinder, direction);
     return isUpdatedStrategy.isSentinelUpdated(newSentinel, oldSentinel);
   }
 

@@ -20,25 +20,32 @@ import com.google.android.droiddriver.UiElement;
 import com.google.common.base.Preconditions;
 
 /**
- * Find UiElement by using the UiElement returned by parent Finder as context
- * for the child Finder.
+ * Finds UiElement by applying Finders in turn: using the UiElement returned by
+ * first Finder as context for the second Finder. It is conceptually similar to
+ * <a href="http://en.wikipedia.org/wiki/Functional_composition">Function
+ * composition</a>. The returned UiElement can be thought of as the result of
+ * second(first(context)).
+ * <p>
+ * Note typically first Finder finds the ancestor, then second Finder finds the
+ * target UiElement, which is a descendant. ChainFinder can be chained with
+ * additional Finders to make a "chain".
  */
 public class ChainFinder implements Finder {
-  private final Finder parent;
-  private final Finder child;
+  private final Finder first;
+  private final Finder second;
 
-  protected ChainFinder(Finder parent, Finder child) {
-    this.parent = Preconditions.checkNotNull(parent);
-    this.child = Preconditions.checkNotNull(child);
+  protected ChainFinder(Finder first, Finder second) {
+    this.first = Preconditions.checkNotNull(first);
+    this.second = Preconditions.checkNotNull(second);
   }
 
   @Override
   public String toString() {
-    return String.format("ChainFinder{%s, %s}", parent, child);
+    return String.format("Chain{%s, %s}", first, second);
   }
 
   @Override
   public UiElement find(UiElement context) {
-    return child.find(parent.find(context));
+    return second.find(first.find(context));
   }
 }

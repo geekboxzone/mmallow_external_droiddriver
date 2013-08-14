@@ -22,19 +22,21 @@ import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.finders.By;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.Axis;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 
 /**
- * A {@link Scroller} that looks for the desired child in the current shown
- * content of the parent, otherwise scrolls the parent one step at a time and
- * look again, until we cannot scroll any more. A {@link SentinelStrategy} is
- * used to determine whether more scrolling is possible.
+ * A {@link Scroller} that looks for the desired item in the currently shown
+ * content of the scrollable container, otherwise scrolls the container one step
+ * at a time and look again, until we cannot scroll any more. A
+ * {@link SentinelStrategy} is used to determine whether more scrolling is
+ * possible.
  * <p>
  * This algorithm is needed unless the DroidDriver implementation supports
- * directly jumping to the child.
+ * directly jumping to the item.
  */
 public class SentinelScroller implements Scroller {
   private final int maxScrolls;
@@ -46,7 +48,7 @@ public class SentinelScroller implements Scroller {
    * @param maxScrolls the maximum number of scrolls. It should be large enough
    *        to allow any reasonable list size
    * @param perScrollTimeoutMillis the timeout in millis that we poll for the
-   *        child after each scroll
+   *        item after each scroll
    * @param axis the axis this scroller can scroll
    */
   public SentinelScroller(int maxScrolls, long perScrollTimeoutMillis, Axis axis,
@@ -66,46 +68,46 @@ public class SentinelScroller implements Scroller {
   }
 
   @Override
-  public UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder,
+  public UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction) {
-    Logs.call(this, "scrollTo", driver, parentFinder, childFinder, direction);
-    // TODO: enforce childFinder is relative to parentFinder.
-    // Combine with parentFinder to make childFinder absolute
-    // childFinder = By.chain(parentFinder, childFinder);
+    Logs.call(this, "scrollTo", driver, containerFinder, itemFinder, direction);
+    // Enforce itemFinder is relative to containerFinder.
+    // Combine with containerFinder to make itemFinder absolute.
+    itemFinder = By.chain(containerFinder, itemFinder);
 
     int i = 0;
     for (; i <= maxScrolls; i++) {
       try {
-        return driver.getPoller().pollFor(driver, childFinder, Poller.EXISTS,
-            perScrollTimeoutMillis);
+        return driver.getPoller()
+            .pollFor(driver, itemFinder, Poller.EXISTS, perScrollTimeoutMillis);
       } catch (TimeoutException e) {
-        if (i < maxScrolls && !sentinelStrategy.scroll(driver, parentFinder, direction)) {
+        if (i < maxScrolls && !sentinelStrategy.scroll(driver, containerFinder, direction)) {
           break;
         }
       }
     }
 
-    ElementNotFoundException exception = new ElementNotFoundException(childFinder);
+    ElementNotFoundException exception = new ElementNotFoundException(itemFinder);
     if (i == maxScrolls) {
       // This is often a program error -- maxScrolls is a safety net; we should
-      // have either found childFinder, or stopped to scroll b/c of reaching the
+      // have either found itemFinder, or stopped to scroll b/c of reaching the
       // end. If maxScrolls is reasonably large, sentinelStrategy must be wrong.
-      Logs.logfmt(Log.WARN, exception, "Scrolled %s %d times; sentinelStrategy=%s", parentFinder,
-          maxScrolls, sentinelStrategy);
+      Logs.logfmt(Log.WARN, exception, "Scrolled %s %d times; sentinelStrategy=%s",
+          containerFinder, maxScrolls, sentinelStrategy);
     }
     throw exception;
   }
 
   @Override
-  public UiElement scrollTo(DroidDriver driver, Finder parentFinder, Finder childFinder) {
+  public UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder) {
     // TODO: start searching from beginning instead of the current location.
     for (PhysicalDirection direction : axis.getPhysicalDirections()) {
       try {
-        return scrollTo(driver, parentFinder, childFinder, direction);
+        return scrollTo(driver, containerFinder, itemFinder, direction);
       } catch (ElementNotFoundException e) {
         // try another direction
       }
     }
-    throw new ElementNotFoundException(childFinder);
+    throw new ElementNotFoundException(By.chain(containerFinder, itemFinder));
   }
 }
