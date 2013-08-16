@@ -16,6 +16,11 @@
 
 package com.google.android.droiddriver.actions;
 
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.DOWN;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.LEFT;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.RIGHT;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.UP;
+
 import android.graphics.Rect;
 import android.os.SystemClock;
 import android.view.ViewConfiguration;
@@ -28,26 +33,63 @@ import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
 /**
- * A {@link ScrollAction} that swipes the touch screen.
+ * A {@link ScrollAction} that swipes the touch screen. Note the scroll
+ * direction enum values specify where the content will move, instead of the
+ * finger. This class includes some common instances that use the finger
+ * direction in the names, hopefully to mitigate this confusion.
  */
 public class SwipeAction extends ScrollAction {
-  /** Common instances for convenience */
-  public static final SwipeAction SCROLL_UP = new SwipeAction(PhysicalDirection.UP, false);
-  public static final SwipeAction SCROLL_DOWN = new SwipeAction(PhysicalDirection.DOWN, false);
-  public static final SwipeAction SCROLL_LEFT = new SwipeAction(PhysicalDirection.LEFT, false);
-  public static final SwipeAction SCROLL_RIGHT = new SwipeAction(PhysicalDirection.RIGHT, false);
+  // More steps slows the swipe and prevents contents from being flung too far
+  private static final int SCROLL_STEPS = 55;
+  private static final int FLING_STEPS = 5;
 
-  /** Gets canned common instances */
+  /**
+   * Common instances for convenience. The direction in names reflects the
+   * direction of finger rather than the scroll direction.
+   */
+  public static final SwipeAction SWIPE_DOWN = new SwipeAction(UP, SCROLL_STEPS);
+  public static final SwipeAction SWIPE_UP = new SwipeAction(DOWN, SCROLL_STEPS);
+  public static final SwipeAction SWIPE_RIGHT = new SwipeAction(LEFT, SCROLL_STEPS);
+  public static final SwipeAction SWIPE_LEFT = new SwipeAction(RIGHT, SCROLL_STEPS);
+
+  public static final SwipeAction FLING_DOWN = new SwipeAction(UP, FLING_STEPS);
+  public static final SwipeAction FLING_UP = new SwipeAction(DOWN, FLING_STEPS);
+  public static final SwipeAction FLING_RIGHT = new SwipeAction(LEFT, FLING_STEPS);
+  public static final SwipeAction FLING_LEFT = new SwipeAction(RIGHT, FLING_STEPS);
+
+  /**
+   * Gets canned common instances for scrolling. Note the scroll direction
+   * specifies where the content will move, instead of the finger.
+   */
   public static SwipeAction toScroll(PhysicalDirection direction) {
     switch (direction) {
       case UP:
-        return SCROLL_UP;
+        return SWIPE_DOWN;
       case DOWN:
-        return SCROLL_DOWN;
+        return SWIPE_UP;
       case LEFT:
-        return SCROLL_LEFT;
+        return SWIPE_RIGHT;
       case RIGHT:
-        return SCROLL_RIGHT;
+        return SWIPE_LEFT;
+      default:
+        throw new ActionException("Unknown scroll direction: " + direction);
+    }
+  }
+
+  /**
+   * Gets canned common instances for flinging. Note the scroll direction
+   * specifies where the content will move, instead of the finger.
+   */
+  public static SwipeAction toFling(PhysicalDirection direction) {
+    switch (direction) {
+      case UP:
+        return FLING_DOWN;
+      case DOWN:
+        return FLING_UP;
+      case LEFT:
+        return FLING_RIGHT;
+      case RIGHT:
+        return FLING_LEFT;
       default:
         throw new ActionException("Unknown scroll direction: " + direction);
     }
@@ -55,17 +97,34 @@ public class SwipeAction extends ScrollAction {
 
   private final PhysicalDirection direction;
   private final boolean drag;
+  private final int steps;
 
   /**
-   * Defaults timeoutMillis to 1000.
+   * Defaults timeoutMillis to 1000 and no drag.
    */
-  public SwipeAction(PhysicalDirection direction, boolean drag) {
-    this(direction, drag, 1000L);
+  public SwipeAction(PhysicalDirection direction, int steps) {
+    this(direction, steps, false, 1000L);
   }
 
-  public SwipeAction(PhysicalDirection direction, boolean drag, long timeoutMillis) {
+  /**
+   * Defaults timeoutMillis to 1000 and to swipe rather than flinging.
+   */
+  public SwipeAction(PhysicalDirection direction, boolean drag) {
+    this(direction, SCROLL_STEPS, drag, 1000L);
+  }
+
+  /**
+   * @param direction the scroll direction specifying where the content will
+   *        move, instead of the finger.
+   * @param steps (steps-1) is the number of {@code ACTION_MOVE} that will be
+   *        injected between {@code ACTION_DOWN} and {@code ACTION_UP}
+   * @param drag whether this is a drag
+   * @param timeoutMillis
+   */
+  public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis) {
     super(timeoutMillis);
     this.direction = direction;
+    this.steps = steps;
     this.drag = drag;
   }
 
@@ -75,7 +134,6 @@ public class SwipeAction extends ScrollAction {
 
     int swipeAreaHeightAdjust = (int) (elementRect.height() * 0.1);
     int swipeAreaWidthAdjust = (int) (elementRect.width() * 0.1);
-    int steps = 50;
     int startX;
     int startY;
     int endX;
@@ -132,7 +190,9 @@ public class SwipeAction extends ScrollAction {
 
   @Override
   public String toString() {
-    ToStringHelper toStringHelper = Objects.toStringHelper(this).addValue(direction);
+    ToStringHelper toStringHelper = Objects.toStringHelper(this);
+    toStringHelper.addValue(direction);
+    toStringHelper.add("steps", steps);
     if (drag) {
       toStringHelper.addValue("drag");
     }

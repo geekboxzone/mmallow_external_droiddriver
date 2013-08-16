@@ -15,26 +15,86 @@
  */
 package com.google.android.droiddriver.scroll;
 
-import com.google.android.droiddriver.exceptions.ActionException;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.DOWN;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.LEFT;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.RIGHT;
+import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.UP;
 
 /**
- * Interfaces and constants for scroll directions.
+ * A namespace to hold interfaces and constants for scroll directions.
  */
-public interface Direction {
+public class Direction {
   /** Logical directions */
   public enum LogicalDirection {
-    FORWARD, BACKWARD;
+    FORWARD {
+      @Override
+      public LogicalDirection reverse() {
+        return BACKWARD;
+      }
+    },
+    BACKWARD {
+      @Override
+      public LogicalDirection reverse() {
+        return FORWARD;
+      }
+    };
+    public abstract LogicalDirection reverse();
   }
 
   /** Physical directions */
   public enum PhysicalDirection {
-    UP, DOWN, LEFT, RIGHT
+    UP {
+      @Override
+      public PhysicalDirection reverse() {
+        return DOWN;
+      }
+
+      @Override
+      public Axis axis() {
+        return Axis.VERTICAL;
+      }
+    },
+    DOWN {
+      @Override
+      public PhysicalDirection reverse() {
+        return UP;
+      }
+
+      @Override
+      public Axis axis() {
+        return Axis.VERTICAL;
+      }
+    },
+    LEFT {
+      @Override
+      public PhysicalDirection reverse() {
+        return RIGHT;
+      }
+
+      @Override
+      public Axis axis() {
+        return Axis.HORIZONTAL;
+      }
+    },
+    RIGHT {
+      @Override
+      public PhysicalDirection reverse() {
+        return LEFT;
+      }
+
+      @Override
+      public Axis axis() {
+        return Axis.HORIZONTAL;
+      }
+    };
+    public abstract PhysicalDirection reverse();
+
+    public abstract Axis axis();
   }
 
   public enum Axis {
     HORIZONTAL {
-      private final PhysicalDirection[] directions = {PhysicalDirection.LEFT,
-          PhysicalDirection.RIGHT};
+      private final PhysicalDirection[] directions = {LEFT, RIGHT};
 
       @Override
       public PhysicalDirection[] getPhysicalDirections() {
@@ -42,42 +102,92 @@ public interface Direction {
       }
     },
     VERTICAL {
-      private final PhysicalDirection[] directions = {PhysicalDirection.UP, PhysicalDirection.DOWN};
+      private final PhysicalDirection[] directions = {UP, DOWN};
 
       @Override
       public PhysicalDirection[] getPhysicalDirections() {
         return directions;
       }
     };
+
     public abstract PhysicalDirection[] getPhysicalDirections();
   }
 
   /**
-   * Converts ScrollDirection to LogicalDirection.
+   * Converts between PhysicalDirection and LogicalDirection. It's possible to
+   * override this for RTL (right-to-left) views, for example.
    */
-  public interface PhysicalToLogicalConverter {
-    /**
-     * Converts ScrollDirection to LogicalDirection. It's possible to override
-     * this for RTL (right-to-left) views, for example.
-     */
-    LogicalDirection toLogicalDirection(PhysicalDirection direction);
+  public static abstract class DirectionConverter {
 
     /** Follows standard convention: up-to-down, left-to-right */
-    PhysicalToLogicalConverter STANDARD_CONVERTER = new PhysicalToLogicalConverter() {
+    public static final DirectionConverter STANDARD_CONVERTER = new DirectionConverter() {
       @Override
-      public LogicalDirection toLogicalDirection(PhysicalDirection direction) {
-        switch (direction) {
-          case UP:
-            return LogicalDirection.BACKWARD;
-          case DOWN:
-            return LogicalDirection.FORWARD;
-          case LEFT:
-            return LogicalDirection.BACKWARD;
-          case RIGHT:
-            return LogicalDirection.FORWARD;
-        }
-        throw new ActionException("Unknown scroll direction: " + direction);
+      public PhysicalDirection horizontalForwardDirection() {
+        return RIGHT;
+      }
+
+      @Override
+      public PhysicalDirection verticalForwardDirection() {
+        return DOWN;
       }
     };
+
+    /** Follows RTL convention: up-to-down, right-to-left */
+    public static final DirectionConverter RTL_CONVERTER = new DirectionConverter() {
+      @Override
+      public PhysicalDirection horizontalForwardDirection() {
+        return LEFT;
+      }
+
+      @Override
+      public PhysicalDirection verticalForwardDirection() {
+        return DOWN;
+      }
+    };
+
+    public abstract PhysicalDirection horizontalForwardDirection();
+
+    public abstract PhysicalDirection verticalForwardDirection();
+
+    public final PhysicalDirection horizontalBackwardDirection() {
+      return horizontalForwardDirection().reverse();
+    }
+
+    public final PhysicalDirection verticalBackwardDirection() {
+      return verticalForwardDirection().reverse();
+    }
+
+    /** Converts PhysicalDirection to LogicalDirection */
+    public final LogicalDirection toLogicalDirection(PhysicalDirection physicalDirection) {
+      LogicalDirection forward = LogicalDirection.FORWARD;
+      if (toPhysicalDirection(physicalDirection.axis(), forward) == physicalDirection) {
+        return forward;
+      }
+      return forward.reverse();
+    }
+
+    /** Converts LogicalDirection to PhysicalDirection */
+    public final PhysicalDirection toPhysicalDirection(Axis axis, LogicalDirection logicalDirection) {
+      switch (axis) {
+        case HORIZONTAL:
+          switch (logicalDirection) {
+            case BACKWARD:
+              return horizontalBackwardDirection();
+            case FORWARD:
+              return horizontalForwardDirection();
+          }
+          break;
+        case VERTICAL:
+          switch (logicalDirection) {
+            case BACKWARD:
+              return verticalBackwardDirection();
+            case FORWARD:
+              return verticalForwardDirection();
+          }
+      }
+      return null;
+    }
   }
+
+  private Direction() {}
 }

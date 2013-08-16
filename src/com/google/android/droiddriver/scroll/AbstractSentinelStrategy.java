@@ -20,9 +20,9 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.By;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.LogicalDirection;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
-import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -46,12 +46,12 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     }
 
     /**
-     * Gets the sentinel, which must be an immediate child of {@code parent} --
-     * not a descendant. Note this could be null if {@code parent} has not
+     * Gets the sentinel, which must be an immediate child of {@code container}
+     * -- not a descendant. Note this could be null if {@code container} has not
      * finished updating.
      */
-    public UiElement getSentinel(UiElement parent) {
-      return getSentinel(parent.getChildren(predicate));
+    public UiElement getSentinel(UiElement container) {
+      return getSentinel(container.getChildren(predicate));
     }
 
     protected abstract UiElement getSentinel(List<? extends UiElement> children);
@@ -116,6 +116,7 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     }
   };
 
+  // Make sure sentinel exists in container
   private static class SentinelFinder implements Finder {
     private final GetStrategy getStrategy;
 
@@ -124,8 +125,8 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     }
 
     @Override
-    public UiElement find(UiElement parent) {
-      UiElement sentinel = getStrategy.getSentinel(parent);
+    public UiElement find(UiElement container) {
+      UiElement sentinel = getStrategy.getSentinel(container);
       if (sentinel == null) {
         throw new ElementNotFoundException(this);
       }
@@ -138,32 +139,36 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
     }
   }
 
-  protected final GetStrategy backwardGetStrategy;
-  protected final GetStrategy forwardGetStrategy;
-  protected final PhysicalToLogicalConverter physicalToLogicalConverter;
+  private final GetStrategy backwardGetStrategy;
+  private final GetStrategy forwardGetStrategy;
+  private final DirectionConverter directionConverter;
   private final SentinelFinder backwardSentinelFinder;
   private final SentinelFinder forwardSentinelFinder;
 
   public AbstractSentinelStrategy(GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy,
-      PhysicalToLogicalConverter physicalToLogicalConverter) {
+      DirectionConverter directionConverter) {
     this.backwardGetStrategy = backwardGetStrategy;
     this.forwardGetStrategy = forwardGetStrategy;
-    this.physicalToLogicalConverter = physicalToLogicalConverter;
+    this.directionConverter = directionConverter;
     this.backwardSentinelFinder = new SentinelFinder(backwardGetStrategy);
     this.forwardSentinelFinder = new SentinelFinder(forwardGetStrategy);
   }
 
-  protected UiElement getSentinel(DroidDriver driver, Finder parentFinder,
+  protected UiElement getSentinel(DroidDriver driver, Finder containerFinder,
       PhysicalDirection direction) {
-    // Make sure sentinel exists in parent
-    Finder chainFinder;
-    LogicalDirection logicalDirection = physicalToLogicalConverter.toLogicalDirection(direction);
+    Finder sentinelFinder;
+    LogicalDirection logicalDirection = directionConverter.toLogicalDirection(direction);
     if (logicalDirection == LogicalDirection.BACKWARD) {
-      chainFinder = By.chain(parentFinder, backwardSentinelFinder);
+      sentinelFinder = By.chain(containerFinder, backwardSentinelFinder);
     } else {
-      chainFinder = By.chain(parentFinder, forwardSentinelFinder);
+      sentinelFinder = By.chain(containerFinder, forwardSentinelFinder);
     }
-    return driver.on(chainFinder);
+    return driver.on(sentinelFinder);
+  }
+
+  @Override
+  public final DirectionConverter getDirectionConverter() {
+    return directionConverter;
   }
 
   @Override

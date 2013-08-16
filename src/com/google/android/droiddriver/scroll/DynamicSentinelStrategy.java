@@ -21,8 +21,8 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
-import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 
@@ -152,36 +152,35 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
   /**
    * Constructs with {@code GetStrategy}s that decorate the given
    * {@code GetStrategy}s with {@link UiElement#VISIBLE}, and the given
-   * {@code isUpdatedStrategy} and {@code physicalToLogicalConverter}. Be
-   * careful with {@code GetStrategy}s: the sentinel after each scroll should be
-   * unique.
+   * {@code isUpdatedStrategy} and {@code directionConverter}. Be careful with
+   * {@code GetStrategy}s: the sentinel after each scroll should be unique.
    */
   public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
       GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy,
-      PhysicalToLogicalConverter physicalToLogicalConverter) {
+      DirectionConverter directionConverter) {
     super(new MorePredicateGetStrategy(backwardGetStrategy, UiElement.VISIBLE, "VISIBLE_"),
         new MorePredicateGetStrategy(forwardGetStrategy, UiElement.VISIBLE, "VISIBLE_"),
-        physicalToLogicalConverter);
+        directionConverter);
     this.isUpdatedStrategy = isUpdatedStrategy;
   }
 
   /**
-   * Defaults to the standard {@link PhysicalToLogicalConverter}.
+   * Defaults to the standard {@link DirectionConverter}.
    */
   public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
       GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy) {
     this(isUpdatedStrategy, backwardGetStrategy, forwardGetStrategy,
-        PhysicalToLogicalConverter.STANDARD_CONVERTER);
+        DirectionConverter.STANDARD_CONVERTER);
   }
 
   /**
    * Defaults to LAST_CHILD_GETTER for forward scrolling, and the standard
-   * {@link PhysicalToLogicalConverter}.
+   * {@link DirectionConverter}.
    */
   public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
       GetStrategy backwardGetStrategy) {
     this(isUpdatedStrategy, backwardGetStrategy, LAST_CHILD_GETTER,
-        PhysicalToLogicalConverter.STANDARD_CONVERTER);
+        DirectionConverter.STANDARD_CONVERTER);
   }
 
   @Override

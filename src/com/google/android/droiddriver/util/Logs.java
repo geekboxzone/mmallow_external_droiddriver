@@ -32,7 +32,7 @@ public class Logs {
       Log.d(
           TAG,
           String.format("Invoking %s.%s(%s)", self.getClass().getSimpleName(), method,
-              Joiner.on(",").join(args)));
+              Joiner.on(", ").join(args)));
     }
   }
 

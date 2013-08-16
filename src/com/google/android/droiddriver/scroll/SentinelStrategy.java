@@ -17,6 +17,7 @@ package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
@@ -24,16 +25,21 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  */
 public interface SentinelStrategy {
   /**
-   * Tries to scroll {@code parentFinder} in {@code direction}. Returns whether
-   * scrolling is effective.
+   * Tries to scroll {@code containerFinder} in {@code direction}. Returns
+   * whether scrolling is effective.
    *
    * @param driver
-   * @param parentFinder Finder for the container that can scroll, for instance
-   *        a ListView
+   * @param containerFinder Finder for the container that can scroll, for
+   *        instance a ListView
    * @param direction
    * @return whether scrolling is effective
    */
-  boolean scroll(DroidDriver driver, Finder parentFinder, PhysicalDirection direction);
+  boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction);
+
+  /**
+   * Returns the {@link DirectionConverter}.
+   */
+  DirectionConverter getDirectionConverter();
 
   /**
    * {@inheritDoc}

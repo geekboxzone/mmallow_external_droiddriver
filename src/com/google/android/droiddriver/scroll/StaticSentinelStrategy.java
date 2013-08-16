@@ -21,8 +21,8 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
+import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
-import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverter;
 
 /**
  * Determines whether scrolling is possible by checking whether the last child
@@ -37,15 +37,15 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalToLogicalConverte
 public class StaticSentinelStrategy extends AbstractSentinelStrategy {
   /**
    * Defaults to FIRST_CHILD_GETTER for backward scrolling, LAST_CHILD_GETTER
-   * for forward scrolling, and the standard {@link PhysicalToLogicalConverter}.
+   * for forward scrolling, and the standard {@link DirectionConverter}.
    */
   public StaticSentinelStrategy() {
-    super(FIRST_CHILD_GETTER, LAST_CHILD_GETTER, PhysicalToLogicalConverter.STANDARD_CONVERTER);
+    super(FIRST_CHILD_GETTER, LAST_CHILD_GETTER, DirectionConverter.STANDARD_CONVERTER);
   }
 
   public StaticSentinelStrategy(GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy,
-      PhysicalToLogicalConverter physicalToLogicalConverter) {
-    super(backwardGetStrategy, forwardGetStrategy, physicalToLogicalConverter);
+      DirectionConverter directionConverter) {
+    super(backwardGetStrategy, forwardGetStrategy, directionConverter);
   }
 
   @Override
