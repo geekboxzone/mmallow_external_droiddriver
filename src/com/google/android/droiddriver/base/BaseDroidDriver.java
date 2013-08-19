@@ -37,12 +37,13 @@ public abstract class BaseDroidDriver implements DroidDriver {
   @Override
   public UiElement find(Finder finder) {
     Logs.call(this, "find", finder);
-    return finder.find(refreshRootElement());
+    return finder.find(getRootElement());
   }
 
   @Override
   public boolean has(Finder finder) {
     try {
+      refreshUiElementTree();
       find(finder);
       return true;
     } catch (ElementNotFoundException enfe) {
@@ -94,15 +95,15 @@ public abstract class BaseDroidDriver implements DroidDriver {
 
   protected BaseUiElement getRootElement() {
     if (rootElement == null) {
-      refreshRootElement();
+      refreshUiElementTree();
     }
     return rootElement;
   }
 
-  private BaseUiElement refreshRootElement() {
+  @Override
+  public void refreshUiElementTree() {
     getContext().clearData();
     rootElement = getNewRootElement();
-    return rootElement;
   }
 
   @Override

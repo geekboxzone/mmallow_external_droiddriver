@@ -106,10 +106,13 @@ public interface Poller {
   ConditionChecker<Void> GONE = new ConditionChecker<Void>() {
     @Override
     public Void check(DroidDriver driver, Finder finder) throws UnsatisfiedConditionException {
-      if (driver.has(finder)) {
+      try {
+        // "find" does not call refreshUiElementTree, while "has" calls
+        driver.find(finder);
         throw new UnsatisfiedConditionException();
+      } catch (ElementNotFoundException enfe) {
+        return null;
       }
-      return null;
     }
 
     @Override

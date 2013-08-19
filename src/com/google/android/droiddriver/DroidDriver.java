@@ -68,15 +68,21 @@ public interface DroidDriver {
 
   /**
    * Returns the first {@link UiElement} found using the given finder without
-   * polling. This method is useful in {@link Poller.PollingListener#onPolling}.
-   * In other situations polling is desired, and {@link #on} is more
-   * appropriate.
+   * polling and without {@link #refreshUiElementTree}. This method is useful in
+   * {@link Poller.PollingListener#onPolling}. In other situations polling is
+   * desired, and {@link #on} is more appropriate.
    *
    * @param finder The matching mechanism
    * @return The first matching element
    * @throws ElementNotFoundException If no matching elements are found
    */
   UiElement find(Finder finder);
+
+  /**
+   * Refreshes the UiElement tree. All methods in this interface that take a
+   * Finder parameter call this method, unless noted otherwise.
+   */
+  void refreshUiElementTree();
 
   /**
    * Polls until a {@link UiElement} is found using the given finder, or the
@@ -116,9 +122,8 @@ public interface DroidDriver {
 
   /**
    * Dumps the UiElement tree to a file to help debug. The tree is based on the
-   * last used root UiElement if it exists. Screenshot is always current. If
-   * they do not match, the UiElement tree must be stale, indicating that you
-   * should use a fresh UiElement instead of an old instance.
+   * last used root UiElement if it exists, otherwise
+   * {@link #refreshUiElementTree} is called.
    *
    * @param path the path of file to save the tree
    * @return whether the dumping succeeded

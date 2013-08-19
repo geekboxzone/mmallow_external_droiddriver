@@ -67,6 +67,7 @@ public class DefaultPoller implements Poller {
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
       try {
+        driver.refreshUiElementTree();
         return checker.check(driver, finder);
       } catch (UnsatisfiedConditionException e) {
         // fall through to poll
