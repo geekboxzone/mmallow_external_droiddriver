@@ -26,6 +26,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
 
 /**
@@ -89,6 +90,7 @@ public class UiAutomationDriver extends BaseDroidDriver {
    * clear the AccessibilityNodeInfoCache.
    */
   public void clearAccessibilityNodeInfoCache() {
+    Logs.call(this, "clearAccessibilityNodeInfoCache");
     uiDevice.sleep();
     uiDevice.wakeUp();
   }
@@ -100,6 +102,7 @@ public class UiAutomationDriver extends BaseDroidDriver {
    * discretion.
    */
   public void clearAccessibilityNodeInfoCacheHack() {
+    Logs.call(this, "clearAccessibilityNodeInfoCacheHack");
     AccessibilityManager accessibilityManager =
         (AccessibilityManager) context.getInstrumentation().getTargetContext()
             .getSystemService(Context.ACCESSIBILITY_SERVICE);

@@ -97,11 +97,14 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
       }
 
       String newString = getUniqueStringFromSentinel(newSentinel);
-      // If newString is null, newSentinel must be partially shown. In this case
-      // we return true to allow further scrolling. But program error could also
-      // cause this, e.g. a bad choice of GetStrategy. log for debugging.
+      // A legitimate case for newString being null is when newSentinel is
+      // partially shown. We return true to allow further scrolling. But program
+      // error could also cause this, e.g. a bad choice of GetStrategy, which
+      // results in unnecessary scroll actions that have no visual effect. This
+      // log helps troubleshooting in the latter case.
       if (newString == null) {
-        Logs.logfmt(Log.WARN, "Unique String under sentinel %s is null", newSentinel);
+        Logs.logfmt(Log.WARN, "Unique String is null: sentinel=%s, uniqueStringFinder=%s",
+            newSentinel, uniqueStringFinder);
         return true;
       }
       if (newString.equals(getUniqueStringFromSentinel(oldSentinel))) {

@@ -45,6 +45,11 @@ public interface UiDevice {
 
   /**
    * Takes a screenshot of current window and stores it in {@code path} as PNG.
+   * <p>
+   * If this is used in a test which extends
+   * {@link android.test.ActivityInstrumentationTestCase2}, call this before
+   * {@code tearDown()} because {@code tearDown()} finishes activities created
+   * by {@link android.test.ActivityInstrumentationTestCase2#getActivity()}.
    *
    * @param path the path of file to save screenshot
    * @return true if screen shot is created successfully
