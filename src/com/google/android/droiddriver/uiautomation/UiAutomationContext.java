@@ -28,7 +28,6 @@ import com.google.common.collect.MapMaker;
 import java.util.Map;
 
 class UiAutomationContext implements DroidDriverContext {
-  // Maybe we should use Cache instead of Map on memory-constrained devices
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
       .weakValues().makeMap();
   private final UiAutomation uiAutomation;

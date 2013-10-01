@@ -41,7 +41,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 /**
- * Abstract implementation with common methods already implemented.
+ * Base UiElement that implements the common operations.
  */
 public abstract class BaseUiElement implements UiElement {
   private WeakReference<Element> domNode;
@@ -91,7 +91,7 @@ public abstract class BaseUiElement implements UiElement {
   @Override
   public void setText(String text) {
     perform(new TextAction(text));
-    // TypeAction may not be effective immediately and reflected bygetText(),
+    // TextAction may not be effective immediately and reflected by getText(),
     // so the following will fail.
     // if (Logs.DEBUG) {
     // String actual = getText();

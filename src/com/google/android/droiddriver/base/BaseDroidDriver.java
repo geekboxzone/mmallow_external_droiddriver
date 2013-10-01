@@ -26,8 +26,7 @@ import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.util.Logs;
 
 /**
- * Abstract implementation of DroidDriver that does the common actions, and
- * should not differ in implementations of {@link DroidDriver}.
+ * Base DroidDriver that implements the common operations.
  */
 public abstract class BaseDroidDriver implements DroidDriver {
 

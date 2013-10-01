@@ -39,9 +39,15 @@ import com.google.common.base.Objects.ToStringHelper;
  * direction in the names, hopefully to mitigate this confusion.
  */
 public class SwipeAction extends ScrollAction {
-  // More steps slows the swipe and prevents contents from being flung too far
-  private static final int SCROLL_STEPS = 55;
-  private static final int FLING_STEPS = 5;
+  // The action is a fling if the ACTION_MOVE velocity is greater than
+  // ViewConfiguration#getScaledMinimumFlingVelocity. The velocity is calculated
+  // as <distance between ACTION_MOVE points> / ACTION_MOVE_INTERVAL
+  private static final int ACTION_MOVE_INTERVAL = 5;
+  // ViewConfiguration.MINIMUM_FLING_VELOCITY = 50, so if there is no scale, in
+  // theory a swipe of 20 steps is a scroll instead of fling on devices that
+  // have 20 * 50 * 5 = 5000 pixels in one direction. Make it 40 for safety.
+  private static final int SCROLL_STEPS = 40;
+  private static final int FLING_STEPS = 2;
 
   /**
    * Common instances for convenience. The direction in names reflects the
@@ -178,7 +184,7 @@ public class SwipeAction extends ScrollAction {
     }
     for (int i = 1; i < steps; i++) {
       Events.touchMove(injector, downTime, startX + (int) (xStep * i), startY + (int) (yStep * i));
-      SystemClock.sleep(5);
+      SystemClock.sleep(ACTION_MOVE_INTERVAL);
     }
     if (drag) {
       // Hold final position for a little bit to simulate drag.
