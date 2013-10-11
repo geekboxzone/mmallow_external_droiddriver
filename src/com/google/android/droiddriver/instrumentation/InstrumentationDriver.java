@@ -20,11 +20,13 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
@@ -85,7 +87,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
 
   private static class ScreenshotRunnable implements Runnable {
     private final View rootView;
-    private Bitmap screenshot;
+    Bitmap screenshot;
 
     private ScreenshotRunnable(View rootView) {
       this.rootView = rootView;
@@ -93,10 +95,14 @@ public class InstrumentationDriver extends BaseDroidDriver {
 
     @Override
     public void run() {
-      rootView.destroyDrawingCache();
-      rootView.buildDrawingCache(false);
-      screenshot = Bitmap.createBitmap(rootView.getDrawingCache());
-      rootView.destroyDrawingCache();
+      try {
+        rootView.destroyDrawingCache();
+        rootView.buildDrawingCache(false);
+        screenshot = Bitmap.createBitmap(rootView.getDrawingCache());
+        rootView.destroyDrawingCache();
+      } catch (Throwable e) {
+        Logs.log(Log.ERROR, e);
+      }
     }
   }
 

@@ -17,8 +17,10 @@
 package com.google.android.droiddriver.uiautomation;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.google.android.droiddriver.base.BaseUiDevice;
+import com.google.android.droiddriver.util.Logs;
 
 class UiAutomationUiDevice extends BaseUiDevice {
   private final UiAutomationContext context;
@@ -29,7 +31,12 @@ class UiAutomationUiDevice extends BaseUiDevice {
 
   @Override
   protected Bitmap takeScreenshot() {
-    return context.getUiAutomation().takeScreenshot();
+    try {
+      return context.getUiAutomation().takeScreenshot();
+    } catch (Throwable e) {
+      Logs.log(Log.ERROR, e);
+      return null;
+    }
   }
 
   @Override

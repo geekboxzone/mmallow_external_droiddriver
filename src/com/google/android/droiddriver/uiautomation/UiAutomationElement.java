@@ -192,7 +192,7 @@ public class UiAutomationElement extends BaseUiElement {
       // A legitimate case of no AccessibilityEvent is when scrolling has
       // reached the end, but we cannot tell whether it's legitimate or the
       // widget has bugs, so clearAccessibilityNodeInfoCache anyways.
-      ((UiAutomationDriver) context.getDriver()).clearAccessibilityNodeInfoCacheHack();
+      context.getDriver().clearAccessibilityNodeInfoCacheHack();
     }
   }
 }
