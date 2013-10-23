@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 
 /**
  * Class to find the root view.
- * Note(twickham): This class is no longer being used.
  */
 public class RootFinder {
 
@@ -38,8 +37,9 @@ public class RootFinder {
   private static final Object windowManagerObj;
 
   static {
-    String windowManagerClassName = Build.VERSION.SDK_INT >= 17 ? "android.view.WindowManagerGlobal"
-        : "android.view.WindowManagerImpl";
+    String windowManagerClassName =
+        Build.VERSION.SDK_INT >= 17 ? "android.view.WindowManagerGlobal"
+            : "android.view.WindowManagerImpl";
     String instanceMethod = Build.VERSION.SDK_INT >= 17 ? "getInstance" : "getDefault";
     try {
       Class<?> clazz = Class.forName(windowManagerClassName);
@@ -51,8 +51,8 @@ public class RootFinder {
       throw new DroidDriverException(String.format("could not invoke: %s on %s", instanceMethod,
           windowManagerClassName), ite.getCause());
     } catch (ClassNotFoundException cnfe) {
-      throw new DroidDriverException(
-          String.format("could not find class: %s", windowManagerClassName), cnfe);
+      throw new DroidDriverException(String.format("could not find class: %s",
+          windowManagerClassName), cnfe);
     } catch (NoSuchFieldException nsfe) {
       throw new DroidDriverException(String.format("could not find field: %s on %s",
           VIEW_FIELD_NAME, windowManagerClassName), nsfe);
@@ -60,13 +60,13 @@ public class RootFinder {
       throw new DroidDriverException(String.format("could not find method: %s on %s",
           instanceMethod, windowManagerClassName), nsme);
     } catch (RuntimeException re) {
-      throw new DroidDriverException(
-          String.format("reflective setup failed using obj: %s method: %s field: %s",
-          windowManagerClassName, instanceMethod, VIEW_FIELD_NAME), re);
+      throw new DroidDriverException(String.format(
+          "reflective setup failed using obj: %s method: %s field: %s", windowManagerClassName,
+          instanceMethod, VIEW_FIELD_NAME), re);
     } catch (IllegalAccessException iae) {
-      throw new DroidDriverException(
-          String.format("reflective setup failed using obj: %s method: %s field: %s",
-          windowManagerClassName, instanceMethod, VIEW_FIELD_NAME), iae);
+      throw new DroidDriverException(String.format(
+          "reflective setup failed using obj: %s method: %s field: %s", windowManagerClassName,
+          instanceMethod, VIEW_FIELD_NAME), iae);
     }
   }
 
@@ -78,12 +78,11 @@ public class RootFinder {
 
     try {
       views = (View[]) viewsField.get(windowManagerObj);
-      Logs.log(Log.DEBUG, "View size:" +views.length);
+      Logs.log(Log.DEBUG, "View size:" + views.length);
       return views;
     } catch (RuntimeException re) {
       throw new DroidDriverException(String.format("Reflective access to %s on %s failed.",
           viewsField, windowManagerObj), re);
-
     } catch (IllegalAccessException iae) {
       throw new DroidDriverException(String.format("Reflective access to %s on %s failed.",
           viewsField, windowManagerObj), iae);

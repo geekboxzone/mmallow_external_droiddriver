@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
 /**
  * Builds DroidDriver instances.
  */
+@Deprecated
 public class DroidDriverBuilder {
   public enum Implementation {
     ANY, INSTRUMENTATION, UI_AUTOMATION

@@ -25,6 +25,7 @@ import android.test.suitebuilder.TestMethod;
 import android.util.Log;
 
 import com.android.internal.util.Predicate;
+import com.google.android.droiddriver.helpers.DroidDrivers;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Supplier;
@@ -121,7 +122,7 @@ public class TestRunner extends InstrumentationTestRunner {
         }
 
         UseUiAutomation useUiAutomation = getAnnotation(arg0, UseUiAutomation.class);
-        if (useUiAutomation != null && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        if (useUiAutomation != null && !DroidDrivers.hasUiAutomation()) {
           Logs.logfmt(Log.INFO,
               "filtered %s#%s: Has @UseUiAutomation, but ro.build.version.sdk=%d",
               arg0.getEnclosingClassname(), arg0.getName(), Build.VERSION.SDK_INT);

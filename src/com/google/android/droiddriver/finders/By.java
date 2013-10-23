@@ -19,7 +19,7 @@ package com.google.android.droiddriver.finders;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.common.annotations.Beta;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
@@ -215,7 +215,6 @@ public class By {
    * @param xPath The xpath to use
    * @return a finder which locates elements via XPath
    */
-  @Beta
   public static ByXPath xpath(String xPath) {
     return new ByXPath(xPath);
   }
@@ -322,8 +321,8 @@ public class By {
   }
 
   /**
-   * Matches a UiElement which has a sibling matching the given siblingFinder.
-   * For complex cases, consider {@link #xpath}.
+   * Matches a UiElement which has a visible sibling matching the given
+   * siblingFinder. This could be inefficient; consider {@link #xpath}.
    */
   public static MatchFinder withSibling(final MatchFinder siblingFinder) {
     checkNotNull(siblingFinder);
@@ -334,8 +333,7 @@ public class By {
         if (parent == null) {
           return false;
         }
-        // Do not care if the sibling is visible
-        for (UiElement sibling : parent.getChildren(null)) {
+        for (UiElement sibling : parent.getChildren(UiElement.VISIBLE)) {
           if (sibling != element && siblingFinder.matches(sibling)) {
             return true;
           }
@@ -346,6 +344,54 @@ public class By {
       @Override
       public String toString() {
         return "withSibling(" + siblingFinder + ")";
+      }
+    };
+  }
+
+  /**
+   * Matches a UiElement which has a visible child matching the given
+   * childFinder. This could be inefficient; consider {@link #xpath}.
+   */
+  public static MatchFinder withChild(final MatchFinder childFinder) {
+    checkNotNull(childFinder);
+    return new MatchFinder(new Predicate<UiElement>() {
+      @Override
+      public boolean apply(UiElement element) {
+        for (UiElement child : element.getChildren(UiElement.VISIBLE)) {
+          if (childFinder.matches(child)) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }) {
+      @Override
+      public String toString() {
+        return "withChild(" + childFinder + ")";
+      }
+    };
+  }
+
+  /**
+   * Matches a UiElement whose descendant matches the given descendantFinder.
+   * This could be VERY inefficient; consider {@link #xpath}.
+   */
+  public static MatchFinder withDescendant(final MatchFinder descendantFinder) {
+    checkNotNull(descendantFinder);
+    return new MatchFinder(new Predicate<UiElement>() {
+      @Override
+      public boolean apply(UiElement element) {
+        try {
+          descendantFinder.find(element);
+          return true;
+        } catch (ElementNotFoundException enfe) {
+          return false;
+        }
+      }
+    }) {
+      @Override
+      public String toString() {
+        return "withDescendant(" + descendantFinder + ")";
       }
     };
   }
