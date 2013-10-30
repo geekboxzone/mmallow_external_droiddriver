@@ -15,6 +15,8 @@
  */
 package com.google.android.droiddriver.scroll;
 
+import android.util.Log;
+
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
@@ -23,6 +25,7 @@ import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.LogicalDirection;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
+import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -105,6 +108,24 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
   };
 
   /**
+   * Returns the second last child as the sentinel. Useful when the activity
+   * always shows the last child as an anchor (for example a footer).
+   * <p>
+   * Sometimes uiautomatorviewer may not show the anchor as the last child, due
+   * to the reordering by layout described in {@link UiElement#getChildren}.
+   * This is not a problem with UiAutomationDriver because it sees the same as
+   * uiautomatorviewer does, but could be a problem with InstrumentationDriver.
+   * </p>
+   */
+  public static final GetStrategy SECOND_LAST_CHILD_GETTER = new GetStrategy(
+      Predicates.alwaysTrue(), "SECOND_LAST_CHILD") {
+    @Override
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.size() < 2 ? null : children.get(children.size() - 2);
+    }
+  };
+
+  /**
    * Returns the second child as the sentinel. Useful when the activity shows a
    * fixed first child.
    */
@@ -130,6 +151,7 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
       if (sentinel == null) {
         throw new ElementNotFoundException(this);
       }
+      Logs.log(Log.INFO, "Found match: " + sentinel);
       return sentinel;
     }
 
@@ -156,6 +178,7 @@ public abstract class AbstractSentinelStrategy implements SentinelStrategy {
 
   protected UiElement getSentinel(DroidDriver driver, Finder containerFinder,
       PhysicalDirection direction) {
+    Logs.call(this, "getSentinel", driver, containerFinder, direction);
     Finder sentinelFinder;
     LogicalDirection logicalDirection = directionConverter.toLogicalDirection(direction);
     if (logicalDirection == LogicalDirection.BACKWARD) {

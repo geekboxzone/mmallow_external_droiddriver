@@ -32,6 +32,18 @@ import java.util.List;
  * Convenience methods to create commonly used finders.
  */
 public class By {
+  private static final MatchFinder ANY = new MatchFinder(null) {
+    @Override
+    public String toString() {
+      return "any";
+    }
+  };
+
+  /** Matches any UiElement. */
+  public static MatchFinder any() {
+    return ANY;
+  }
+
   /** Matches by {@link Object#equals}. */
   public static final MatchStrategy<Object> OBJECT_EQUALS = new MatchStrategy<Object>() {
     @Override

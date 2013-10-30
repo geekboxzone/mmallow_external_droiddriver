@@ -136,7 +136,10 @@ public class ByXPath implements Finder {
     setAttribute(element, Attribute.SELECTED, uiElement.isSelected());
     element.setAttribute(Attribute.BOUNDS.getName(), uiElement.getBounds().toShortString());
 
-    // TODO: visitor pattern
+    // TODO: Make VISIBLE optional so that the DOM dump contains all children.
+    // This is especially useful for InstrumentationDriver which sees more than
+    // uiautomatorviewer does. For now users can temporarily change VISIBLE to
+    // null, rebuild test apk and run to get a more comprehensive dump.
     for (BaseUiElement child : uiElement.getChildren(UiElement.VISIBLE)) {
       element.appendChild(child.getDomNode());
     }

@@ -17,11 +17,9 @@
 package com.google.android.droiddriver.instrumentation;
 
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 
 import com.google.android.droiddriver.exceptions.DroidDriverException;
-import com.google.android.droiddriver.util.Logs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -78,7 +76,6 @@ public class RootFinder {
 
     try {
       views = (View[]) viewsField.get(windowManagerObj);
-      Logs.log(Log.DEBUG, "View size:" + views.length);
       return views;
     } catch (RuntimeException re) {
       throw new DroidDriverException(String.format("Reflective access to %s on %s failed.",

@@ -196,6 +196,13 @@ public interface UiElement {
    * does not include off-screen children, but may include invisible on-screen
    * children.</li>
    * </ul>
+   * <p>
+   * Another discrepancy between {@link InstrumentationDriver}
+   * {@link UiAutomationDriver} is the order of children. The Accessibility API
+   * returns children in the order of layout (see
+   * {@link android.view.ViewGroup#addChildrenForAccessibility}, which is added
+   * in API16).
+   * </p>
    */
   List<? extends UiElement> getChildren(Predicate<? super UiElement> predicate);
 
