@@ -41,11 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A UiElement that is backed by a View. A snapshot of all attributes is taken
- * at construction. The attributes of a {@code ViewElement} instance are
- * immutable. If the underlying view is updated, a new {@code ViewElement}
- * instance will be created in
- * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
+ * A UiElement that is backed by a View.
  */
 public class ViewElement extends BaseUiElement {
   private static class SnapshotViewAttributesRunnable implements Runnable {
@@ -205,6 +201,12 @@ public class ViewElement extends BaseUiElement {
   private final ViewElement parent;
   private final List<ViewElement> children;
 
+  /**
+   * A snapshot of all attributes is taken at construction. The attributes of a
+   * {@code ViewElement} instance are immutable. If the underlying view is
+   * updated, a new {@code ViewElement} instance will be created in
+   * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
+   */
   public ViewElement(final InstrumentationContext context, View view, ViewElement parent) {
     this.context = Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(view);

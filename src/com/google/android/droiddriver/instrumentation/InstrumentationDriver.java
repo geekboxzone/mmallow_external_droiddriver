@@ -19,6 +19,12 @@ package com.google.android.droiddriver.instrumentation;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Bitmap.Config;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
@@ -99,7 +105,21 @@ public class InstrumentationDriver extends BaseDroidDriver {
       try {
         rootView.destroyDrawingCache();
         rootView.buildDrawingCache(false);
-        screenshot = Bitmap.createBitmap(rootView.getDrawingCache());
+        Bitmap drawingCache = rootView.getDrawingCache();
+        int[] xy = new int[2];
+        rootView.getLocationOnScreen(xy);
+        if (xy[0] == 0 && xy[1] == 0) {
+          screenshot = Bitmap.createBitmap(drawingCache);
+        } else {
+          Canvas canvas = new Canvas();
+          Rect rect = new Rect(0, 0, drawingCache.getWidth(), drawingCache.getHeight());
+          rect.offset(xy[0], xy[1]);
+          screenshot =
+              Bitmap.createBitmap(rect.width() + xy[0], rect.height() + xy[1], Config.ARGB_8888);
+          canvas.setBitmap(screenshot);
+          canvas.drawBitmap(drawingCache, null, new RectF(rect), null);
+          canvas.setBitmap(null);
+        }
         rootView.destroyDrawingCache();
       } catch (Throwable e) {
         Logs.log(Log.ERROR, e);
