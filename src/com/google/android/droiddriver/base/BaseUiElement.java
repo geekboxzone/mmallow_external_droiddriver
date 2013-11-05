@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.base;
 
+import android.graphics.Rect;
+
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
@@ -31,12 +33,14 @@ import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 
 import org.w3c.dom.Element;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
@@ -46,9 +50,90 @@ import java.util.concurrent.FutureTask;
 public abstract class BaseUiElement implements UiElement {
   private WeakReference<Element> domNode;
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T get(Attribute attribute) {
-    return attribute.getValue(this);
+    return (T) getAttributes().get(attribute);
+  }
+
+  @Override
+  public String getText() {
+    return get(Attribute.TEXT);
+  }
+
+  @Override
+  public String getContentDescription() {
+    return get(Attribute.CONTENT_DESC);
+  }
+
+  @Override
+  public String getClassName() {
+    return get(Attribute.CLASS);
+  }
+
+  @Override
+  public String getResourceId() {
+    return get(Attribute.RESOURCE_ID);
+  }
+
+  @Override
+  public String getPackageName() {
+    return get(Attribute.PACKAGE);
+  }
+
+  @Override
+  public boolean isCheckable() {
+    return (Boolean) get(Attribute.CHECKABLE);
+  }
+
+  @Override
+  public boolean isChecked() {
+    return (Boolean) get(Attribute.CHECKED);
+  }
+
+  @Override
+  public boolean isClickable() {
+    return (Boolean) get(Attribute.CLICKABLE);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return (Boolean) get(Attribute.ENABLED);
+  }
+
+  @Override
+  public boolean isFocusable() {
+    return (Boolean) get(Attribute.FOCUSABLE);
+  }
+
+  @Override
+  public boolean isFocused() {
+    return (Boolean) get(Attribute.FOCUSED);
+  }
+
+  @Override
+  public boolean isScrollable() {
+    return (Boolean) get(Attribute.SCROLLABLE);
+  }
+
+  @Override
+  public boolean isLongClickable() {
+    return (Boolean) get(Attribute.LONG_CLICKABLE);
+  }
+
+  @Override
+  public boolean isPassword() {
+    return (Boolean) get(Attribute.PASSWORD);
+  }
+
+  @Override
+  public boolean isSelected() {
+    return (Boolean) get(Attribute.SELECTED);
+  }
+
+  @Override
+  public Rect getBounds() {
+    return get(Attribute.BOUNDS);
   }
 
   @Override
@@ -122,9 +207,9 @@ public abstract class BaseUiElement implements UiElement {
     perform(SwipeAction.toScroll(direction));
   }
 
-  protected abstract int getChildCount();
+  protected abstract Map<Attribute, Object> getAttributes();
 
-  protected abstract BaseUiElement getChild(int index);
+  protected abstract List<? extends BaseUiElement> getChildren();
 
   protected abstract InputInjector getInjector();
 
@@ -135,21 +220,16 @@ public abstract class BaseUiElement implements UiElement {
   }
 
   @Override
-  public List<BaseUiElement> getChildren(Predicate<? super UiElement> predicate) {
-    if (predicate == null) {
-      predicate = Predicates.notNull();
-    } else {
-      predicate = Predicates.and(Predicates.notNull(), predicate);
+  public List<? extends BaseUiElement> getChildren(Predicate<? super UiElement> predicate) {
+    List<? extends BaseUiElement> children = getChildren();
+    if (children == null) {
+      return ImmutableList.of();
+    }
+    if (predicate == null || predicate.equals(Predicates.alwaysTrue())) {
+      return children;
     }
 
-    List<BaseUiElement> list = Lists.newArrayList();
-    for (int i = 0; i < getChildCount(); i++) {
-      BaseUiElement child = getChild(i);
-      if (predicate.apply(child)) {
-        list.add(child);
-      }
-    }
-    return list;
+    return ImmutableList.copyOf(Collections2.filter(children, predicate));
   }
 
   @Override

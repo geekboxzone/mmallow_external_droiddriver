@@ -8,7 +8,7 @@ LOCAL_RESOURCE_DIR := \
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     ActionBarSherlock \
-    libguava13
+    guava
 
 LOCAL_AAPT_FLAGS += --auto-add-overlay
 

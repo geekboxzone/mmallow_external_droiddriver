@@ -33,7 +33,7 @@ public class ByAttribute<T> extends MatchFinder {
     super(new Predicate<UiElement>() {
       @Override
       public boolean apply(UiElement element) {
-        T value = attribute.getValue(element);
+        T value = element.get(attribute);
         return strategy.match(expected, value);
       }
     });

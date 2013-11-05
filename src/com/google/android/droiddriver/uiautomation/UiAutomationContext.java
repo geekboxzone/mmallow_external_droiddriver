@@ -62,10 +62,10 @@ class UiAutomationContext implements DroidDriverContext {
     return injector;
   }
 
-  public UiAutomationElement getUiElement(AccessibilityNodeInfo node) {
+  public UiAutomationElement getUiElement(AccessibilityNodeInfo node, UiAutomationElement parent) {
     UiAutomationElement element = map.get(node);
     if (element == null) {
-      element = new UiAutomationElement(this, node);
+      element = new UiAutomationElement(this, node, parent);
       map.put(node, element);
     }
     return element;

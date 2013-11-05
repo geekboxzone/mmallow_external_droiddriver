@@ -46,7 +46,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
 
   @Override
   protected ViewElement getNewRootElement() {
-    return context.getUiElement(findRootView());
+    return context.getUiElement(findRootView(), null /* parent */);
   }
 
   @Override
@@ -58,6 +58,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
     Activity runningActivity = getRunningActivity();
     View[] views = RootFinder.getRootViews();
     if (views.length > 1) {
+      Logs.log(Log.VERBOSE, "views.length=" + views.length);
       for (View view : views) {
         if (view.hasWindowFocus()) {
           return view;

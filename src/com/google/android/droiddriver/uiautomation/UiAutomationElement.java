@@ -26,14 +26,26 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
+import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeoutException;
 
 /**
- * A UiElement that is backed by the UiAutomation object.
+ * A UiElement that is backed by an {@link AccessibilityNodeInfo}. A snapshot of
+ * all attributes is taken at construction. The attributes of a
+ * {@code UiAutomationElement} instance are immutable. If the underlying
+ * {@link AccessibilityNodeInfo} is updated, a new {@code UiAutomationElement}
+ * instance will be created in
+ * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
  */
 public class UiAutomationElement extends BaseUiElement {
   private static final AccessibilityEventFilter ANY_EVENT_FILTER = new AccessibilityEventFilter() {
@@ -44,108 +56,76 @@ public class UiAutomationElement extends BaseUiElement {
   };
 
   private final UiAutomationContext context;
-  private final AccessibilityNodeInfo node;
+  private final Map<Attribute, Object> attributes;
+  private final boolean visible;
+  private final Rect visibleBounds;
+  private final UiAutomationElement parent;
+  private final List<UiAutomationElement> children;
 
-  public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node) {
+  public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node,
+      UiAutomationElement parent) {
     this.context = Preconditions.checkNotNull(context);
-    this.node = Preconditions.checkNotNull(node);
+    Preconditions.checkNotNull(node);
+    this.parent = parent;
+
+    Map<Attribute, Object> attribs = Maps.newEnumMap(Attribute.class);
+    put(attribs, Attribute.PACKAGE, charSequenceToString(node.getPackageName()));
+    put(attribs, Attribute.CLASS, charSequenceToString(node.getClassName()));
+    put(attribs, Attribute.TEXT, charSequenceToString(node.getText()));
+    put(attribs, Attribute.CONTENT_DESC, charSequenceToString(node.getContentDescription()));
+    put(attribs, Attribute.RESOURCE_ID, charSequenceToString(node.getViewIdResourceName()));
+    put(attribs, Attribute.CHECKABLE, node.isCheckable());
+    put(attribs, Attribute.CHECKED, node.isChecked());
+    put(attribs, Attribute.CLICKABLE, node.isClickable());
+    put(attribs, Attribute.ENABLED, node.isEnabled());
+    put(attribs, Attribute.FOCUSABLE, node.isFocusable());
+    put(attribs, Attribute.FOCUSED, node.isFocused());
+    put(attribs, Attribute.LONG_CLICKABLE, node.isLongClickable());
+    put(attribs, Attribute.PASSWORD, node.isPassword());
+    put(attribs, Attribute.SCROLLABLE, node.isScrollable());
+    put(attribs, Attribute.SELECTED, node.isSelected());
+    put(attribs, Attribute.BOUNDS, getBounds(node));
+    attributes = ImmutableMap.copyOf(attribs);
+
+    // Order matters as getVisibleBounds depends on visible
+    visible = node.isVisibleToUser();
+    visibleBounds = getVisibleBounds(node);
+    List<UiAutomationElement> mutableChildren = buildChildren(context, node);
+    this.children = mutableChildren == null ? null : ImmutableList.copyOf(mutableChildren);
   }
 
-  @Override
-  public String getText() {
-    return charSequenceToString(node.getText());
+  private void put(Map<Attribute, Object> attribs, Attribute key, Object value) {
+    if (value != null) {
+      attribs.put(key, value);
+    }
   }
 
-  @Override
-  public String getContentDescription() {
-    return charSequenceToString(node.getContentDescription());
+  private List<UiAutomationElement> buildChildren(UiAutomationContext context,
+      AccessibilityNodeInfo node) {
+    List<UiAutomationElement> children;
+    int childCount = node.getChildCount();
+    if (childCount == 0) {
+      children = null;
+    } else {
+      children = Lists.newArrayListWithExpectedSize(childCount);
+      for (int i = 0; i < childCount; i++) {
+        AccessibilityNodeInfo child = node.getChild(i);
+        if (child != null) {
+          children.add(context.getUiElement(child, this));
+        }
+      }
+    }
+    return children;
   }
 
-  @Override
-  public String getClassName() {
-    return charSequenceToString(node.getClassName());
-  }
-
-  @Override
-  public String getResourceId() {
-    return charSequenceToString(node.getViewIdResourceName());
-  }
-
-  @Override
-  public String getPackageName() {
-    return charSequenceToString(node.getPackageName());
-  }
-
-  @Override
-  public InputInjector getInjector() {
-    return context.getInjector();
-  }
-
-  @Override
-  public boolean isVisible() {
-    return node.isVisibleToUser();
-  }
-
-  @Override
-  public boolean isCheckable() {
-    return node.isCheckable();
-  }
-
-  @Override
-  public boolean isChecked() {
-    return node.isChecked();
-  }
-
-  @Override
-  public boolean isClickable() {
-    return node.isClickable();
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return node.isEnabled();
-  }
-
-  @Override
-  public boolean isFocusable() {
-    return node.isFocusable();
-  }
-
-  @Override
-  public boolean isFocused() {
-    return node.isFocused();
-  }
-
-  @Override
-  public boolean isScrollable() {
-    return node.isScrollable();
-  }
-
-  @Override
-  public boolean isLongClickable() {
-    return node.isLongClickable();
-  }
-
-  @Override
-  public boolean isPassword() {
-    return node.isPassword();
-  }
-
-  @Override
-  public boolean isSelected() {
-    return node.isSelected();
-  }
-
-  @Override
-  public Rect getBounds() {
+  private Rect getBounds(AccessibilityNodeInfo node) {
     Rect rect = new Rect();
     node.getBoundsInScreen(rect);
     return rect;
   }
 
-  @Override
-  public Rect getVisibleBounds() {
-    if (!isVisible()) {
+  private Rect getVisibleBounds(AccessibilityNodeInfo node) {
+    if (!visible) {
       Logs.log(Log.DEBUG, "Node is invisible: " + node);
       return new Rect();
     }
@@ -161,20 +141,33 @@ public class UiAutomationElement extends BaseUiElement {
   }
 
   @Override
-  protected int getChildCount() {
-    return node.getChildCount();
+  public Rect getVisibleBounds() {
+    return visibleBounds;
   }
 
   @Override
-  protected UiAutomationElement getChild(int index) {
-    AccessibilityNodeInfo child = node.getChild(index);
-    return child == null ? null : context.getUiElement(child);
+  public boolean isVisible() {
+    return visible;
   }
 
   @Override
   public UiAutomationElement getParent() {
-    AccessibilityNodeInfo parent = node.getParent();
-    return parent == null ? null : context.getUiElement(parent);
+    return parent;
+  }
+
+  @Override
+  protected List<UiAutomationElement> getChildren() {
+    return children;
+  }
+
+  @Override
+  protected Map<Attribute, Object> getAttributes() {
+    return attributes;
+  }
+
+  @Override
+  protected InputInjector getInjector() {
+    return context.getInjector();
   }
 
   @Override

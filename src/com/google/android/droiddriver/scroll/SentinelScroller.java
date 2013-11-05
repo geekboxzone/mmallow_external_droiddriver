@@ -41,8 +41,13 @@ import com.google.android.droiddriver.util.Logs;
  * {@link SentinelStrategy} is used to determine whether more scrolling is
  * possible.
  * <p>
- * This algorithm is needed unless the DroidDriver implementation supports
- * directly jumping to the item.
+ * This implementation may not work well with InstrumentationDriver if
+ * {@link UiElement#getChildren} returns children in an order different from the
+ * Accessibility API. In this case you may try
+ * {@link AbstractSentinelStrategy#SECOND_LAST_CHILD_GETTER}.
+ * </p>
+ * TODO: A {@link Scroller} that directly jumps to the item if an
+ * InstrumentationDriver is used.
  */
 public class SentinelScroller implements Scroller {
 

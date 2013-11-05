@@ -20,6 +20,7 @@ import android.util.Log;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
+import com.google.android.droiddriver.finders.By;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
@@ -147,6 +148,28 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
     @Override
     protected String getUniqueString(UiElement uniqueStringElement) {
       return uniqueStringElement.getContentDescription();
+    }
+  }
+
+  /**
+   * Determines whether the sentinel is updated by checking the resource-id of a
+   * descendant element of the sentinel (often itself). This is useful when the
+   * children of the container are heterogeneous -- they don't have a common
+   * pattern to get a unique string.
+   */
+  public static class ResourceIdUpdated extends SingleStringUpdated {
+    /**
+     * Uses the resource-id of the sentinel itself.
+     */
+    public static final ResourceIdUpdated SELF = new ResourceIdUpdated(By.any());
+
+    public ResourceIdUpdated(Finder uniqueStringFinder) {
+      super(uniqueStringFinder);
+    }
+
+    @Override
+    protected String getUniqueString(UiElement uniqueStringElement) {
+      return uniqueStringElement.getResourceId();
     }
   }
 

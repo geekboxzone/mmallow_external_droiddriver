@@ -53,7 +53,7 @@ public class UiAutomationDriver extends BaseDroidDriver {
 
   @Override
   protected UiAutomationElement getNewRootElement() {
-    return context.getUiElement(getRootNode());
+    return context.getUiElement(getRootNode(), null /* parent */);
   }
 
   @Override
