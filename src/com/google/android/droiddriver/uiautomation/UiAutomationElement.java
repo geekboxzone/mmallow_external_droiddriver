@@ -40,12 +40,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeoutException;
 
 /**
- * A UiElement that is backed by an {@link AccessibilityNodeInfo}. A snapshot of
- * all attributes is taken at construction. The attributes of a
- * {@code UiAutomationElement} instance are immutable. If the underlying
- * {@link AccessibilityNodeInfo} is updated, a new {@code UiAutomationElement}
- * instance will be created in
- * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
+ * A UiElement that is backed by an {@link AccessibilityNodeInfo}.
  */
 public class UiAutomationElement extends BaseUiElement {
   private static final AccessibilityEventFilter ANY_EVENT_FILTER = new AccessibilityEventFilter() {
@@ -62,6 +57,13 @@ public class UiAutomationElement extends BaseUiElement {
   private final UiAutomationElement parent;
   private final List<UiAutomationElement> children;
 
+  /**
+   * A snapshot of all attributes is taken at construction. The attributes of a
+   * {@code UiAutomationElement} instance are immutable. If the underlying
+   * {@link AccessibilityNodeInfo} is updated, a new {@code UiAutomationElement}
+   * instance will be created in
+   * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
+   */
   public UiAutomationElement(UiAutomationContext context, AccessibilityNodeInfo node,
       UiAutomationElement parent) {
     this.context = Preconditions.checkNotNull(context);
