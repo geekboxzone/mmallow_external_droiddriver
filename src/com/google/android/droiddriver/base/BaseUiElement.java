@@ -211,8 +211,6 @@ public abstract class BaseUiElement implements UiElement {
 
   protected abstract List<? extends BaseUiElement> getChildren();
 
-  protected abstract InputInjector getInjector();
-
   private void checkVisible() {
     if (!isVisible()) {
       throw new ElementNotVisibleException(this);

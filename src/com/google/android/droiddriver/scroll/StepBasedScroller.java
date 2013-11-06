@@ -37,19 +37,11 @@ import com.google.android.droiddriver.util.Logs;
 /**
  * A {@link Scroller} that looks for the desired item in the currently shown
  * content of the scrollable container, otherwise scrolls the container one step
- * at a time and look again, until we cannot scroll any more. A
- * {@link SentinelStrategy} is used to determine whether more scrolling is
+ * at a time and looks again, until we cannot scroll any more. A
+ * {@link ScrollStepStrategy} is used to determine whether more scrolling is
  * possible.
- * <p>
- * This implementation may not work well with InstrumentationDriver if
- * {@link UiElement#getChildren} returns children in an order different from the
- * Accessibility API. In this case you may try
- * {@link AbstractSentinelStrategy#SECOND_LAST_CHILD_GETTER}.
- * </p>
- * TODO: A {@link Scroller} that directly jumps to the item if an
- * InstrumentationDriver is used.
  */
-public class SentinelScroller implements Scroller {
+public class StepBasedScroller implements Scroller {
 
   private static final SingleKeyAction MOVE_HOME = new SingleKeyAction(KeyEvent.KEYCODE_MOVE_HOME,
       1000L, false);
@@ -57,7 +49,7 @@ public class SentinelScroller implements Scroller {
   private final int maxScrolls;
   private final long perScrollTimeoutMillis;
   private final Axis axis;
-  private final SentinelStrategy sentinelStrategy;
+  private final ScrollStepStrategy scrollStepStrategy;
   private final boolean startFromBeginning;
 
   /**
@@ -72,29 +64,21 @@ public class SentinelScroller implements Scroller {
    *        location and scrolling in both directions. It may not always work,
    *        but when it works, it is faster.
    */
-  public SentinelScroller(int maxScrolls, long perScrollTimeoutMillis, Axis axis,
-      SentinelStrategy sentinelStrategy, boolean startFromBeginning) {
+  public StepBasedScroller(int maxScrolls, long perScrollTimeoutMillis, Axis axis,
+      ScrollStepStrategy scrollStepStrategy, boolean startFromBeginning) {
     this.maxScrolls = maxScrolls;
     this.perScrollTimeoutMillis = perScrollTimeoutMillis;
     this.axis = axis;
-    this.sentinelStrategy = sentinelStrategy;
+    this.scrollStepStrategy = scrollStepStrategy;
     this.startFromBeginning = startFromBeginning;
-  }
-
-  /**
-   * Constructs with default not startFromBegining.
-   */
-  public SentinelScroller(int maxScrolls, long perScrollTimeoutMillis, Axis axis,
-      SentinelStrategy sentinelStrategy) {
-    this(maxScrolls, perScrollTimeoutMillis, axis, sentinelStrategy, false);
   }
 
   /**
    * Constructs with default 100 maxScrolls, 1 second for
    * perScrollTimeoutMillis, vertical axis, not startFromBegining.
    */
-  public SentinelScroller(SentinelStrategy sentinelStrategy) {
-    this(100, 1000L, Axis.VERTICAL, sentinelStrategy, false);
+  public StepBasedScroller(ScrollStepStrategy scrollStepStrategy) {
+    this(100, 1000L, Axis.VERTICAL, scrollStepStrategy, false);
   }
 
   // if scrollBack is true, scrolls back to starting location if not found, so
@@ -113,7 +97,7 @@ public class SentinelScroller implements Scroller {
         return driver.getPoller()
             .pollFor(driver, itemFinder, Poller.EXISTS, perScrollTimeoutMillis);
       } catch (TimeoutException e) {
-        if (i < maxScrolls && !sentinelStrategy.scroll(driver, containerFinder, direction)) {
+        if (i < maxScrolls && !scrollStepStrategy.scroll(driver, containerFinder, direction)) {
           break;
         }
       }
@@ -123,9 +107,10 @@ public class SentinelScroller implements Scroller {
     if (i == maxScrolls) {
       // This is often a program error -- maxScrolls is a safety net; we should
       // have either found itemFinder, or stopped to scroll b/c of reaching the
-      // end. If maxScrolls is reasonably large, sentinelStrategy must be wrong.
-      Logs.logfmt(Log.WARN, exception, "Scrolled %s %d times; sentinelStrategy=%s",
-          containerFinder, maxScrolls, sentinelStrategy);
+      // end. If maxScrolls is reasonably large, ScrollStepStrategy must be
+      // wrong.
+      Logs.logfmt(Log.WARN, exception, "Scrolled %s %d times; ScrollStepStrategy=%s",
+          containerFinder, maxScrolls, scrollStepStrategy);
     }
 
     if (scrollBack) {
@@ -145,7 +130,7 @@ public class SentinelScroller implements Scroller {
   @Override
   public UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder) {
     Logs.call(this, "scrollTo", driver, containerFinder, itemFinder);
-    DirectionConverter converter = sentinelStrategy.getDirectionConverter();
+    DirectionConverter converter = scrollStepStrategy.getDirectionConverter();
     PhysicalDirection backwardDirection = converter.toPhysicalDirection(axis, BACKWARD);
 
     if (startFromBeginning) {

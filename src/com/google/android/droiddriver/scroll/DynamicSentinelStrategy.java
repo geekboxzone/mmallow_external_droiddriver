@@ -34,7 +34,7 @@ import com.google.common.base.Objects;
  * used, which skips invisible children, or in the case of dynamic list, which
  * shows more items when scrolling beyond the end.
  */
-public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
+public class DynamicSentinelStrategy extends BaseSentinelStrategy {
 
   /**
    * Interface for determining whether sentinel is updated.
@@ -100,7 +100,7 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
       String newString = getUniqueStringFromSentinel(newSentinel);
       // A legitimate case for newString being null is when newSentinel is
       // partially shown. We return true to allow further scrolling. But program
-      // error could also cause this, e.g. a bad choice of GetStrategy, which
+      // error could also cause this, e.g. a bad choice of Getter, which
       // results in unnecessary scroll actions that have no visual effect. This
       // log helps troubleshooting in the latter case.
       if (newString == null) {
@@ -176,36 +176,32 @@ public class DynamicSentinelStrategy extends AbstractSentinelStrategy {
   private final IsUpdatedStrategy isUpdatedStrategy;
 
   /**
-   * Constructs with {@code GetStrategy}s that decorate the given
-   * {@code GetStrategy}s with {@link UiElement#VISIBLE}, and the given
-   * {@code isUpdatedStrategy} and {@code directionConverter}. Be careful with
-   * {@code GetStrategy}s: the sentinel after each scroll should be unique.
+   * Constructs with {@code Getter}s that decorate the given {@code Getter}s
+   * with {@link UiElement#VISIBLE}, and the given {@code isUpdatedStrategy} and
+   * {@code directionConverter}. Be careful with {@code Getter}s: the sentinel
+   * after each scroll should be unique.
    */
-  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
-      GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy,
-      DirectionConverter directionConverter) {
-    super(new MorePredicateGetStrategy(backwardGetStrategy, UiElement.VISIBLE, "VISIBLE_"),
-        new MorePredicateGetStrategy(forwardGetStrategy, UiElement.VISIBLE, "VISIBLE_"),
-        directionConverter);
+  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy, Getter backwardGetter,
+      Getter forwardGetter, DirectionConverter directionConverter) {
+    super(new MorePredicateGetter(backwardGetter, UiElement.VISIBLE, "VISIBLE_"),
+        new MorePredicateGetter(forwardGetter, UiElement.VISIBLE, "VISIBLE_"), directionConverter);
     this.isUpdatedStrategy = isUpdatedStrategy;
   }
 
   /**
    * Defaults to the standard {@link DirectionConverter}.
    */
-  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
-      GetStrategy backwardGetStrategy, GetStrategy forwardGetStrategy) {
-    this(isUpdatedStrategy, backwardGetStrategy, forwardGetStrategy,
-        DirectionConverter.STANDARD_CONVERTER);
+  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy, Getter backwardGetter,
+      Getter forwardGetter) {
+    this(isUpdatedStrategy, backwardGetter, forwardGetter, DirectionConverter.STANDARD_CONVERTER);
   }
 
   /**
    * Defaults to LAST_CHILD_GETTER for forward scrolling, and the standard
    * {@link DirectionConverter}.
    */
-  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy,
-      GetStrategy backwardGetStrategy) {
-    this(isUpdatedStrategy, backwardGetStrategy, LAST_CHILD_GETTER,
+  public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy, Getter backwardGetter) {
+    this(isUpdatedStrategy, backwardGetter, LAST_CHILD_GETTER,
         DirectionConverter.STANDARD_CONVERTER);
   }
 

@@ -15,38 +15,110 @@
  */
 package com.google.android.droiddriver.scroll;
 
-import com.google.android.droiddriver.DroidDriver;
-import com.google.android.droiddriver.finders.Finder;
-import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
-import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
+import com.google.android.droiddriver.UiElement;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
+import java.util.List;
 
 /**
  * Interface for determining whether scrolling is possible based on a sentinel.
  */
-public interface SentinelStrategy {
-  /**
-   * Tries to scroll {@code containerFinder} in {@code direction}. Returns
-   * whether scrolling is effective.
-   *
-   * @param driver
-   * @param containerFinder Finder for the container that can scroll, for
-   *        instance a ListView
-   * @param direction
-   * @return whether scrolling is effective
-   */
-  boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction);
+public interface SentinelStrategy extends ScrollStepStrategy {
 
   /**
-   * Returns the {@link DirectionConverter}.
+   * Gets sentinel based on {@link Predicate}.
    */
-  DirectionConverter getDirectionConverter();
+  public static abstract class Getter {
+    protected final Predicate<? super UiElement> predicate;
+    protected final String description;
+
+    protected Getter(Predicate<? super UiElement> predicate, String description) {
+      this.predicate = predicate;
+      this.description = description;
+    }
+
+    /**
+     * Gets the sentinel, which must be an immediate child of {@code container}
+     * -- not a descendant. Note this could be null if {@code container} has not
+     * finished updating.
+     */
+    public UiElement getSentinel(UiElement container) {
+      return getSentinel(container.getChildren(predicate));
+    }
+
+    protected abstract UiElement getSentinel(List<? extends UiElement> children);
+
+    @Override
+    public String toString() {
+      return description;
+    }
+  }
 
   /**
-   * {@inheritDoc}
-   *
+   * Decorates an existing {@link Getter} by adding another {@link Predicate}.
+   */
+  public static class MorePredicateGetter extends Getter {
+    private final Getter original;
+
+    public MorePredicateGetter(Getter original, Predicate<? super UiElement> extraPredicate,
+        String extraDescription) {
+      super(Predicates.and(original.predicate, extraPredicate), extraDescription
+          + original.description);
+      this.original = original;
+    }
+
+    @Override
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return original.getSentinel(children);
+    }
+  }
+
+  /**
+   * Returns the first child as the sentinel.
+   */
+  public static final Getter FIRST_CHILD_GETTER =
+      new Getter(Predicates.alwaysTrue(), "FIRST_CHILD") {
+        @Override
+        protected UiElement getSentinel(List<? extends UiElement> children) {
+          return children.isEmpty() ? null : children.get(0);
+        }
+      };
+  /**
+   * Returns the last child as the sentinel.
+   */
+  public static final Getter LAST_CHILD_GETTER = new Getter(Predicates.alwaysTrue(), "LAST_CHILD") {
+    @Override
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.isEmpty() ? null : children.get(children.size() - 1);
+    }
+  };
+  /**
+   * Returns the second last child as the sentinel. Useful when the activity
+   * always shows the last child as an anchor (for example a footer).
    * <p>
-   * It is recommended that this method return a description to help debugging.
+   * Sometimes uiautomatorviewer may not show the anchor as the last child, due
+   * to the reordering by layout described in {@link UiElement#getChildren}.
+   * This is not a problem with UiAutomationDriver because it sees the same as
+   * uiautomatorviewer does, but could be a problem with InstrumentationDriver.
+   * </p>
    */
-  @Override
-  String toString();
+  public static final Getter SECOND_LAST_CHILD_GETTER = new Getter(Predicates.alwaysTrue(),
+      "SECOND_LAST_CHILD") {
+    @Override
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.size() < 2 ? null : children.get(children.size() - 2);
+    }
+  };
+  /**
+   * Returns the second child as the sentinel. Useful when the activity shows a
+   * fixed first child.
+   */
+  public static final Getter SECOND_CHILD_GETTER = new Getter(Predicates.alwaysTrue(),
+      "SECOND_CHILD") {
+    @Override
+    protected UiElement getSentinel(List<? extends UiElement> children) {
+      return children.size() <= 1 ? null : children.get(1);
+    }
+  };
 }

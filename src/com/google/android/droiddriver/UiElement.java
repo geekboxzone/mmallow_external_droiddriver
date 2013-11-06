@@ -19,6 +19,7 @@ package com.google.android.droiddriver;
 import android.graphics.Rect;
 
 import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
@@ -225,4 +226,9 @@ public interface UiElement {
    * Gets the parent.
    */
   UiElement getParent();
+
+  /**
+   * Gets the {@link InputInjector} for injecting InputEvent.
+   */
+  InputInjector getInjector();
 }

@@ -255,7 +255,7 @@ public class ViewElement extends BaseUiElement {
   }
 
   @Override
-  protected InputInjector getInjector() {
+  public InputInjector getInjector() {
     return context.getInjector();
   }
 }
