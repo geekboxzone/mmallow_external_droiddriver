@@ -124,6 +124,10 @@ public interface DroidDriver {
    * Dumps the UiElement tree to a file to help debug. The tree is based on the
    * last used root UiElement if it exists, otherwise
    * {@link #refreshUiElementTree} is called.
+   * <p>
+   * The dump may contain invisible UiElements that are not used in the finding
+   * algorithm.
+   * </p>
    *
    * @param path the path of file to save the tree
    * @return whether the dumping succeeded

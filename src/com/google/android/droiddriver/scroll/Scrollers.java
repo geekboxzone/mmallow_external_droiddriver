@@ -18,6 +18,7 @@ package com.google.android.droiddriver.scroll;
 
 import android.app.UiAutomation;
 
+import com.google.android.droiddriver.scroll.Direction.Axis;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 
 /**
@@ -35,14 +36,22 @@ public class Scrollers {
    * the case of dynamic list, which shows more items when scrolling beyond the
    * end. On the other hand, it's complex and needs more configuration.</li>
    * </ul>
+   * Note if a {@link StepBasedScroller} is returned, it is constructed with
+   * arguments that apply to typical cases. You may want to customize them for
+   * specific cases. For instance, {@code perScrollTimeoutMillis} can be 0L if
+   * there are no asynchronously updated views. To that extent, this method
+   * serves as an example of how to construct rather {@link Scroller}s than
+   * providing the "official" {@link Scroller}.
    */
   public static Scroller newScroller(UiAutomation uiAutomation) {
     if (uiAutomation != null) {
-      return new StepBasedScroller(new AccessibilityEventScrollStepStrategy(uiAutomation, 1000L,
-          DirectionConverter.STANDARD_CONVERTER));
+      return new StepBasedScroller(100/* maxScrolls */, 1000L/* perScrollTimeoutMillis */,
+          Axis.VERTICAL, new AccessibilityEventScrollStepStrategy(uiAutomation, 1000L,
+              DirectionConverter.STANDARD_CONVERTER), true/* startFromBeginning */);
     }
     // TODO: A {@link Scroller} that directly jumps to the view if an
     // InstrumentationDriver is used.
-    return new StepBasedScroller(StaticSentinelStrategy.DEFAULT);
+    return new StepBasedScroller(100/* maxScrolls */, 1000L/* perScrollTimeoutMillis */,
+        Axis.VERTICAL, StaticSentinelStrategy.DEFAULT, true/* startFromBeginning */);
   }
 }

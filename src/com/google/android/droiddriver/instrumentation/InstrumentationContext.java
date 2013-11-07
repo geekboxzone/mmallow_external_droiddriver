@@ -25,6 +25,7 @@ import android.view.View;
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.ActionException;
+import com.google.android.droiddriver.finders.ByXPath;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
@@ -80,5 +81,6 @@ class InstrumentationContext implements DroidDriverContext {
   @Override
   public void clearData() {
     map.clear();
+    ByXPath.clearData();
   }
 }

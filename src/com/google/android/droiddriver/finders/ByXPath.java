@@ -25,6 +25,9 @@ import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -50,10 +53,17 @@ import javax.xml.xpath.XPathFactory;
  */
 public class ByXPath implements Finder {
   private static final XPath XPATH_COMPILER = XPathFactory.newInstance().newXPath();
-  private static final String UI_ELEMENT = "UiElement";
   // document needs to be static so that when buildDomNode is called recursively
   // on children they are in the same document to be appended.
+  // TODO: move the below two to DroidDriverContext?
   private static Document document;
+  private static BiMap<BaseUiElement, Element> domBiMap = HashBiMap.create();
+
+  public static void clearData() {
+    domBiMap.clear();
+    document = null;
+  }
+
   private final String xPathString;
   private final XPathExpression xPathExpression;
 
@@ -73,7 +83,7 @@ public class ByXPath implements Finder {
 
   @Override
   public UiElement find(UiElement context) {
-    Element domNode = ((BaseUiElement) context).getDomNode();
+    Element domNode = getDomNode((BaseUiElement) context, UiElement.VISIBLE);
     try {
       getDocument().appendChild(domNode);
       Element foundNode = (Element) xPathExpression.evaluate(domNode, XPathConstants.NODE);
@@ -82,7 +92,7 @@ public class ByXPath implements Finder {
         throw new ElementNotFoundException(this);
       }
 
-      UiElement match = (UiElement) foundNode.getUserData(UI_ELEMENT);
+      UiElement match = domBiMap.inverse().get(foundNode);
       Logs.log(Log.INFO, "Found match: " + match);
       return match;
     } catch (XPathExpressionException e) {
@@ -109,15 +119,24 @@ public class ByXPath implements Finder {
   }
 
   /**
-   * Used internally in {@link BaseUiElement}.
+   * Returns the DOM node representing this UiElement.
    */
-  public static Element buildDomNode(BaseUiElement uiElement) {
+  private static Element getDomNode(BaseUiElement uiElement, Predicate<? super UiElement> predicate) {
+    Element domNode = domBiMap.get(uiElement);
+    if (domNode == null) {
+      domNode = buildDomNode(uiElement, predicate);
+    }
+    return domNode;
+  }
+
+  private static Element buildDomNode(BaseUiElement uiElement,
+      Predicate<? super UiElement> predicate) {
     String className = uiElement.getClassName();
     if (className == null) {
       className = "UNKNOWN";
     }
     Element element = getDocument().createElement(XPaths.tag(className));
-    element.setUserData(UI_ELEMENT, uiElement, null /* UserDataHandler */);
+    domBiMap.put(uiElement, element);
 
     setAttribute(element, Attribute.CLASS, className);
     setAttribute(element, Attribute.RESOURCE_ID, uiElement.getResourceId());
@@ -136,12 +155,8 @@ public class ByXPath implements Finder {
     setAttribute(element, Attribute.SELECTED, uiElement.isSelected());
     element.setAttribute(Attribute.BOUNDS.getName(), uiElement.getBounds().toShortString());
 
-    // TODO: Make VISIBLE optional so that the DOM dump contains all children.
-    // This is especially useful for InstrumentationDriver which sees more than
-    // uiautomatorviewer does. For now users can temporarily change VISIBLE to
-    // null, rebuild test apk and run to get a more comprehensive dump.
-    for (BaseUiElement child : uiElement.getChildren(UiElement.VISIBLE)) {
-      element.appendChild(child.getDomNode());
+    for (BaseUiElement child : uiElement.getChildren(predicate)) {
+      element.appendChild(getDomNode(child, predicate));
     }
     return element;
   }
@@ -160,17 +175,22 @@ public class ByXPath implements Finder {
   }
 
   public static boolean dumpDom(String path, BaseUiElement uiElement) {
+    // find() filters invisible UiElements, but this is for debugging and
+    // invisible UiElements may be of interest.
+    clearData();
     BufferedOutputStream bos = null;
     try {
       bos = FileUtils.open(path);
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.transform(new DOMSource(uiElement.getDomNode()), new StreamResult(bos));
+      transformer.transform(new DOMSource(getDomNode(uiElement, null)), new StreamResult(bos));
       Logs.log(Log.INFO, "Wrote dom to " + path);
     } catch (Exception e) {
       Logs.log(Log.ERROR, e, "Failed to transform node");
       return false;
     } finally {
+      // We built DOM with invisible UiElements. Don't use it for find()!
+      clearData();
       if (bos != null) {
         try {
           bos.close();

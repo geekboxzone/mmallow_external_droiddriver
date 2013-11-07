@@ -21,12 +21,10 @@ import android.graphics.Rect;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.ClickAction;
-import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TextAction;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
-import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Objects;
@@ -36,9 +34,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 
-import org.w3c.dom.Element;
-
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -48,8 +43,6 @@ import java.util.concurrent.FutureTask;
  * Base UiElement that implements the common operations.
  */
 public abstract class BaseUiElement implements UiElement {
-  private WeakReference<Element> domNode;
-
   @SuppressWarnings("unchecked")
   @Override
   public <T> T get(Attribute attribute) {
@@ -236,6 +229,11 @@ public abstract class BaseUiElement implements UiElement {
     for (Attribute attr : Attribute.values()) {
       addAttribute(toStringHelper, attr, get(attr));
     }
+    if (!isVisible()) {
+      toStringHelper.addValue("NOT visible");
+    } else {
+      toStringHelper.add("visibleBounds", getVisibleBounds());
+    }
     return toStringHelper.toString();
   }
 
@@ -249,20 +247,5 @@ public abstract class BaseUiElement implements UiElement {
         toStringHelper.add(attr.getName(), value);
       }
     }
-  }
-
-  /**
-   * Used internally in {@link ByXPath}. Returns the DOM node representing this
-   * UiElement. The DOM is constructed from the UiElement tree.
-   * <p>
-   * TODO: move this to {@link ByXPath}. This requires a BiMap using
-   * WeakReference for both keys and values, which is error-prone. This will be
-   * deferred until we decide whether to clear cache upon getRootElement.
-   */
-  public Element getDomNode() {
-    if (domNode == null || domNode.get() == null) {
-      domNode = new WeakReference<Element>(ByXPath.buildDomNode(this));
-    }
-    return domNode.get();
   }
 }

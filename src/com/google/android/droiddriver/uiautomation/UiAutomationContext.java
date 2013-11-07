@@ -23,6 +23,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.DroidDriverContext;
+import com.google.android.droiddriver.finders.ByXPath;
 import com.google.common.collect.MapMaker;
 
 import java.util.Map;
@@ -74,6 +75,7 @@ class UiAutomationContext implements DroidDriverContext {
   @Override
   public void clearData() {
     map.clear();
+    ByXPath.clearData();
   }
 
   public UiAutomation getUiAutomation() {

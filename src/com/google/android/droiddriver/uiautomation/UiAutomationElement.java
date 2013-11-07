@@ -128,7 +128,6 @@ public class UiAutomationElement extends BaseUiElement {
 
   private Rect getVisibleBounds(AccessibilityNodeInfo node) {
     if (!visible) {
-      Logs.log(Log.DEBUG, "Node is invisible: " + node);
       return new Rect();
     }
     Rect visibleBounds = getBounds();

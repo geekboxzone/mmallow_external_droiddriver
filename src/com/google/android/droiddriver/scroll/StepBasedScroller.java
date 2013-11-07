@@ -56,7 +56,8 @@ public class StepBasedScroller implements Scroller {
    * @param maxScrolls the maximum number of scrolls. It should be large enough
    *        to allow any reasonable list size
    * @param perScrollTimeoutMillis the timeout in millis that we poll for the
-   *        item after each scroll
+   *        item after each scroll. 1000L is usually safe; if there are no
+   *        asynchronously updated views, 0L is also a reasonable value.
    * @param axis the axis this scroller can scroll
    * @param startFromBeginning if {@code true},
    *        {@link #scrollTo(DroidDriver, Finder, Finder)} starts from the
