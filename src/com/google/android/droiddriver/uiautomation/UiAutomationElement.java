@@ -20,14 +20,12 @@ import static com.google.android.droiddriver.util.TextUtils.charSequenceToString
 
 import android.app.UiAutomation.AccessibilityEventFilter;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.finders.Attribute;
-import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

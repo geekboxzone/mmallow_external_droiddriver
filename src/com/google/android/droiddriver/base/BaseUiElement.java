@@ -43,6 +43,11 @@ import java.util.concurrent.FutureTask;
  * Base UiElement that implements the common operations.
  */
 public abstract class BaseUiElement implements UiElement {
+  // These two attribute names are used for debugging only.
+  // The two constants are used internally and must match to-uiautomator.xsl.
+  public static final String ATTRIB_VISIBLE_BOUNDS = "VisibleBounds";
+  public static final String ATTRIB_NOT_VISIBLE = "NotVisible";
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T get(Attribute attribute) {
@@ -230,9 +235,9 @@ public abstract class BaseUiElement implements UiElement {
       addAttribute(toStringHelper, attr, get(attr));
     }
     if (!isVisible()) {
-      toStringHelper.addValue("NOT visible");
-    } else {
-      toStringHelper.add("visibleBounds", getVisibleBounds());
+      toStringHelper.addValue(ATTRIB_NOT_VISIBLE);
+    } else if (!getVisibleBounds().equals(getBounds())){
+      toStringHelper.add(ATTRIB_VISIBLE_BOUNDS, getVisibleBounds().toShortString());
     }
     return toStringHelper.toString();
   }
@@ -243,6 +248,8 @@ public abstract class BaseUiElement implements UiElement {
         if ((Boolean) value) {
           toStringHelper.addValue(attr.getName());
         }
+      } else if (value instanceof Rect) {
+        toStringHelper.add(attr.getName(), ((Rect) value).toShortString());
       } else {
         toStringHelper.add(attr.getName(), value);
       }

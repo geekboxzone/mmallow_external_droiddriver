@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<!-- To convert DroidDriver dump (say dd.xml) to UiAutomatorViewer format (say ua.uix), run:
-     xsltproc -o ua.uix to-uiautomator.xsl dd.xml -->
+<!-- To convert DroidDriver dump (say dd.xml) to UiAutomatorViewer format (say ua.uix), run: xsltproc -o ua.uix to-uiautomator.xsl dd.xml -->
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:strip-space elements="*" />
   <xsl:template match="/">
@@ -27,6 +26,14 @@
       <xsl:attribute name="password"><xsl:value-of select="boolean(@password)" /></xsl:attribute>
       <xsl:attribute name="selected"><xsl:value-of select="boolean(@selected)" /></xsl:attribute>
       <xsl:attribute name="bounds"><xsl:value-of select="@bounds" /></xsl:attribute>
+      <!-- These two attributes are added by DroidDriver to help diagnosis -->
+      <!-- They are intentionally named in a different style -->
+      <xsl:if test="@NotVisible">
+        <xsl:attribute name="NotVisible">true</xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@VisibleBounds">
+        <xsl:attribute name="VisibleBounds"><xsl:value-of select="@VisibleBounds" /></xsl:attribute>
+      </xsl:if>
       <xsl:apply-templates />
     </node>
   </xsl:template>

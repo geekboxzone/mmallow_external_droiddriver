@@ -155,6 +155,16 @@ public class ByXPath implements Finder {
     setAttribute(element, Attribute.SELECTED, uiElement.isSelected());
     element.setAttribute(Attribute.BOUNDS.getName(), uiElement.getBounds().toShortString());
 
+    // If we're dumping for debugging, add extra information
+    if (!UiElement.VISIBLE.equals(predicate)) {
+      if (!uiElement.isVisible()) {
+        element.setAttribute(BaseUiElement.ATTRIB_NOT_VISIBLE, "");
+      } else if (!uiElement.getVisibleBounds().equals(uiElement.getBounds())){
+        element.setAttribute(BaseUiElement.ATTRIB_VISIBLE_BOUNDS, uiElement.getVisibleBounds()
+            .toShortString());
+      }
+    }
+
     for (BaseUiElement child : uiElement.getChildren(predicate)) {
       element.appendChild(getDomNode(child, predicate));
     }

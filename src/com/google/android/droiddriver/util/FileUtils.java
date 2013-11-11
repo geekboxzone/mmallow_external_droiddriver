@@ -31,7 +31,8 @@ import java.io.FileOutputStream;
 public class FileUtils {
   /**
    * Opens file at {@code path} to output. If any directories on {@code path} do
-   * not exist, they will be created. The file will be readable to all.
+   * not exist, they will be created. The file will be readable and writable to
+   * all.
    */
   public static BufferedOutputStream open(String path) throws FileNotFoundException {
     File file = getAbsoluteFile(path);
@@ -39,6 +40,7 @@ public class FileUtils {
     Logs.log(Log.INFO, "opening file " + file.getAbsolutePath());
     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
     file.setReadable(true /* readable */, false/* ownerOnly */);
+    file.setWritable(true /* readable */, false/* ownerOnly */);
     return stream;
   }
 
@@ -68,6 +70,7 @@ public class FileUtils {
       throw new DroidDriverException("failed to mkdir " + dir);
     }
     dir.setReadable(true /* readable */, false/* ownerOnly */);
+    dir.setWritable(true /* readable */, false/* ownerOnly */);
     dir.setExecutable(true /* executable */, false/* ownerOnly */);
   }
 }
