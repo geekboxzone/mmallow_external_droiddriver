@@ -19,7 +19,6 @@ package com.google.android.droiddriver.helpers;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Debug;
-import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
 import com.google.android.droiddriver.DroidDriver;
@@ -36,7 +35,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
  * provides handy utility methods.
  */
 public abstract class BaseDroidDriverTest<T extends Activity> extends
-    ActivityInstrumentationTestCase2<T> {
+    D2ActivityInstrumentationTestCase2<T> {
   private static boolean classSetUpDone = false;
   // In case of device-wide fatal errors, e.g. OOME, the remaining tests will
   // fail and the messages will not help, so skip them.
