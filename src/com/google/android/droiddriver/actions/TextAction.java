@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -30,8 +31,11 @@ import com.google.common.base.Preconditions;
  */
 public class TextAction extends KeyAction {
 
-  private static final KeyCharacterMap KEY_CHAR_MAP = KeyCharacterMap
-      .load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+  @SuppressWarnings("deprecation")
+  private static final KeyCharacterMap KEY_CHAR_MAP =
+      Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? KeyCharacterMap
+          .load(KeyCharacterMap.BUILT_IN_KEYBOARD) : KeyCharacterMap
+          .load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
   private final String text;
 

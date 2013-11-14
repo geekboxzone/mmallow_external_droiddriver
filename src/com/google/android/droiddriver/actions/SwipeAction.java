@@ -47,26 +47,29 @@ public class SwipeAction extends ScrollAction {
   // theory a swipe of 20 steps is a scroll instead of fling on devices that
   // have 20 * 50 * 5 = 5000 pixels in one direction. Make it 40 for safety.
   private static final int SCROLL_STEPS = 40;
-  private static final int FLING_STEPS = 2;
+  // FLING_STEPS = 2 does not work on GingerBread
+  private static final int FLING_STEPS = 3;
 
   /**
    * Common instances for convenience. The direction in names reflects the
    * direction of finger rather than the scroll direction.
    */
-  public static final SwipeAction SWIPE_DOWN = new SwipeAction(UP, SCROLL_STEPS);
-  public static final SwipeAction SWIPE_UP = new SwipeAction(DOWN, SCROLL_STEPS);
-  public static final SwipeAction SWIPE_RIGHT = new SwipeAction(LEFT, SCROLL_STEPS);
-  public static final SwipeAction SWIPE_LEFT = new SwipeAction(RIGHT, SCROLL_STEPS);
+  private static final SwipeAction SWIPE_DOWN = new SwipeAction(UP, SCROLL_STEPS);
+  private static final SwipeAction SWIPE_UP = new SwipeAction(DOWN, SCROLL_STEPS);
+  private static final SwipeAction SWIPE_RIGHT = new SwipeAction(LEFT, SCROLL_STEPS);
+  private static final SwipeAction SWIPE_LEFT = new SwipeAction(RIGHT, SCROLL_STEPS);
 
-  public static final SwipeAction FLING_DOWN = new SwipeAction(UP, FLING_STEPS);
-  public static final SwipeAction FLING_UP = new SwipeAction(DOWN, FLING_STEPS);
-  public static final SwipeAction FLING_RIGHT = new SwipeAction(LEFT, FLING_STEPS);
-  public static final SwipeAction FLING_LEFT = new SwipeAction(RIGHT, FLING_STEPS);
+  private static final SwipeAction FLING_DOWN = new SwipeAction(UP, FLING_STEPS);
+  private static final SwipeAction FLING_UP = new SwipeAction(DOWN, FLING_STEPS);
+  private static final SwipeAction FLING_RIGHT = new SwipeAction(LEFT, FLING_STEPS);
+  private static final SwipeAction FLING_LEFT = new SwipeAction(RIGHT, FLING_STEPS);
 
   /**
    * Gets canned common instances for scrolling. Note the scroll direction
    * specifies where the content will move, instead of the finger.
    */
+  // TODO: We may use "smart" steps that depend on the size of the UiElement and
+  // ViewConfiguration#getScaledMinimumFlingVelocity.
   public static SwipeAction toScroll(PhysicalDirection direction) {
     switch (direction) {
       case UP:
@@ -86,6 +89,8 @@ public class SwipeAction extends ScrollAction {
    * Gets canned common instances for flinging. Note the scroll direction
    * specifies where the content will move, instead of the finger.
    */
+  // TODO: We may use "smart" steps that depend on the size of the UiElement and
+  // ViewConfiguration#getScaledMinimumFlingVelocity.
   public static SwipeAction toFling(PhysicalDirection direction) {
     switch (direction) {
       case UP:
@@ -179,6 +184,7 @@ public class SwipeAction extends ScrollAction {
 
     // First touch starts exactly at the point requested
     long downTime = Events.touchDown(injector, startX, startY);
+    SystemClock.sleep(ACTION_MOVE_INTERVAL);
     if (drag) {
       SystemClock.sleep((long) (ViewConfiguration.getLongPressTimeout() * 1.5f));
     }

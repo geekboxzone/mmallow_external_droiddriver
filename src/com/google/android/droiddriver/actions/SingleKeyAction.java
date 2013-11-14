@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
@@ -66,6 +67,9 @@ public class SingleKeyAction extends KeyAction {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(KeyEvent.keyCodeToString(keyCode)).toString();
+    String keyCodeString =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1 ? String.valueOf(keyCode)
+            : KeyEvent.keyCodeToString(keyCode);
+    return Objects.toStringHelper(this).addValue(keyCodeString).toString();
   }
 }

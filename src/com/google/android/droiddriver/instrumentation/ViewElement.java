@@ -39,6 +39,7 @@ import com.google.common.collect.Maps;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.FutureTask;
 
 /**
  * A UiElement that is backed by a View.
@@ -257,5 +258,12 @@ public class ViewElement extends BaseUiElement {
   @Override
   public InputInjector getInjector() {
     return context.getInjector();
+  }
+
+  @Override
+  protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
+    futureTask.run();
+    // Instead of specific timeoutMillis, wait for idle
+    context.getInstrumentation().waitForIdleSync();
   }
 }

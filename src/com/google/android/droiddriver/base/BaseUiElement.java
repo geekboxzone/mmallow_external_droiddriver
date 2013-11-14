@@ -145,10 +145,7 @@ public abstract class BaseUiElement implements UiElement {
     return action.perform(getInjector(), this);
   }
 
-  protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
-    // ignores timeoutMillis; subclasses can override this behavior
-    futureTask.run();
-  }
+  protected abstract void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis);
 
   private boolean performAndWait(final Action action) {
     // timeoutMillis <= 0 means no need to wait
@@ -236,7 +233,7 @@ public abstract class BaseUiElement implements UiElement {
     }
     if (!isVisible()) {
       toStringHelper.addValue(ATTRIB_NOT_VISIBLE);
-    } else if (!getVisibleBounds().equals(getBounds())){
+    } else if (!getVisibleBounds().equals(getBounds())) {
       toStringHelper.add(ATTRIB_VISIBLE_BOUNDS, getVisibleBounds().toShortString());
     }
     return toStringHelper.toString();
