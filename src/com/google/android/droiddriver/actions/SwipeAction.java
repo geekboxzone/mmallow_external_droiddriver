@@ -22,6 +22,7 @@ import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.
 import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.UP;
 
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.ViewConfiguration;
 
@@ -31,6 +32,7 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Events;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.primitives.Ints;
 
 /**
  * A {@link ScrollAction} that swipes the touch screen. Note the scroll
@@ -42,13 +44,18 @@ public class SwipeAction extends ScrollAction {
   // The action is a fling if the ACTION_MOVE velocity is greater than
   // ViewConfiguration#getScaledMinimumFlingVelocity. The velocity is calculated
   // as <distance between ACTION_MOVE points> / ACTION_MOVE_INTERVAL
+  // Note: ACTION_MOVE_INTERVAL is the minimum interval between injected events;
+  // the actual interval typically is longer.
   private static final int ACTION_MOVE_INTERVAL = 5;
   // ViewConfiguration.MINIMUM_FLING_VELOCITY = 50, so if there is no scale, in
   // theory a swipe of 20 steps is a scroll instead of fling on devices that
   // have 20 * 50 * 5 = 5000 pixels in one direction. Make it 40 for safety.
   private static final int SCROLL_STEPS = 40;
-  // FLING_STEPS = 2 does not work on GingerBread
-  private static final int FLING_STEPS = 3;
+  // TODO: Find the exact version-dependent fling steps. It is observed that 2
+  // does not work on GINGERBREAD; we haven't tested all versions so <JELLY_BEAN
+  // is used as a guess.
+  private static final int FLING_STEPS = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ? 3
+      : 2;
 
   /**
    * Common instances for convenience. The direction in names reflects the
@@ -88,6 +95,13 @@ public class SwipeAction extends ScrollAction {
   /**
    * Gets canned common instances for flinging. Note the scroll direction
    * specifies where the content will move, instead of the finger.
+   * <p>
+   * Note: This may not actually fling, depending on the size of the target
+   * UiElement and the SDK version of the device. If it does not behave as
+   * expected, you can use SwipeAction instances with custom steps.
+   * </p>
+   *
+   * @see ViewConfiguration#getScaledMinimumFlingVelocity
    */
   // TODO: We may use "smart" steps that depend on the size of the UiElement and
   // ViewConfiguration#getScaledMinimumFlingVelocity.
@@ -127,15 +141,15 @@ public class SwipeAction extends ScrollAction {
   /**
    * @param direction the scroll direction specifying where the content will
    *        move, instead of the finger.
-   * @param steps (steps-1) is the number of {@code ACTION_MOVE} that will be
-   *        injected between {@code ACTION_DOWN} and {@code ACTION_UP}
+   * @param steps minimum 2; (steps-1) is the number of {@code ACTION_MOVE} that
+   *        will be injected between {@code ACTION_DOWN} and {@code ACTION_UP}.
    * @param drag whether this is a drag
    * @param timeoutMillis
    */
   public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis) {
     super(timeoutMillis);
     this.direction = direction;
-    this.steps = steps;
+    this.steps = Ints.max(2, steps);
     this.drag = drag;
   }
 

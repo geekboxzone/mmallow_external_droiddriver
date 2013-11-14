@@ -24,7 +24,6 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.SingleKeyAction;
-import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.By;
@@ -149,8 +148,13 @@ public class StepBasedScroller implements Scroller {
         container.perform(MOVE_HOME);
         Logs.log(Log.DEBUG, "MOVE_HOME used");
       } else {
-        // Fling to beginning
-        container.perform(SwipeAction.toFling(backwardDirection));
+        // Fling to beginning is not reliable; scroll to beginning
+        // container.perform(SwipeAction.toFling(backwardDirection));
+        for (int i = 0; i < maxScrolls; i++) {
+          if (!scrollStepStrategy.scroll(driver, containerFinder, backwardDirection)) {
+            break;
+          }
+        }
       }
     } else {
       // search backward
