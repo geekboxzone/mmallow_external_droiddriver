@@ -90,6 +90,12 @@ public abstract class BaseSentinelStrategy implements SentinelStrategy {
   }
 
   @Override
+  public void beginScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {}
+
+  @Override
+  public void endScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {}
+
+  @Override
   public String toString() {
     return String.format("{backwardGetter=%s, forwardGetter=%s}", backwardGetter, forwardGetter);
   }

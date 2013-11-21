@@ -124,7 +124,12 @@ public class StepBasedScroller implements Scroller {
   @Override
   public UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction) {
-    return scrollTo(driver, containerFinder, itemFinder, direction, false);
+    try {
+      scrollStepStrategy.beginScrolling(containerFinder, itemFinder, direction);
+      return scrollTo(driver, containerFinder, itemFinder, direction, false);
+    } finally {
+      scrollStepStrategy.endScrolling(containerFinder, itemFinder, direction);
+    }
   }
 
   @Override
@@ -150,18 +155,23 @@ public class StepBasedScroller implements Scroller {
       } else {
         // Fling to beginning is not reliable; scroll to beginning
         // container.perform(SwipeAction.toFling(backwardDirection));
-        for (int i = 0; i < maxScrolls; i++) {
-          if (!scrollStepStrategy.scroll(driver, containerFinder, backwardDirection)) {
-            break;
+        try {
+          scrollStepStrategy.beginScrolling(containerFinder, itemFinder, backwardDirection);
+          for (int i = 0; i < maxScrolls; i++) {
+            if (!scrollStepStrategy.scroll(driver, containerFinder, backwardDirection)) {
+              break;
+            }
           }
+        } finally {
+          scrollStepStrategy.endScrolling(containerFinder, itemFinder, backwardDirection);
         }
       }
     } else {
-      // search backward
+      // search backward first
       try {
         return scrollTo(driver, containerFinder, itemFinder, backwardDirection, true);
       } catch (ElementNotFoundException e) {
-        // try another direction
+        // fall through to search forward
       }
     }
 

@@ -44,6 +44,29 @@ import java.util.concurrent.TimeoutException;
  * </p>
  */
 public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy {
+  /**
+   * Stores the data if we reached end at the last
+   * {@link AccessibilityEventScrollStepStrategy#scroll}. If the data match when
+   * a new scroll is requested, we can return immediately.
+   */
+  private static class EndData {
+    private Finder containerFinderAtEnd;
+    private PhysicalDirection directionAtEnd;
+
+    public boolean match(Finder containerFinder, PhysicalDirection direction) {
+      return containerFinderAtEnd == containerFinder && directionAtEnd == direction;
+    }
+
+    public void set(Finder containerFinder, PhysicalDirection direction) {
+      containerFinderAtEnd = containerFinder;
+      directionAtEnd = direction;
+    }
+
+    public void reset() {
+      set(null, null);
+    }
+  }
+
   private static final AccessibilityEventFilter SCROLL_EVENT_FILTER =
       new AccessibilityEventFilter() {
         @Override
@@ -55,9 +78,7 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   private final UiAutomation uiAutomation;
   private final long scrollEventTimeoutMillis;
   private final DirectionConverter directionConverter;
-
-  private Finder containerFinderAtEnd;
-  private PhysicalDirection directionAtEnd;
+  private final EndData atEndData = new EndData();
 
   public AccessibilityEventScrollStepStrategy(UiAutomation uiAutomation,
       long scrollEventTimeoutMillis, DirectionConverter converter) {
@@ -70,7 +91,7 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   public boolean scroll(DroidDriver driver, Finder containerFinder,
       final PhysicalDirection direction) {
     // Check if we've reached end after last scroll.
-    if (containerFinderAtEnd == containerFinder && directionAtEnd == direction) {
+    if (atEndData.match(containerFinder, direction)) {
       return false;
     }
 
@@ -84,12 +105,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
       }, SCROLL_EVENT_FILTER, scrollEventTimeoutMillis);
 
       if (detectEnd(direction.axis(), event)) {
-        containerFinderAtEnd = containerFinder;
-        directionAtEnd = direction;
+        atEndData.set(containerFinder, direction);
         Logs.log(Log.DEBUG, "reached scroll end");
-      } else {
-        containerFinderAtEnd = null;
-        directionAtEnd = null;
       }
     } catch (TimeoutException e) {
       // If no TYPE_VIEW_SCROLLED event, no more scrolling is possible
@@ -125,4 +142,12 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
     return String.format("AccessibilityEventScrollStepStrategy{scrollEventTimeoutMillis=%d}",
         scrollEventTimeoutMillis);
   }
+
+  @Override
+  public void beginScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {
+    atEndData.reset();
+  }
+
+  @Override
+  public void endScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {}
 }

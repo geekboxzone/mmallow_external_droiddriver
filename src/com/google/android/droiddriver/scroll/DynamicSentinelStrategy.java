@@ -174,6 +174,7 @@ public class DynamicSentinelStrategy extends BaseSentinelStrategy {
   }
 
   private final IsUpdatedStrategy isUpdatedStrategy;
+  private UiElement lastSentinel;
 
   /**
    * Constructs with {@code Getter}s that decorate the given {@code Getter}s
@@ -207,10 +208,27 @@ public class DynamicSentinelStrategy extends BaseSentinelStrategy {
 
   @Override
   public boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction) {
-    UiElement oldSentinel = getSentinel(driver, containerFinder, direction);
+    UiElement oldSentinel = getOldSentinel(driver, containerFinder, direction);
     oldSentinel.getParent().scroll(direction);
     UiElement newSentinel = getSentinel(driver, containerFinder, direction);
+    lastSentinel = newSentinel;
     return isUpdatedStrategy.isSentinelUpdated(newSentinel, oldSentinel);
+  }
+
+  private UiElement getOldSentinel(DroidDriver driver, Finder containerFinder,
+      PhysicalDirection direction) {
+    return lastSentinel != null ? lastSentinel : getSentinel(driver, containerFinder, direction);
+  }
+
+  @Override
+  public void beginScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {
+    lastSentinel = null;
+  }
+
+  @Override
+  public void endScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {
+    // Prevent memory leak
+    lastSentinel = null;
   }
 
   @Override

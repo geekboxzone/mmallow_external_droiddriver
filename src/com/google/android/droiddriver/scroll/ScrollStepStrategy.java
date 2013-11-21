@@ -42,6 +42,30 @@ public interface ScrollStepStrategy {
   DirectionConverter getDirectionConverter();
 
   /**
+   * Called only if this step is at the beginning of a series of scroll steps
+   * with regard to the given arguments.
+   *
+   * @param containerFinder Finder for the container that can scroll, for
+   *        instance a ListView
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
+   * @param direction
+   */
+  void beginScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction);
+
+  /**
+   * Called only if this step is at the end of a series of scroll steps with
+   * regard to the given arguments.
+   *
+   * @param containerFinder Finder for the container that can scroll, for
+   *        instance a ListView
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
+   * @param direction
+   */
+  void endScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction);
+
+  /**
    * {@inheritDoc}
    *
    * <p>
