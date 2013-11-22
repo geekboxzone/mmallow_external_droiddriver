@@ -221,12 +221,14 @@ public class DynamicSentinelStrategy extends BaseSentinelStrategy {
   }
 
   @Override
-  public void beginScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {
+  public void beginScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
+      PhysicalDirection direction) {
     lastSentinel = null;
   }
 
   @Override
-  public void endScrolling(Finder containerFinder, Finder itemFinder, PhysicalDirection direction) {
+  public void endScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
+      PhysicalDirection direction) {
     // Prevent memory leak
     lastSentinel = null;
   }

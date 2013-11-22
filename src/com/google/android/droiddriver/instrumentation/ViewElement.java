@@ -190,6 +190,9 @@ public class ViewElement extends BaseUiElement {
    * {@link com.google.android.droiddriver.DroidDriver#dumpUiElementTree}, then
    * call this method in setUp to override it with the class name seen in
    * uiautomatorviewer.
+   * </p>
+   * A better solution is to use resource-id instead of classname, which is an
+   * implementation detail and subject to change.
    */
   public static void overrideClassName(String actualClassName, String overridingClassName) {
     CLASS_NAME_OVERRIDES.put(actualClassName, overridingClassName);
