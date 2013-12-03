@@ -101,4 +101,9 @@ public abstract class BaseSentinelStrategy implements SentinelStrategy {
   public String toString() {
     return String.format("{backwardGetter=%s, forwardGetter=%s}", backwardGetter, forwardGetter);
   }
+
+  @Override
+  public void doScroll(UiElement container, PhysicalDirection direction) {
+    container.scroll(direction);
+  }
 }

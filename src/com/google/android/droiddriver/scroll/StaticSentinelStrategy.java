@@ -58,7 +58,7 @@ public class StaticSentinelStrategy extends BaseSentinelStrategy {
       return false;
     }
 
-    container.scroll(direction);
+    doScroll(container, direction);
     return true;
   }
 }

@@ -123,6 +123,10 @@ public class SwipeAction extends ScrollAction {
   private final PhysicalDirection direction;
   private final boolean drag;
   private final int steps;
+  private final float topMarginRatio;
+  private final float leftMarginRatio;
+  private final float bottomMarginRatio;
+  private final float rightMarginRatio;
 
   /**
    * Defaults timeoutMillis to 1000 and no drag.
@@ -139,26 +143,48 @@ public class SwipeAction extends ScrollAction {
   }
 
   /**
+   * Defaults all margin ratios to 0.1F.
+   */
+  public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis) {
+    this(direction, SCROLL_STEPS, drag, timeoutMillis, 0.1F, 0.1F, 0.1F, 0.1F);
+  }
+
+  /**
    * @param direction the scroll direction specifying where the content will
    *        move, instead of the finger.
    * @param steps minimum 2; (steps-1) is the number of {@code ACTION_MOVE} that
    *        will be injected between {@code ACTION_DOWN} and {@code ACTION_UP}.
    * @param drag whether this is a drag
    * @param timeoutMillis
+   * @param topMarginRatio margin ratio from top
+   * @param leftMarginRatio margin ratio from left
+   * @param bottomMarginRatio margin ratio from bottom
+   * @param rightMarginRatio margin ratio from right
    */
-  public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis) {
+  public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis,
+      float topMarginRatio, float leftMarginRatio, float bottomMarginRatio, float rightMarginRatio) {
     super(timeoutMillis);
     this.direction = direction;
     this.steps = Ints.max(2, steps);
     this.drag = drag;
+    this.topMarginRatio = topMarginRatio;
+    this.bottomMarginRatio = bottomMarginRatio;
+    this.leftMarginRatio = leftMarginRatio;
+    this.rightMarginRatio = rightMarginRatio;
   }
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
     Rect elementRect = element.getVisibleBounds();
 
-    int swipeAreaHeightAdjust = (int) (elementRect.height() * 0.1);
-    int swipeAreaWidthAdjust = (int) (elementRect.width() * 0.1);
+    int topMargin = (int) (elementRect.height() * topMarginRatio);
+    int bottomMargin = (int) (elementRect.height() * bottomMarginRatio);
+    int leftMargin = (int) (elementRect.width() * leftMarginRatio);
+    int rightMargin = (int) (elementRect.width() * rightMarginRatio);
+    int adjustedbottom = elementRect.bottom - bottomMargin;
+    int adjustedTop = elementRect.top + topMargin;
+    int adjustedLeft = elementRect.left + leftMargin;
+    int adjustedRight = elementRect.right - rightMargin;
     int startX;
     int startY;
     int endX;
@@ -167,26 +193,26 @@ public class SwipeAction extends ScrollAction {
     switch (direction) {
       case DOWN:
         startX = elementRect.centerX();
-        startY = elementRect.bottom - swipeAreaHeightAdjust;
+        startY = adjustedbottom;
         endX = elementRect.centerX();
-        endY = elementRect.top + swipeAreaHeightAdjust;
+        endY = adjustedTop;
         break;
       case UP:
         startX = elementRect.centerX();
-        startY = elementRect.top + swipeAreaHeightAdjust;
+        startY = adjustedTop;
         endX = elementRect.centerX();
-        endY = elementRect.bottom - swipeAreaHeightAdjust;
+        endY = adjustedbottom;
         break;
       case LEFT:
-        startX = elementRect.left + swipeAreaWidthAdjust;
+        startX = adjustedLeft;
         startY = elementRect.centerY();
-        endX = elementRect.right - swipeAreaWidthAdjust;
+        endX = adjustedRight;
         endY = elementRect.centerY();
         break;
       case RIGHT:
-        startX = elementRect.right - swipeAreaWidthAdjust;
+        startX = adjustedRight;
         startY = elementRect.centerY();
-        endX = elementRect.left + swipeAreaHeightAdjust;
+        endX = adjustedLeft;
         endY = elementRect.centerY();
         break;
       default:

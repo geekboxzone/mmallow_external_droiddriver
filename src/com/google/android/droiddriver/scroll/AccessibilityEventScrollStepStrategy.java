@@ -78,7 +78,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   private final UiAutomation uiAutomation;
   private final long scrollEventTimeoutMillis;
   private final DirectionConverter directionConverter;
-  private final EndData atEndData = new EndData();
+  private final EndData endData = new EndData();
+  private AccessibilityEvent event;
 
   public AccessibilityEventScrollStepStrategy(UiAutomation uiAutomation,
       long scrollEventTimeoutMillis, DirectionConverter converter) {
@@ -91,33 +92,24 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   public boolean scroll(DroidDriver driver, Finder containerFinder,
       final PhysicalDirection direction) {
     // Check if we've reached end after last scroll.
-    if (atEndData.match(containerFinder, direction)) {
+    if (endData.match(containerFinder, direction)) {
       return false;
     }
 
-    final UiElement container = driver.on(containerFinder);
-    try {
-      AccessibilityEvent event = uiAutomation.executeAndWaitForEvent(new Runnable() {
-        @Override
-        public void run() {
-          SwipeAction.toScroll(direction).perform(container.getInjector(), container);
-        }
-      }, SCROLL_EVENT_FILTER, scrollEventTimeoutMillis);
-
-      if (detectEnd(direction.axis(), event)) {
-        atEndData.set(containerFinder, direction);
-        Logs.log(Log.DEBUG, "reached scroll end");
-      }
-    } catch (TimeoutException e) {
-      // If no TYPE_VIEW_SCROLLED event, no more scrolling is possible
-      return false;
+    doScroll(driver.on(containerFinder), direction);
+    if (detectEnd(direction.axis())) {
+      endData.set(containerFinder, direction);
+      Logs.log(Log.DEBUG, "reached scroll end");
     }
     return true;
   }
 
   // Copied from UiAutomator.
   // AdapterViews have indices we can use to check for the beginning.
-  private static boolean detectEnd(Axis axis, AccessibilityEvent event) {
+  protected boolean detectEnd(Axis axis) {
+    if (event == null) {
+      return true;
+    }
     boolean foundEnd = false;
     if (event.getFromIndex() != -1 && event.getToIndex() != -1 && event.getItemCount() != -1) {
       foundEnd = event.getFromIndex() == 0 || (event.getItemCount() - 1) == event.getToIndex();
@@ -129,6 +121,7 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
       }
     }
     event.recycle();
+    event = null;
     return foundEnd;
   }
 
@@ -146,10 +139,25 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   @Override
   public void beginScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction) {
-    atEndData.reset();
+    endData.reset();
   }
 
   @Override
   public void endScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction) {}
+
+  @Override
+  public void doScroll(final UiElement container, final PhysicalDirection direction) {
+    event = null;
+    try {
+      event = uiAutomation.executeAndWaitForEvent(new Runnable() {
+        @Override
+        public void run() {
+          SwipeAction.toScroll(direction).perform(container.getInjector(), container);
+        }
+      }, SCROLL_EVENT_FILTER, scrollEventTimeoutMillis);
+    } catch (TimeoutException e) {
+      // If no TYPE_VIEW_SCROLLED event, no more scrolling is possible
+    }
+  }
 }

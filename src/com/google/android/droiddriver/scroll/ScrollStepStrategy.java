@@ -16,6 +16,7 @@
 package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
@@ -68,6 +69,16 @@ public interface ScrollStepStrategy {
    */
   void endScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction);
+
+  /**
+   * Performs the scroll action on {@code container}. Subclasses can override
+   * this to customize the scroll action, for example, to adjust the scroll
+   * margins.
+   *
+   * @param container the container that can scroll
+   * @param direction
+   */
+  void doScroll(UiElement container, PhysicalDirection direction);
 
   /**
    * {@inheritDoc}
