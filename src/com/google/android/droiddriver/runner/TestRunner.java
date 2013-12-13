@@ -45,7 +45,7 @@ import java.util.Set;
  * Adds activity watcher to InstrumentationTestRunner.
  */
 public class TestRunner extends InstrumentationTestRunner {
-  private final Set<Activity> activities = Sets.newIdentityHashSet();
+  private final Set<Activity> activities = Sets.newHashSet();
   private final AndroidTestRunner androidTestRunner = new AndroidTestRunner();
   private Activity runningActivity;
 
