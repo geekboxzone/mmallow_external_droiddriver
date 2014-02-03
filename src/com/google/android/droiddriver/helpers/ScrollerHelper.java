@@ -20,6 +20,7 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.scroll.Scroller;
 
 /**
@@ -36,10 +37,39 @@ public class ScrollerHelper {
     this.containerFinder = containerFinder;
   }
 
+  /**
+   * Scrolls {@code containerFinder} in both directions if necessary to find
+   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
+   *
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
+   * @return the UiElement matching {@code itemFinder}
+   * @throws ElementNotFoundException If no match is found
+   */
   public UiElement scrollTo(Finder itemFinder) {
     return scroller.scrollTo(driver, containerFinder, itemFinder);
   }
 
+  /**
+   * Scrolls {@code containerFinder} in {@code direction} if necessary to find
+   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
+   *
+   * @param itemFinder Finder for the desired item; relative to
+   *        {@code containerFinder}
+   * @param direction
+   * @return the UiElement matching {@code itemFinder}
+   * @throws ElementNotFoundException If no match is found
+   */
+  public UiElement scrollTo(Finder itemFinder, PhysicalDirection direction) {
+    return scroller.scrollTo(driver, containerFinder, itemFinder, direction);
+  }
+
+  /**
+   * Scrolls to {@code itemFinder} and returns true, otherwise returns false.
+   *
+   * @param itemFinder Finder for the desired item
+   * @return true if successful, otherwise false
+   */
   public boolean canScrollTo(Finder itemFinder) {
     try {
       scrollTo(itemFinder);

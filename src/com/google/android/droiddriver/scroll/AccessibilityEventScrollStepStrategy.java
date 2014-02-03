@@ -81,6 +81,9 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   private final EndData endData = new EndData();
   private AccessibilityEvent event;
 
+  protected AccessibilityEvent getLastEvent() {
+    return event;
+  }
   public AccessibilityEventScrollStepStrategy(UiAutomation uiAutomation,
       long scrollEventTimeoutMillis, DirectionConverter converter) {
     this.uiAutomation = uiAutomation;
@@ -101,6 +104,13 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
       endData.set(containerFinder, direction);
       Logs.log(Log.DEBUG, "reached scroll end");
     }
+
+    // Clean up the event after use.
+    if (event != null) {
+        event.recycle();
+        event = null;
+    }
+
     return true;
   }
 
@@ -120,8 +130,6 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
         foundEnd = event.getScrollX() == 0 || event.getScrollX() == event.getMaxScrollX();
       }
     }
-    event.recycle();
-    event = null;
     return foundEnd;
   }
 
