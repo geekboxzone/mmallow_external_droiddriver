@@ -30,7 +30,7 @@ import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
 
 /**
- * Implementation of a DroidDriver that is driven via the accessibility layer.
+ * Implementation of DroidDriver that is driven via the accessibility layer.
  */
 public class UiAutomationDriver extends BaseDroidDriver {
   // TODO: magic const from UiAutomator, but may not be useful
@@ -64,6 +64,7 @@ public class UiAutomationDriver extends BaseDroidDriver {
   private AccessibilityNodeInfo getRootNode() {
     long timeoutMillis = getPoller().getTimeoutMillis();
     try {
+      context.getInstrumentation().waitForIdleSync();
       uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
     } catch (java.util.concurrent.TimeoutException e) {
       throw new TimeoutException(e);

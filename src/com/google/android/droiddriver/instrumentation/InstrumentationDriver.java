@@ -35,7 +35,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
 /**
- * Implementation of a UiDriver that is driven via instrumentation.
+ * Implementation of DroidDriver that is driven via instrumentation.
  */
 public class InstrumentationDriver extends BaseDroidDriver {
   private final InstrumentationContext context;
