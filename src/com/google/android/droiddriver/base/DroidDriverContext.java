@@ -17,19 +17,69 @@
 package com.google.android.droiddriver.base;
 
 import android.app.Instrumentation;
+import android.os.Looper;
+import android.util.Log;
 
 import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.util.Logs;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Internal helper for managing all UiElement instances.
+ * Internal helper for DroidDriver implementation.
  */
-public interface DroidDriverContext {
-  Instrumentation getInstrumentation();
+public abstract class DroidDriverContext {
+  private final Instrumentation instrumentation;
 
-  BaseDroidDriver getDriver();
+  protected DroidDriverContext(Instrumentation instrumentation) {
+    this.instrumentation = instrumentation;
+  }
 
-  InputInjector getInjector();
+  public Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
+  public abstract BaseDroidDriver getDriver();
+
+  public abstract InputInjector getInjector();
 
   /** Clears UiElement instances in the context */
-  void clearData();
+  public abstract void clearData();
+
+  /**
+   * Tries to wait for an idle state on the main thread on best-effort basis up
+   * to {@code timeoutMillis}. The main thread may not enter the idle state when
+   * animation is playing, for example, the ProgressBar.
+   */
+  public boolean tryWaitForIdleSync(long timeoutMillis) {
+    validateNotAppThread();
+    FutureTask<?> futureTask = new FutureTask<Void>(new Runnable() {
+      @Override
+      public void run() {}
+    }, null);
+    instrumentation.waitForIdle(futureTask);
+
+    try {
+      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new DroidDriverException(e);
+    } catch (ExecutionException e) {
+      throw new DroidDriverException(e);
+    } catch (java.util.concurrent.TimeoutException e) {
+      Logs.log(Log.DEBUG, String.format(
+          "Timed out after %d milliseconds waiting for idle on main looper", timeoutMillis));
+      return false;
+    }
+    return true;
+  }
+
+  private void validateNotAppThread() {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      throw new DroidDriverException(
+          "This method can not be called from the main application thread");
+    }
+  }
 }

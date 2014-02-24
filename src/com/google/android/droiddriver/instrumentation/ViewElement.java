@@ -266,7 +266,6 @@ public class ViewElement extends BaseUiElement {
   @Override
   protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
     futureTask.run();
-    // Instead of specific timeoutMillis, wait for idle
-    context.getInstrumentation().waitForIdleSync();
+    context.tryWaitForIdleSync(timeoutMillis);
   }
 }

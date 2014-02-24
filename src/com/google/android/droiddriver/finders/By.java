@@ -235,8 +235,12 @@ public class By {
    * Returns a finder that uses the UiElement returned by first Finder as
    * context for the second Finder.
    * <p>
-   * Note typically first Finder finds the ancestor, then second Finder finds
-   * the target UiElement, which is a descendant.
+   * typically first Finder finds the ancestor, then second Finder finds the
+   * target UiElement, which is a descendant.
+   * </p>
+   * Note that if the first Finder matches multiple UiElements, only the first
+   * match is tried, which usually is not what callers expect. In this case,
+   * allOf(second, withAncesor(first)) may work.
    */
   public static ChainFinder chain(Finder first, Finder second) {
     return new ChainFinder(first, second);

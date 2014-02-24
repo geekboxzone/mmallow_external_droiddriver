@@ -31,7 +31,6 @@ import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
 /**
@@ -39,11 +38,9 @@ import com.google.common.primitives.Longs;
  */
 public class InstrumentationDriver extends BaseDroidDriver {
   private final InstrumentationContext context;
-  private final Instrumentation instrumentation;
   private final InstrumentationUiDevice uiDevice;
 
   public InstrumentationDriver(Instrumentation instrumentation) {
-    this.instrumentation = Preconditions.checkNotNull(instrumentation);
     this.context = new InstrumentationContext(instrumentation, this);
     uiDevice = new InstrumentationUiDevice(context);
   }
@@ -76,7 +73,6 @@ public class InstrumentationDriver extends BaseDroidDriver {
     long timeoutMillis = getPoller().getTimeoutMillis();
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      instrumentation.waitForIdleSync();
       Activity runningActivity = ActivityUtils.getRunningActivity();
       if (runningActivity != null) {
         return runningActivity;
@@ -127,7 +123,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
 
   Bitmap takeScreenshot() {
     ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
-    instrumentation.runOnMainSync(screenshotRunnable);
+    context.getInstrumentation().runOnMainSync(screenshotRunnable);
     return screenshotRunnable.screenshot;
   }
 

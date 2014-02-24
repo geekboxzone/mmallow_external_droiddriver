@@ -30,14 +30,13 @@ import com.google.common.collect.MapMaker;
 
 import java.util.Map;
 
-class InstrumentationContext implements DroidDriverContext {
+class InstrumentationContext extends DroidDriverContext {
   private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
-  private final Instrumentation instrumentation;
   private final InstrumentationDriver driver;
   private final InputInjector injector;
 
   InstrumentationContext(final Instrumentation instrumentation, InstrumentationDriver driver) {
-    this.instrumentation = instrumentation;
+    super(instrumentation);
     this.driver = driver;
     this.injector = new InputInjector() {
       @Override
@@ -52,11 +51,6 @@ class InstrumentationContext implements DroidDriverContext {
         return true;
       }
     };
-  }
-
-  @Override
-  public Instrumentation getInstrumentation() {
-    return instrumentation;
   }
 
   @Override

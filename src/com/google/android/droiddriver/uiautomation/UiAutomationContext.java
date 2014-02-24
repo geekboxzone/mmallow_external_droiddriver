@@ -28,16 +28,15 @@ import com.google.common.collect.MapMaker;
 
 import java.util.Map;
 
-class UiAutomationContext implements DroidDriverContext {
+class UiAutomationContext extends DroidDriverContext {
   private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
       .weakValues().makeMap();
   private final UiAutomation uiAutomation;
-  private final Instrumentation instrumentation;
-  private final UiAutomationDriver driver;
   private final InputInjector injector;
+  private final UiAutomationDriver driver;
 
   UiAutomationContext(final Instrumentation instrumentation, UiAutomationDriver driver) {
-    this.instrumentation = instrumentation;
+    super(instrumentation);
     this.uiAutomation = instrumentation.getUiAutomation();
     this.driver = driver;
     this.injector = new InputInjector() {
@@ -46,11 +45,6 @@ class UiAutomationContext implements DroidDriverContext {
         return uiAutomation.injectInputEvent(event, true /* sync */);
       }
     };
-  }
-
-  @Override
-  public Instrumentation getInstrumentation() {
-    return instrumentation;
   }
 
   @Override

@@ -64,7 +64,6 @@ public class UiAutomationDriver extends BaseDroidDriver {
   private AccessibilityNodeInfo getRootNode() {
     long timeoutMillis = getPoller().getTimeoutMillis();
     try {
-      context.getInstrumentation().waitForIdleSync();
       uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
     } catch (java.util.concurrent.TimeoutException e) {
       throw new TimeoutException(e);

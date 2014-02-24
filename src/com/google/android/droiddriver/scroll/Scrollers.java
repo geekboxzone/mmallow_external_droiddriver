@@ -40,7 +40,7 @@ public class Scrollers {
    * arguments that apply to typical cases. You may want to customize them for
    * specific cases. For instance, {@code perScrollTimeoutMillis} can be 0L if
    * there are no asynchronously updated views. To that extent, this method
-   * serves as an example of how to construct rather {@link Scroller}s than
+   * serves as an example of how to construct {@link Scroller}s rather than
    * providing the "official" {@link Scroller}.
    */
   public static Scroller newScroller(UiAutomation uiAutomation) {
