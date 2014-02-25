@@ -66,13 +66,30 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
     }
   }
 
-  private static final AccessibilityEventFilter SCROLL_EVENT_FILTER =
-      new AccessibilityEventFilter() {
-        @Override
-        public boolean accept(AccessibilityEvent arg0) {
-          return (arg0.getEventType() & AccessibilityEvent.TYPE_VIEW_SCROLLED) != 0;
+  /**
+   * This filter allows us to grab the last accessibility event generated
+   * for a scroll up to {@code scrollEventTimeoutMillis}.
+   */
+  private static class LastScrollEventFilter implements AccessibilityEventFilter {
+    private AccessibilityEvent lastEvent;
+
+    @Override
+    public boolean accept(AccessibilityEvent event) {
+      if ((event.getEventType() & AccessibilityEvent.TYPE_VIEW_SCROLLED) != 0) {
+        // Recycle the current last event.
+        if (lastEvent != null) {
+          lastEvent.recycle();
         }
-      };
+        lastEvent = AccessibilityEvent.obtain(event);
+      }
+      // Return false to collect events until scrollEventTimeoutMillis has elapsed.
+      return false;
+    }
+
+    public AccessibilityEvent getLastEvent() {
+      return lastEvent;
+    }
+  }
 
   private final UiAutomation uiAutomation;
   private final long scrollEventTimeoutMillis;
@@ -150,18 +167,18 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
 
   protected AccessibilityEvent doScrollAndReturnEvent(final UiElement container,
       final PhysicalDirection direction) {
-    AccessibilityEvent event = null;
+    LastScrollEventFilter filter = new LastScrollEventFilter();
     try {
-      event = uiAutomation.executeAndWaitForEvent(new Runnable() {
+      uiAutomation.executeAndWaitForEvent(new Runnable() {
         @Override
         public void run() {
           doScroll(container, direction);
         }
-      }, SCROLL_EVENT_FILTER, scrollEventTimeoutMillis);
+      }, filter, scrollEventTimeoutMillis);
     } catch (TimeoutException e) {
-      // If no TYPE_VIEW_SCROLLED event, no more scrolling is possible
+      // We expect this because LastScrollEventFilter.accept always returns false.
     }
-    return event;
+    return filter.getLastEvent();
   }
 
   @Override
