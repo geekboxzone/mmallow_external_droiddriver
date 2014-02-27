@@ -112,6 +112,9 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       // This method is for troubleshooting. Do not throw new error; we'll
       // throw the original failure.
       Logs.log(Log.WARN, e);
+      if (e instanceof OutOfMemoryError) {
+        dumpHprof();
+      }
     } finally {
       throw failure;
     }
