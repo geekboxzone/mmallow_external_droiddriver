@@ -73,6 +73,10 @@ public class DefaultPoller implements Poller {
         // fall through to poll
       }
 
+      for (PollingListener pollingListener : pollingListeners) {
+        pollingListener.onPolling(driver, finder);
+      }
+
       long remainingMillis = end - SystemClock.uptimeMillis();
       if (remainingMillis < 0) {
         for (TimeoutListener timeoutListener : timeoutListeners) {
@@ -80,10 +84,6 @@ public class DefaultPoller implements Poller {
         }
         throw new TimeoutException(String.format(
             "Timed out after %d milliseconds waiting for %s %s", timeoutMillis, finder, checker));
-      }
-
-      for (PollingListener pollingListener : pollingListeners) {
-        pollingListener.onPolling(driver, finder);
       }
       SystemClock.sleep(Longs.min(intervalMillis, remainingMillis));
     }
