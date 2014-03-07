@@ -93,7 +93,6 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     // Give uncaughtException (thrown by app instead of tests) high priority
     if (uncaughtException != null) {
       failure = uncaughtException;
-      uncaughtException = null;
       skipRemainingTests = true;
     }
 
@@ -103,7 +102,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       }
       if (failure instanceof OutOfMemoryError) {
         dumpHprof();
-      } else {
+      } else if (uncaughtException == null) {
         String baseFileName = getBaseFileName();
         driver.dumpUiElementTree(baseFileName + ".xml");
         driver.getUiDevice().takeScreenshot(baseFileName + ".png");
@@ -112,7 +111,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       // This method is for troubleshooting. Do not throw new error; we'll
       // throw the original failure.
       Logs.log(Log.WARN, e);
-      if (e instanceof OutOfMemoryError) {
+      if (e instanceof OutOfMemoryError && !(failure instanceof OutOfMemoryError)) {
         dumpHprof();
       }
     } finally {
@@ -145,6 +144,10 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     if (skipRemainingTests) {
       return;
     }
+    if (uncaughtException != null) {
+      onFailure(uncaughtException);
+    }
+
     Throwable exception = null;
     try {
       setUp();
@@ -165,9 +168,6 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     }
     if (exception != null) {
       throw exception;
-    }
-    if (uncaughtException != null) {
-      onFailure(uncaughtException);
     }
   }
 }

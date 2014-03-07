@@ -40,6 +40,8 @@ import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Adds activity watcher to InstrumentationTestRunner.
@@ -68,7 +70,7 @@ public class TestRunner extends InstrumentationTestRunner {
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override
       public void endTest(Test test) {
-        runOnMainSync(new Runnable() {
+        runOnMainSyncWithTimeLimit(new Runnable() {
           @Override
           public void run() {
             Iterator<Activity> iterator = activities.iterator();
@@ -165,6 +167,26 @@ public class TestRunner extends InstrumentationTestRunner {
     super.callActivityOnPause(activity);
     if (activity == ActivityUtils.getRunningActivity()) {
       runningActivity = null;
+    }
+  }
+
+  private void runOnMainSyncWithTimeLimit(Runnable runnable) {
+    // Do we need it configurable? Now only used in endTest.
+    long timeoutMillis = 10000L;
+    final FutureTask<?> futureTask = new FutureTask<Void>(runnable, null);
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        runOnMainSync(futureTask);
+      }
+    }).start();
+
+    try {
+      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
+    } catch (Throwable e) {
+      Logs.log(Log.WARN, e, String.format(
+          "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync",
+          timeoutMillis));
     }
   }
 }

@@ -123,7 +123,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
 
   Bitmap takeScreenshot() {
     ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
-    context.getInstrumentation().runOnMainSync(screenshotRunnable);
+    context.runOnMainSync(screenshotRunnable);
     return screenshotRunnable.screenshot;
   }
 

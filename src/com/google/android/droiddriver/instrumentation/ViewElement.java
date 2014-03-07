@@ -216,7 +216,7 @@ public class ViewElement extends BaseUiElement {
     Preconditions.checkNotNull(view);
     this.parent = parent;
     SnapshotViewAttributesRunnable attributesSnapshot = new SnapshotViewAttributesRunnable(view);
-    context.getInstrumentation().runOnMainSync(attributesSnapshot);
+    context.runOnMainSync(attributesSnapshot);
     if (attributesSnapshot.exception != null) {
       throw new DroidDriverException(attributesSnapshot.exception);
     }

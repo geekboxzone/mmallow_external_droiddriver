@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
+import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.Logs;
 
 import java.util.concurrent.ExecutionException;
@@ -74,6 +75,46 @@ public abstract class DroidDriverContext {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Tries to run {@code runnable} on the main thread on best-effort basis up to
+   * {@code timeoutMillis}. The {@code runnable} may never run, for example, in
+   * case that the main Looper has exited due to uncaught exception.
+   */
+  public boolean tryRunOnMainSync(Runnable runnable, long timeoutMillis) {
+    validateNotAppThread();
+    final FutureTask<?> futureTask = new FutureTask<Void>(runnable, null);
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        instrumentation.runOnMainSync(futureTask);
+      }
+    }).start();
+
+    try {
+      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new DroidDriverException(e);
+    } catch (ExecutionException e) {
+      throw new DroidDriverException(e);
+    } catch (java.util.concurrent.TimeoutException e) {
+      Logs.log(Log.WARN, getRunOnMainSyncTimeoutMessage(timeoutMillis));
+      return false;
+    }
+    return true;
+  }
+
+  public void runOnMainSync(Runnable runnable) {
+    long timeoutMillis = getDriver().getPoller().getTimeoutMillis();
+    if (!tryRunOnMainSync(runnable, timeoutMillis)) {
+      throw new TimeoutException(getRunOnMainSyncTimeoutMessage(timeoutMillis));
+    }
+  }
+
+  private String getRunOnMainSyncTimeoutMessage(long timeoutMillis) {
+    return String.format(
+        "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync", timeoutMillis);
   }
 
   private void validateNotAppThread() {
