@@ -16,10 +16,13 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.app.UiAutomation;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.google.android.droiddriver.base.BaseUiDevice;
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
+import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.android.droiddriver.util.Logs;
 
 class UiAutomationUiDevice extends BaseUiDevice {
@@ -32,7 +35,14 @@ class UiAutomationUiDevice extends BaseUiDevice {
   @Override
   protected Bitmap takeScreenshot() {
     try {
-      return context.getUiAutomation().takeScreenshot();
+      return context.callUiAutomation(new UiAutomationCallable<Bitmap>() {
+        @Override
+        public Bitmap call(UiAutomation uiAutomation) {
+          return uiAutomation.takeScreenshot();
+        }
+      });
+    } catch (UnrecoverableException e) {
+      throw e;
     } catch (Throwable e) {
       Logs.log(Log.ERROR, e);
       return null;

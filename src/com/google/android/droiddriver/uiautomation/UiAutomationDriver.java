@@ -26,6 +26,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.primitives.Longs;
 
@@ -42,11 +43,9 @@ public class UiAutomationDriver extends BaseDroidDriver {
   private static final long QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE = 500;// ms
 
   private final UiAutomationContext context;
-  private final UiAutomation uiAutomation;
   private final UiAutomationUiDevice uiDevice;
 
   public UiAutomationDriver(Instrumentation instrumentation) {
-    this.uiAutomation = instrumentation.getUiAutomation();
     this.context = new UiAutomationContext(instrumentation, this);
     this.uiDevice = new UiAutomationUiDevice(context);
   }
@@ -62,15 +61,28 @@ public class UiAutomationDriver extends BaseDroidDriver {
   }
 
   private AccessibilityNodeInfo getRootNode() {
-    long timeoutMillis = getPoller().getTimeoutMillis();
-    try {
-      uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
-    } catch (java.util.concurrent.TimeoutException e) {
-      throw new TimeoutException(e);
-    }
+    final long timeoutMillis = getPoller().getTimeoutMillis();
+    context.callUiAutomation(new UiAutomationCallable<Void>() {
+      @Override
+      public Void call(UiAutomation uiAutomation) {
+        try {
+          uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
+          return null;
+        } catch (java.util.concurrent.TimeoutException e) {
+          throw new TimeoutException(e);
+        }
+      }
+    });
+
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      AccessibilityNodeInfo root = uiAutomation.getRootInActiveWindow();
+      AccessibilityNodeInfo root =
+          context.callUiAutomation(new UiAutomationCallable<AccessibilityNodeInfo>() {
+            @Override
+            public AccessibilityNodeInfo call(UiAutomation uiAutomation) {
+              return uiAutomation.getRootInActiveWindow();
+            }
+          });
       if (root != null) {
         return root;
       }

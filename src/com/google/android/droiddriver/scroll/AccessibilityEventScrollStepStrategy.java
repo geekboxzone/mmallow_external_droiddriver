@@ -23,6 +23,7 @@ import android.view.accessibility.AccessibilityEvent;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.SwipeAction;
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.Axis;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
@@ -175,6 +176,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
           doScroll(container, direction);
         }
       }, filter, scrollEventTimeoutMillis);
+    } catch (IllegalStateException e) {
+      throw new UnrecoverableException(e);
     } catch (TimeoutException e) {
       // We expect this because LastScrollEventFilter.accept always returns false.
     }

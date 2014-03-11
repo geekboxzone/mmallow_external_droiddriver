@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.helpers;
+package com.google.android.droiddriver.exceptions;
 
 import com.google.android.droiddriver.helpers.BaseDroidDriverTest;
 
 /**
- * When an {@code UnrecoverableFailure} occurs, the rest of the tests are going
- * to fail as well, therefore running them only adds noise to the report.
+ * When an {@link UnrecoverableException} occurs, the rest of the tests are
+ * going to fail as well, therefore running them only adds noise to the report.
  * {@link BaseDroidDriverTest} will skip remaining tests when this is thrown.
- *
- * @deprecated Use
- *             {@link com.google.android.droiddriver.exceptions.UnrecoverableException}
- *             instead.
  */
-@Deprecated
 @SuppressWarnings("serial")
-public class UnrecoverableFailure extends RuntimeException {
-  public UnrecoverableFailure(String message) {
+public class UnrecoverableException extends RuntimeException {
+  public UnrecoverableException(String message) {
     super(message);
   }
 
-  public UnrecoverableFailure(Throwable throwable) {
+  public UnrecoverableException(Throwable throwable) {
     super(throwable);
   }
 }

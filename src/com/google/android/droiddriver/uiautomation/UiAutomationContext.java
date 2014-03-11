@@ -23,6 +23,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.DroidDriverContext;
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.finders.ByXPath;
 import com.google.common.collect.MapMaker;
 
@@ -41,8 +42,13 @@ class UiAutomationContext extends DroidDriverContext {
     this.driver = driver;
     this.injector = new InputInjector() {
       @Override
-      public boolean injectInputEvent(InputEvent event) {
-        return uiAutomation.injectInputEvent(event, true /* sync */);
+      public boolean injectInputEvent(final InputEvent event) {
+        return callUiAutomation(new UiAutomationCallable<Boolean>() {
+          @Override
+          public Boolean call(UiAutomation uiAutomation) {
+            return uiAutomation.injectInputEvent(event, true /* sync */);
+          }
+        });
       }
     };
   }
@@ -57,7 +63,7 @@ class UiAutomationContext extends DroidDriverContext {
     return injector;
   }
 
-  public UiAutomationElement getUiElement(AccessibilityNodeInfo node, UiAutomationElement parent) {
+  UiAutomationElement getUiElement(AccessibilityNodeInfo node, UiAutomationElement parent) {
     UiAutomationElement element = map.get(node);
     if (element == null) {
       element = new UiAutomationElement(this, node, parent);
@@ -72,7 +78,20 @@ class UiAutomationContext extends DroidDriverContext {
     ByXPath.clearData();
   }
 
-  public UiAutomation getUiAutomation() {
-    return uiAutomation;
+  interface UiAutomationCallable<T> {
+    T call(UiAutomation uiAutomation);
+  }
+
+  /*
+   * Wraps calls to UiAutomation API. Currently supports fail-fast if
+   * UiAutomation throws IllegalStateException, which occurs when the connection
+   * to UiAutomation service is lost.
+   */
+  <T> T callUiAutomation(UiAutomationCallable<T> uiAutomationCallable) {
+    try {
+      return uiAutomationCallable.call(uiAutomation);
+    } catch (IllegalStateException e) {
+      throw new UnrecoverableException(e);
+    }
   }
 }

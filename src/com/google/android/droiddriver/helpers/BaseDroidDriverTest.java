@@ -22,6 +22,7 @@ import android.os.Debug;
 import android.util.Log;
 
 import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
 
@@ -97,7 +98,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     }
 
     try {
-      if (failure instanceof UnrecoverableFailure) {
+      if (failure instanceof UnrecoverableException) {
         skipRemainingTests = true;
       }
       if (failure instanceof OutOfMemoryError) {

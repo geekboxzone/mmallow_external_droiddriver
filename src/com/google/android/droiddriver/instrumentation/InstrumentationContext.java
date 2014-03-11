@@ -63,7 +63,7 @@ class InstrumentationContext extends DroidDriverContext {
     return injector;
   }
 
-  public ViewElement getUiElement(View view, ViewElement parent) {
+  ViewElement getUiElement(View view, ViewElement parent) {
     ViewElement element = map.get(view);
     if (element == null) {
       element = new ViewElement(this, view, parent);

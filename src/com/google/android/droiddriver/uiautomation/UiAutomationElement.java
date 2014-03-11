@@ -18,6 +18,7 @@ package com.google.android.droiddriver.uiautomation;
 
 import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
 
+import android.app.UiAutomation;
 import android.app.UiAutomation.AccessibilityEventFilter;
 import android.graphics.Rect;
 import android.view.accessibility.AccessibilityEvent;
@@ -26,6 +27,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.finders.Attribute;
+import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -170,21 +172,29 @@ public class UiAutomationElement extends BaseUiElement {
   }
 
   @Override
-  protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
-    try {
-      context.getUiAutomation().executeAndWaitForEvent(futureTask, ANY_EVENT_FILTER, timeoutMillis);
-    } catch (TimeoutException e) {
-      // This is for sync'ing with Accessibility API on best-effort because
-      // it is not reliable.
-      // Exception is ignored here. Tests will fail anyways if this is
-      // critical.
-      // Actions should usually trigger some AccessibilityEvent's, but some
-      // widgets fail to do so, resulting in stale AccessibilityNodeInfo's. As a
-      // work-around, force to clear the AccessibilityNodeInfoCache.
-      // A legitimate case of no AccessibilityEvent is when scrolling has
-      // reached the end, but we cannot tell whether it's legitimate or the
-      // widget has bugs, so clearAccessibilityNodeInfoCache anyways.
-      context.getDriver().clearAccessibilityNodeInfoCacheHack();
-    }
+  protected void doPerformAndWait(final FutureTask<Boolean> futureTask, final long timeoutMillis) {
+    context.callUiAutomation(new UiAutomationCallable<Void>() {
+
+      @Override
+      public Void call(UiAutomation uiAutomation) {
+        try {
+          uiAutomation.executeAndWaitForEvent(futureTask, ANY_EVENT_FILTER, timeoutMillis);
+        } catch (TimeoutException e) {
+          // This is for sync'ing with Accessibility API on best-effort because
+          // it is not reliable.
+          // Exception is ignored here. Tests will fail anyways if this is
+          // critical.
+          // Actions should usually trigger some AccessibilityEvent's, but some
+          // widgets fail to do so, resulting in stale AccessibilityNodeInfo's.
+          // As a work-around, force to clear the AccessibilityNodeInfoCache.
+          // A legitimate case of no AccessibilityEvent is when scrolling has
+          // reached the end, but we cannot tell whether it's legitimate or the
+          // widget has bugs, so clearAccessibilityNodeInfoCache anyways.
+          context.getDriver().clearAccessibilityNodeInfoCacheHack();
+        }
+        return null;
+      }
+
+    });
   }
 }
