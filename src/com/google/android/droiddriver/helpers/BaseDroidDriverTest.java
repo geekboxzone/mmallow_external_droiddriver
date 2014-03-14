@@ -19,6 +19,7 @@ package com.google.android.droiddriver.helpers;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Debug;
+import android.test.FlakyTest;
 import android.util.Log;
 
 import com.google.android.droiddriver.DroidDriver;
@@ -29,6 +30,9 @@ import com.google.android.droiddriver.util.Logs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Base class for tests using DroidDriver that handles uncaught exceptions, for
@@ -89,18 +93,21 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   /**
    * Takes a screenshot on failure.
    */
-  @SuppressWarnings("finally")
   protected void onFailure(Throwable failure) throws Throwable {
-    // Give uncaughtException (thrown by app instead of tests) high priority
-    if (uncaughtException != null) {
-      failure = uncaughtException;
+    // If skipRemainingTests is true, the failure has already been reported.
+    if (skipRemainingTests) {
+      return;
+    }
+    if (shouldSkipRemainingTests(failure)) {
       skipRemainingTests = true;
     }
 
+    // Give uncaughtException (thrown by app instead of tests) high priority
+    if (uncaughtException != null) {
+      failure = uncaughtException;
+    }
+
     try {
-      if (failure instanceof UnrecoverableException) {
-        skipRemainingTests = true;
-      }
       if (failure instanceof OutOfMemoryError) {
         dumpHprof();
       } else if (uncaughtException == null) {
@@ -113,11 +120,17 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       // throw the original failure.
       Logs.log(Log.WARN, e);
       if (e instanceof OutOfMemoryError && !(failure instanceof OutOfMemoryError)) {
+        skipRemainingTests = true;
         dumpHprof();
       }
-    } finally {
-      throw failure;
     }
+
+    throw failure;
+  }
+
+  protected boolean shouldSkipRemainingTests(Throwable e) {
+    return e instanceof UnrecoverableException || e instanceof OutOfMemoryError
+        || skipRemainingTests || uncaughtException != null;
   }
 
   /**
@@ -129,7 +142,6 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   }
 
   protected void dumpHprof() throws IOException, FileNotFoundException {
-    skipRemainingTests = true;
     String path = FileUtils.getAbsoluteFile(getBaseFileName() + ".hprof").getPath();
     // create an empty readable file
     FileUtils.open(path).close();
@@ -169,6 +181,55 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     }
     if (exception != null) {
       throw exception;
+    }
+  }
+
+  /**
+   * Overrides super.runTest() to fail fast when the test is annotated as
+   * FlakyTest and we should skip remaining tests (the failure is fatal).
+   */
+  @Override
+  protected void runTest() throws Throwable {
+    String fName = getName();
+    assertNotNull(fName);
+    Method method = null;
+    try {
+      // use getMethod to get all public inherited
+      // methods. getDeclaredMethods returns all
+      // methods of this class but excludes the
+      // inherited ones.
+      method = getClass().getMethod(fName, (Class[]) null);
+    } catch (NoSuchMethodException e) {
+      fail("Method \"" + fName + "\" not found");
+    }
+
+    if (!Modifier.isPublic(method.getModifiers())) {
+      fail("Method \"" + fName + "\" should be public");
+    }
+
+    int tolerance = 1;
+    if (method.isAnnotationPresent(FlakyTest.class)) {
+      tolerance = method.getAnnotation(FlakyTest.class).tolerance();
+    }
+
+    for (int runCount = 0; runCount < tolerance; runCount++) {
+      if (runCount > 0) {
+        Logs.logfmt(Log.INFO, "Running %s round %d of %d attempts", fName, runCount + 1, tolerance);
+      }
+
+      try {
+        method.invoke(this);
+        return;
+      } catch (InvocationTargetException e) {
+        e.fillInStackTrace();
+        Throwable exception = e.getTargetException();
+        if (shouldSkipRemainingTests(exception) || runCount >= tolerance - 1) {
+          throw exception;
+        }
+      } catch (IllegalAccessException e) {
+        e.fillInStackTrace();
+        throw e;
+      }
     }
   }
 }

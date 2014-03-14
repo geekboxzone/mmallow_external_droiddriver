@@ -70,24 +70,28 @@ public class TestRunner extends InstrumentationTestRunner {
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override
       public void endTest(Test test) {
-        runOnMainSyncWithTimeLimit(new Runnable() {
-          @Override
-          public void run() {
-            Iterator<Activity> iterator = activities.iterator();
-            while (iterator.hasNext()) {
-              Activity activity = iterator.next();
-              iterator.remove();
-              if (!activity.isFinishing()) {
-                try {
-                  Logs.log(Log.INFO, "Stopping activity: " + activity);
-                  activity.finish();
-                } catch (RuntimeException e) {
-                  Logs.log(Log.ERROR, e, "Failed to stop activity");
+        boolean couldFinish = true;
+        Iterator<Activity> iterator = activities.iterator();
+        while (iterator.hasNext()) {
+          final Activity activity = iterator.next();
+          iterator.remove();
+          // Try to finish activity on best-effort basis
+          if (couldFinish) {
+            couldFinish = runOnMainSyncWithTimeLimit(new Runnable() {
+              @Override
+              public void run() {
+                if (!activity.isFinishing()) {
+                  try {
+                    Logs.log(Log.INFO, "Stopping activity: " + activity);
+                    activity.finish();
+                  } catch (RuntimeException e) {
+                    Logs.log(Log.ERROR, e, "Failed to stop activity");
+                  }
                 }
               }
-            }
+            });
           }
-        });
+        }
       }
 
       @Override
@@ -170,7 +174,7 @@ public class TestRunner extends InstrumentationTestRunner {
     }
   }
 
-  private void runOnMainSyncWithTimeLimit(Runnable runnable) {
+  private boolean runOnMainSyncWithTimeLimit(Runnable runnable) {
     // Do we need it configurable? Now only used in endTest.
     long timeoutMillis = 10000L;
     final FutureTask<?> futureTask = new FutureTask<Void>(runnable, null);
@@ -183,10 +187,13 @@ public class TestRunner extends InstrumentationTestRunner {
 
     try {
       futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
+      return true;
     } catch (Throwable e) {
       Logs.log(Log.WARN, e, String.format(
           "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync",
           timeoutMillis));
+      futureTask.cancel(true);
+      return false;
     }
   }
 }
