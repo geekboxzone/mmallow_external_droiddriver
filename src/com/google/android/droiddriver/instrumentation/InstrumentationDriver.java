@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver.instrumentation;
 
-import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -28,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.android.droiddriver.base.BaseDroidDriver;
+import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
@@ -55,27 +55,48 @@ public class InstrumentationDriver extends BaseDroidDriver {
     return context;
   }
 
-  private View findRootView() {
-    Activity runningActivity = getRunningActivity();
-    View[] views = RootFinder.getRootViews();
-    if (views.length > 1) {
-      Logs.log(Log.VERBOSE, "views.length=" + views.length);
-      for (View view : views) {
-        if (view.hasWindowFocus()) {
-          return view;
+  private static class FindRootViewRunnable implements Runnable {
+    View rootView;
+    Throwable exception;
+
+    @Override
+    public void run() {
+      try {
+        View[] views = RootFinder.getRootViews();
+        if (views.length > 1) {
+          Logs.log(Log.VERBOSE, "views.length=" + views.length);
+          for (View view : views) {
+            if (view.hasWindowFocus()) {
+              rootView = view;
+              return;
+            }
+          }
         }
+        // Fall back to DecorView.
+        rootView = ActivityUtils.getRunningActivity().getWindow().getDecorView();
+      } catch (Throwable e) {
+        exception = e;
+        Logs.log(Log.ERROR, e);
       }
     }
-    return runningActivity.getWindow().getDecorView();
   }
 
-  private Activity getRunningActivity() {
+  private View findRootView() {
+    waitForRunningActivity();
+    FindRootViewRunnable findRootViewRunnable = new FindRootViewRunnable();
+    context.runOnMainSync(findRootViewRunnable);
+    if (findRootViewRunnable.exception != null) {
+      throw new DroidDriverException(findRootViewRunnable.exception);
+    }
+    return findRootViewRunnable.rootView;
+  }
+
+  private void waitForRunningActivity() {
     long timeoutMillis = getPoller().getTimeoutMillis();
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
-      Activity runningActivity = ActivityUtils.getRunningActivity();
-      if (runningActivity != null) {
-        return runningActivity;
+      if (ActivityUtils.getRunningActivity() != null) {
+        return;
       }
       long remainingMillis = end - SystemClock.uptimeMillis();
       if (remainingMillis < 0) {

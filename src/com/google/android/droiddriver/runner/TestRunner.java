@@ -30,14 +30,13 @@ import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestListener;
 
 import java.lang.annotation.Annotation;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.FutureTask;
@@ -47,9 +46,9 @@ import java.util.concurrent.TimeUnit;
  * Adds activity watcher to InstrumentationTestRunner.
  */
 public class TestRunner extends InstrumentationTestRunner {
-  private final Set<Activity> activities = Sets.newHashSet();
+  private final Set<Activity> activities = new HashSet<Activity>();
   private final AndroidTestRunner androidTestRunner = new AndroidTestRunner();
-  private Activity runningActivity;
+  private volatile Activity runningActivity;
 
   /**
    * Returns an {@link AndroidTestRunner} that is shared by this and super, such
@@ -70,27 +69,34 @@ public class TestRunner extends InstrumentationTestRunner {
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override
       public void endTest(Test test) {
-        boolean couldFinish = true;
-        Iterator<Activity> iterator = activities.iterator();
-        while (iterator.hasNext()) {
-          final Activity activity = iterator.next();
-          iterator.remove();
-          // Try to finish activity on best-effort basis
-          if (couldFinish) {
-            couldFinish = runOnMainSyncWithTimeLimit(new Runnable() {
-              @Override
-              public void run() {
-                if (!activity.isFinishing()) {
-                  try {
-                    Logs.log(Log.INFO, "Stopping activity: " + activity);
-                    activity.finish();
-                  } catch (RuntimeException e) {
-                    Logs.log(Log.ERROR, e, "Failed to stop activity");
-                  }
+        // Try to finish activity on best-effort basis - TestListener should
+        // not throw.
+        runOnMainSyncWithTimeLimit(new Runnable() {
+          @Override
+          public void run() {
+            Activity[] activitiesCopy;;
+            synchronized (activities) {
+              activitiesCopy = new Activity[activities.size()];
+              activitiesCopy = activities.toArray(activitiesCopy);
+            }
+
+            for (Activity activity : activitiesCopy) {
+              if (!activity.isFinishing()) {
+                try {
+                  Logs.log(Log.INFO, "Stopping activity: " + activity);
+                  activity.finish();
+                } catch (Throwable e) {
+                  Logs.log(Log.ERROR, e, "Failed to stop activity");
                 }
               }
-            });
+            }
           }
+        });
+
+        // We've done what we can. Clear activities if any are left.
+        synchronized (activities) {
+          activities.clear();
+          runningActivity = null;
         }
       }
 
@@ -151,13 +157,17 @@ public class TestRunner extends InstrumentationTestRunner {
   @Override
   public void callActivityOnDestroy(Activity activity) {
     super.callActivityOnDestroy(activity);
-    activities.remove(activity);
+    synchronized (activities) {
+      activities.remove(activity);
+    }
   }
 
   @Override
   public void callActivityOnCreate(Activity activity, Bundle bundle) {
     super.callActivityOnCreate(activity, bundle);
-    activities.add(activity);
+    synchronized (activities) {
+      activities.add(activity);
+    }
   }
 
   @Override
@@ -169,7 +179,7 @@ public class TestRunner extends InstrumentationTestRunner {
   @Override
   public void callActivityOnPause(Activity activity) {
     super.callActivityOnPause(activity);
-    if (activity == ActivityUtils.getRunningActivity()) {
+    if (activity == runningActivity) {
       runningActivity = null;
     }
   }
