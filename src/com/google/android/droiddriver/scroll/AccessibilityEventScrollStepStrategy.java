@@ -123,6 +123,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
       event.recycle();
     }
 
+    // Even if event == null, that does not mean scroll has no effect!
+    // Some views may not emit correct events when the content changed.
     return true;
   }
 
