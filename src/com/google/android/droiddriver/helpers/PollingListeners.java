@@ -2,20 +2,24 @@ package com.google.android.droiddriver.helpers;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller.PollingListener;
-import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
 
 /**
  * Static utility methods to create commonly used PollingListeners.
  */
 public class PollingListeners {
-  private static UiElement tryFind(DroidDriver driver, Finder finder) {
-    try {
-      return driver.find(finder);
-    } catch (ElementNotFoundException enfe) {
-      return null;
+  /**
+   * Tries to find {@code watchFinder}, and clicks it if found.
+   *
+   * @param watchFinder Identifies the UI component to watch
+   * @return whether {@code watchFinder} is found
+   */
+  public static boolean tryFindAndClick(DroidDriver driver, Finder watchFinder) {
+    if (driver.has(watchFinder)) {
+      driver.find(watchFinder).click();
+      return true;
     }
+    return false;
   }
 
   /**
@@ -38,7 +42,7 @@ public class PollingListeners {
     return new PollingListener() {
       @Override
       public void onPolling(DroidDriver driver, Finder finder) {
-        if (tryFind(driver, watchFinder) != null) {
+        if (driver.has(watchFinder)) {
           driver.find(dismissFinder).click();
         }
       }
