@@ -68,8 +68,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   }
 
   /**
-   * This filter allows us to grab the last accessibility event generated
-   * for a scroll up to {@code scrollEventTimeoutMillis}.
+   * This filter allows us to grab the last accessibility event generated for a
+   * scroll up to {@code scrollEventTimeoutMillis}.
    */
   private static class LastScrollEventFilter implements AccessibilityEventFilter {
     private AccessibilityEvent lastEvent;
@@ -83,7 +83,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
         }
         lastEvent = AccessibilityEvent.obtain(event);
       }
-      // Return false to collect events until scrollEventTimeoutMillis has elapsed.
+      // Return false to collect events until scrollEventTimeoutMillis has
+      // elapsed.
       return false;
     }
 
@@ -134,17 +135,21 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
     if (event == null) {
       return true;
     }
-    boolean foundEnd = false;
+
     if (event.getFromIndex() != -1 && event.getToIndex() != -1 && event.getItemCount() != -1) {
-      foundEnd = event.getFromIndex() == 0 || (event.getItemCount() - 1) == event.getToIndex();
-    } else if (event.getScrollX() != -1 && event.getScrollY() != -1) {
+      return event.getFromIndex() == 0 || (event.getItemCount() - 1) == event.getToIndex();
+    }
+    if (event.getScrollX() != -1 && event.getScrollY() != -1) {
       if (axis == Axis.VERTICAL) {
-        foundEnd = event.getScrollY() == 0 || event.getScrollY() == event.getMaxScrollY();
+        return event.getScrollY() == 0 || event.getScrollY() == event.getMaxScrollY();
       } else if (axis == Axis.HORIZONTAL) {
-        foundEnd = event.getScrollX() == 0 || event.getScrollX() == event.getMaxScrollX();
+        return event.getScrollX() == 0 || event.getScrollX() == event.getMaxScrollX();
       }
     }
-    return foundEnd;
+
+    // This case is different from UiAutomator.
+    return event.getFromIndex() == -1 && event.getToIndex() == -1 && event.getItemCount() == -1
+        && event.getScrollX() == -1 && event.getScrollY() == -1;
   }
 
   @Override
@@ -181,7 +186,8 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
     } catch (IllegalStateException e) {
       throw new UnrecoverableException(e);
     } catch (TimeoutException e) {
-      // We expect this because LastScrollEventFilter.accept always returns false.
+      // We expect this because LastScrollEventFilter.accept always returns
+      // false.
     }
     return filter.getLastEvent();
   }
@@ -189,5 +195,24 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   @Override
   public void doScroll(final UiElement container, final PhysicalDirection direction) {
     SwipeAction.toScroll(direction).perform(container.getInjector(), container);
+  }
+
+  /**
+   * Some widgets may not always fire correct {@link AccessibilityEvent}.
+   * Detecting end by null event is safer (at the cost of a extra scroll) than
+   * examining indices.
+   */
+  public static class NullAccessibilityEventScrollStepStrategy extends
+      AccessibilityEventScrollStepStrategy {
+
+    public NullAccessibilityEventScrollStepStrategy(UiAutomation uiAutomation,
+        long scrollEventTimeoutMillis, DirectionConverter converter) {
+      super(uiAutomation, scrollEventTimeoutMillis, converter);
+    }
+
+    @Override
+    protected boolean detectEnd(AccessibilityEvent event, Axis axis) {
+      return event == null;
+    }
   }
 }

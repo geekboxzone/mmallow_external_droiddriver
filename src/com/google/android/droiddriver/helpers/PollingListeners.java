@@ -2,6 +2,7 @@ package com.google.android.droiddriver.helpers;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller.PollingListener;
+import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.finders.Finder;
 
 /**
@@ -15,11 +16,12 @@ public class PollingListeners {
    * @return whether {@code watchFinder} is found
    */
   public static boolean tryFindAndClick(DroidDriver driver, Finder watchFinder) {
-    if (driver.has(watchFinder)) {
+    try {
       driver.find(watchFinder).click();
       return true;
+    } catch (ElementNotFoundException enfe) {
+      return false;
     }
-    return false;
   }
 
   /**
