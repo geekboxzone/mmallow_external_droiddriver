@@ -15,11 +15,9 @@
  */
 package com.google.android.droiddriver.scroll;
 
-import android.widget.ProgressBar;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.finders.By;
 import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
@@ -67,30 +65,5 @@ public abstract class ForwardingScrollStepStrategy implements ScrollStepStrategy
   @Override
   public String toString() {
     return delegate().toString();
-  }
-
-  /**
-   * Augments the delegate {@link ScrollStepStrategy) - after a successful
-   * scroll, waits until ProgressBar is gone.
-   */
-  public static abstract class ProgressBarScrollStepStrategy extends ForwardingScrollStepStrategy {
-    @Override
-    public boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction) {
-      if (super.scroll(driver, containerFinder, direction)) {
-        driver.checkGone(By.className(ProgressBar.class));
-        return true;
-      }
-      return false;
-    }
-
-    /** Convenience method to wrap {@code delegate} with this class */
-    public static ScrollStepStrategy wrap(final ScrollStepStrategy delegate) {
-      return new ProgressBarScrollStepStrategy() {
-        @Override
-        protected ScrollStepStrategy delegate() {
-          return delegate;
-        }
-      };
-    }
   }
 }

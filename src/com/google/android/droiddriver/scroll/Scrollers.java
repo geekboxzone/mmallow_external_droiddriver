@@ -17,14 +17,44 @@
 package com.google.android.droiddriver.scroll;
 
 import android.app.UiAutomation;
+import android.widget.ProgressBar;
 
+import com.google.android.droiddriver.DroidDriver;
+import com.google.android.droiddriver.finders.By;
+import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.Axis;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
+import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
 /**
- * Static utility methods pertaining to {@link Scroller} instances.
+ * Static utility classes and methods pertaining to {@link Scroller} instances.
  */
 public class Scrollers {
+  /**
+   * Augments the delegate {@link ScrollStepStrategy) - after a successful
+   * scroll, waits until ProgressBar is gone.
+   */
+  public static abstract class ProgressBarScrollStepStrategy extends ForwardingScrollStepStrategy {
+    @Override
+    public boolean scroll(DroidDriver driver, Finder containerFinder, PhysicalDirection direction) {
+      if (super.scroll(driver, containerFinder, direction)) {
+        driver.checkGone(By.className(ProgressBar.class));
+        return true;
+      }
+      return false;
+    }
+
+    /** Convenience method to wrap {@code delegate} with this class */
+    public static ScrollStepStrategy wrap(final ScrollStepStrategy delegate) {
+      return new ProgressBarScrollStepStrategy() {
+        @Override
+        protected ScrollStepStrategy delegate() {
+          return delegate;
+        }
+      };
+    }
+  }
+
   /**
    * Returns a new default Scroller that works in simple cases. In complex cases
    * you may try a {@link StepBasedScroller} with a custom
