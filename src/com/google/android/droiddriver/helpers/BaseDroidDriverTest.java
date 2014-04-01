@@ -52,6 +52,10 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       @Override
       public void uncaughtException(Thread thread, Throwable ex) {
         uncaughtException = ex;
+        // In most cases uncaughtException will be reported by onFailure().
+        // But if it occurs in InstrumentationTestRunner, it's swallowed.
+        // Always log it for all cases.
+        Logs.log(Log.ERROR, uncaughtException, "uncaughtException");
       }
     });
   }
