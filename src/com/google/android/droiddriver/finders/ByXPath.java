@@ -152,6 +152,12 @@ public class ByXPath implements Finder {
     setAttribute(element, Attribute.SCROLLABLE, uiElement.isScrollable());
     setAttribute(element, Attribute.LONG_CLICKABLE, uiElement.isLongClickable());
     setAttribute(element, Attribute.PASSWORD, uiElement.isPassword());
+    if (uiElement.hasSelection()) {
+      element.setAttribute(Attribute.SELECTION_START.getName(),
+          Integer.toString(uiElement.getSelectionStart()));
+      element.setAttribute(Attribute.SELECTION_END.getName(),
+          Integer.toString(uiElement.getSelectionEnd()));
+    }
     setAttribute(element, Attribute.SELECTED, uiElement.isSelected());
     element.setAttribute(Attribute.BOUNDS.getName(), uiElement.getBounds().toShortString());
 
@@ -159,7 +165,7 @@ public class ByXPath implements Finder {
     if (!UiElement.VISIBLE.equals(predicate)) {
       if (!uiElement.isVisible()) {
         element.setAttribute(BaseUiElement.ATTRIB_NOT_VISIBLE, "");
-      } else if (!uiElement.getVisibleBounds().equals(uiElement.getBounds())){
+      } else if (!uiElement.getVisibleBounds().equals(uiElement.getBounds())) {
         element.setAttribute(BaseUiElement.ATTRIB_VISIBLE_BOUNDS, uiElement.getVisibleBounds()
             .toShortString());
       }

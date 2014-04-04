@@ -74,6 +74,13 @@ public class ViewElement extends BaseUiElement {
         put(Attribute.LONG_CLICKABLE, view.isLongClickable());
         put(Attribute.PASSWORD, isPassword());
         put(Attribute.SCROLLABLE, isScrollable());
+        if (view instanceof TextView) {
+          TextView textView = (TextView) view;
+          if (textView.hasSelection()) {
+            attribs.put(Attribute.SELECTION_START, textView.getSelectionStart());
+            attribs.put(Attribute.SELECTION_END, textView.getSelectionEnd());
+          }
+        }
         put(Attribute.SELECTED, view.isSelected());
         put(Attribute.BOUNDS, getBounds());
 

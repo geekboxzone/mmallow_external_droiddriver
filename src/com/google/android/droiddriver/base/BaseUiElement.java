@@ -134,6 +134,24 @@ public abstract class BaseUiElement implements UiElement {
     return get(Attribute.BOUNDS);
   }
 
+  // TODO: expose these 3 methods in UiElement?
+  public int getSelectionStart() {
+    Integer value = get(Attribute.SELECTION_START);
+    return value == null ? 0 : value;
+  }
+
+  public int getSelectionEnd() {
+    Integer value = get(Attribute.SELECTION_END);
+    return value == null ? 0 : value;
+  }
+
+  public boolean hasSelection() {
+    final int selectionStart = getSelectionStart();
+    final int selectionEnd = getSelectionEnd();
+
+    return selectionStart >= 0 && selectionStart != selectionEnd;
+  }
+
   @Override
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
