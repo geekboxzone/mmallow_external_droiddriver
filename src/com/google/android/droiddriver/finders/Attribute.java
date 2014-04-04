@@ -30,6 +30,8 @@ public enum Attribute {
   PASSWORD("password"),
   RESOURCE_ID("resource-id"),
   SCROLLABLE("scrollable"),
+  SELECTION_START("selection-start"),
+  SELECTION_END("selection-end"),
   SELECTED("selected"),
   TEXT("text"),
   BOUNDS("bounds");

@@ -24,6 +24,8 @@
       <xsl:attribute name="scrollable"><xsl:value-of select="boolean(@scrollable)" /></xsl:attribute>
       <xsl:attribute name="long-clickable"><xsl:value-of select="boolean(@long-clickable)" /></xsl:attribute>
       <xsl:attribute name="password"><xsl:value-of select="boolean(@password)" /></xsl:attribute>
+      <xsl:attribute name="selection-start"><xsl:value-of select="@selection-start" /></xsl:attribute>
+      <xsl:attribute name="selection-end"><xsl:value-of select="@selection-end" /></xsl:attribute>
       <xsl:attribute name="selected"><xsl:value-of select="boolean(@selected)" /></xsl:attribute>
       <xsl:attribute name="bounds"><xsl:value-of select="@bounds" /></xsl:attribute>
       <!-- These two attributes are added by DroidDriver to help diagnosis -->

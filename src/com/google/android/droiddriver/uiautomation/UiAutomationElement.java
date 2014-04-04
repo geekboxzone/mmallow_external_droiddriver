@@ -85,6 +85,11 @@ public class UiAutomationElement extends BaseUiElement {
     put(attribs, Attribute.LONG_CLICKABLE, node.isLongClickable());
     put(attribs, Attribute.PASSWORD, node.isPassword());
     put(attribs, Attribute.SCROLLABLE, node.isScrollable());
+    if (node.getTextSelectionStart() >= 0
+        && node.getTextSelectionStart() != node.getTextSelectionEnd()) {
+      attribs.put(Attribute.SELECTION_START, node.getTextSelectionStart());
+      attribs.put(Attribute.SELECTION_END, node.getTextSelectionEnd());
+    }
     put(attribs, Attribute.SELECTED, node.isSelected());
     put(attribs, Attribute.BOUNDS, getBounds(node));
     attributes = ImmutableMap.copyOf(attribs);
