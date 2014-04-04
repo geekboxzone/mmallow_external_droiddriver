@@ -191,6 +191,8 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   /**
    * Overrides super.runTest() to fail fast when the test is annotated as
    * FlakyTest and we should skip remaining tests (the failure is fatal).
+   * When a flaky test is re-run, tearDown() and setUp() are called first in order
+   * to reset the test's state.
    */
   @Override
   protected void runTest() throws Throwable {
@@ -219,6 +221,9 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     for (int runCount = 0; runCount < tolerance; runCount++) {
       if (runCount > 0) {
         Logs.logfmt(Log.INFO, "Running %s round %d of %d attempts", fName, runCount + 1, tolerance);
+        // We are re-attempting a test, so reset all state.
+        tearDown();
+        setUp();
       }
 
       try {
