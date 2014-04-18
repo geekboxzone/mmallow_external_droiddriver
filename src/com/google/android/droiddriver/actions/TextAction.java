@@ -23,8 +23,8 @@ import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import com.google.android.droiddriver.util.Preconditions;
+import com.google.android.droiddriver.util.Strings;
 
 /**
  * An action to type text.
@@ -80,6 +80,6 @@ public class TextAction extends KeyAction {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(text).toString();
+    return Strings.toStringHelper(this).addValue(text).toString();
   }
 }

@@ -16,7 +16,7 @@
 
 package com.google.android.droiddriver.instrumentation;
 
-import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
+import static com.google.android.droiddriver.util.Strings.charSequenceToString;
 
 import android.content.res.Resources;
 import android.graphics.Rect;
@@ -30,13 +30,12 @@ import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.finders.Attribute;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.android.droiddriver.util.Preconditions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.FutureTask;
@@ -47,7 +46,7 @@ import java.util.concurrent.FutureTask;
 public class ViewElement extends BaseUiElement {
   private static class SnapshotViewAttributesRunnable implements Runnable {
     private final View view;
-    final Map<Attribute, Object> attribs = Maps.newEnumMap(Attribute.class);
+    final Map<Attribute, Object> attribs = new EnumMap<Attribute, Object>(Attribute.class);
     boolean visible;
     Rect visibleBounds;
     List<View> childViews;
@@ -171,7 +170,7 @@ public class ViewElement extends BaseUiElement {
       }
       ViewGroup group = (ViewGroup) view;
       int childCount = group.getChildCount();
-      childViews = Lists.newArrayListWithExpectedSize(childCount);
+      childViews = new ArrayList<View>(childCount);
       for (int i = 0; i < childCount; i++) {
         View child = group.getChildAt(i);
         if (child != null) {
@@ -181,7 +180,7 @@ public class ViewElement extends BaseUiElement {
     }
   }
 
-  private static final Map<String, String> CLASS_NAME_OVERRIDES = Maps.newHashMap();
+  private static final Map<String, String> CLASS_NAME_OVERRIDES = new HashMap<String, String>();
 
   /**
    * Typically users find the class name to use in tests using SDK tool
@@ -228,16 +227,18 @@ public class ViewElement extends BaseUiElement {
       throw new DroidDriverException(attributesSnapshot.exception);
     }
 
-    attributes = ImmutableMap.copyOf(attributesSnapshot.attribs);
+    attributes = Collections.unmodifiableMap(attributesSnapshot.attribs);
     this.visibleBounds = attributesSnapshot.visibleBounds;
     this.visible = attributesSnapshot.visible;
-    this.children =
-        attributesSnapshot.childViews == null ? null : ImmutableList.copyOf(Lists.transform(
-            attributesSnapshot.childViews, new Function<View, ViewElement>() {
-              public ViewElement apply(View input) {
-                return context.getUiElement(input, ViewElement.this);
-              }
-            }));
+    if (attributesSnapshot.childViews == null) {
+      this.children = null;
+    } else {
+      List<ViewElement> children = new ArrayList<ViewElement>(attributesSnapshot.childViews.size());
+      for (View childView : attributesSnapshot.childViews) {
+        children.add(context.getUiElement(childView, this));
+      }
+      this.children = Collections.unmodifiableList(children);
+    }
   }
 
   @Override

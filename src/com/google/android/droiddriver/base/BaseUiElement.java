@@ -25,15 +25,15 @@ import com.google.android.droiddriver.actions.SwipeAction;
 import com.google.android.droiddriver.actions.TextAction;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
+import com.google.android.droiddriver.finders.Predicate;
+import com.google.android.droiddriver.finders.Predicates;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
+import com.google.android.droiddriver.util.Strings;
+import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -234,20 +234,26 @@ public abstract class BaseUiElement implements UiElement {
   public List<? extends BaseUiElement> getChildren(Predicate<? super UiElement> predicate) {
     List<? extends BaseUiElement> children = getChildren();
     if (children == null) {
-      return ImmutableList.of();
+      return Collections.emptyList();
     }
-    if (predicate == null || predicate.equals(Predicates.alwaysTrue())) {
+    if (predicate == null || predicate.equals(Predicates.any())) {
       return children;
     }
 
-    return ImmutableList.copyOf(Collections2.filter(children, predicate));
+    List<BaseUiElement> filteredChildren = new ArrayList<BaseUiElement>(children.size());
+    for (BaseUiElement child : children) {
+      if (predicate.apply(child)) {
+        filteredChildren.add(child);
+      }
+    }
+    return Collections.unmodifiableList(filteredChildren);
   }
 
   @Override
   public String toString() {
-    ToStringHelper toStringHelper = Objects.toStringHelper(this);
-    for (Attribute attr : Attribute.values()) {
-      addAttribute(toStringHelper, attr, get(attr));
+    ToStringHelper toStringHelper = Strings.toStringHelper(this);
+    for (Map.Entry<Attribute, Object> entry : getAttributes().entrySet()) {
+      addAttribute(toStringHelper, entry.getKey(), entry.getValue());
     }
     if (!isVisible()) {
       toStringHelper.addValue(ATTRIB_NOT_VISIBLE);

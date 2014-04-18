@@ -23,17 +23,16 @@ import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import com.google.android.droiddriver.util.Preconditions;
+import com.google.android.droiddriver.util.Strings;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.BufferedOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,12 +54,16 @@ public class ByXPath implements Finder {
   private static final XPath XPATH_COMPILER = XPathFactory.newInstance().newXPath();
   // document needs to be static so that when buildDomNode is called recursively
   // on children they are in the same document to be appended.
-  // TODO: move the below two to DroidDriverContext?
   private static Document document;
-  private static BiMap<BaseUiElement, Element> domBiMap = HashBiMap.create();
+  // The two maps should be kept in sync
+  private static final Map<BaseUiElement, Element> TO_DOM_MAP =
+      new HashMap<BaseUiElement, Element>();
+  private static final Map<Element, BaseUiElement> FROM_DOM_MAP =
+      new HashMap<Element, BaseUiElement>();
 
   public static void clearData() {
-    domBiMap.clear();
+    TO_DOM_MAP.clear();
+    FROM_DOM_MAP.clear();
     document = null;
   }
 
@@ -78,7 +81,7 @@ public class ByXPath implements Finder {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(xPathString).toString();
+    return Strings.toStringHelper(this).addValue(xPathString).toString();
   }
 
   @Override
@@ -92,7 +95,7 @@ public class ByXPath implements Finder {
         throw new ElementNotFoundException(this);
       }
 
-      UiElement match = domBiMap.inverse().get(foundNode);
+      UiElement match = FROM_DOM_MAP.get(foundNode);
       Logs.log(Log.INFO, "Found match: " + match);
       return match;
     } catch (XPathExpressionException e) {
@@ -122,7 +125,7 @@ public class ByXPath implements Finder {
    * Returns the DOM node representing this UiElement.
    */
   private static Element getDomNode(BaseUiElement uiElement, Predicate<? super UiElement> predicate) {
-    Element domNode = domBiMap.get(uiElement);
+    Element domNode = TO_DOM_MAP.get(uiElement);
     if (domNode == null) {
       domNode = buildDomNode(uiElement, predicate);
     }
@@ -136,7 +139,8 @@ public class ByXPath implements Finder {
       className = "UNKNOWN";
     }
     Element element = getDocument().createElement(XPaths.tag(className));
-    domBiMap.put(uiElement, element);
+    TO_DOM_MAP.put(uiElement, element);
+    FROM_DOM_MAP.put(element, uiElement);
 
     setAttribute(element, Attribute.CLASS, className);
     setAttribute(element, Attribute.RESOURCE_ID, uiElement.getResourceId());
@@ -191,15 +195,16 @@ public class ByXPath implements Finder {
   }
 
   public static boolean dumpDom(String path, BaseUiElement uiElement) {
-    // find() filters invisible UiElements, but this is for debugging and
-    // invisible UiElements may be of interest.
-    clearData();
     BufferedOutputStream bos = null;
     try {
       bos = FileUtils.open(path);
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.transform(new DOMSource(getDomNode(uiElement, null)), new StreamResult(bos));
+      // find() filters invisible UiElements, but this is for debugging and
+      // invisible UiElements may be of interest.
+      clearData();
+      Element domNode = getDomNode(uiElement, null);
+      transformer.transform(new DOMSource(domNode), new StreamResult(bos));
       Logs.log(Log.INFO, "Wrote dom to " + path);
     } catch (Exception e) {
       Logs.log(Log.ERROR, e, "Failed to transform node");

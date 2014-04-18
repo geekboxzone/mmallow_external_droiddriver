@@ -16,9 +16,8 @@
 
 package com.google.android.droiddriver.util;
 
+import android.text.TextUtils;
 import android.util.Log;
-
-import com.google.common.base.Joiner;
 
 /**
  * Internal helper for logging.
@@ -32,7 +31,7 @@ public class Logs {
       Log.d(
           TAG,
           String.format("Invoking %s.%s(%s)", self.getClass().getSimpleName(), method,
-              Joiner.on(", ").join(args)));
+              TextUtils.join(", ", args)));
     }
   }
 

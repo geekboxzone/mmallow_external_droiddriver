@@ -16,7 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
-import static com.google.android.droiddriver.util.TextUtils.charSequenceToString;
+import static com.google.android.droiddriver.util.Strings.charSequenceToString;
 
 import android.app.UiAutomation;
 import android.app.UiAutomation.AccessibilityEventFilter;
@@ -28,12 +28,11 @@ import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.android.droiddriver.util.Preconditions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.FutureTask;
@@ -70,7 +69,7 @@ public class UiAutomationElement extends BaseUiElement {
     Preconditions.checkNotNull(node);
     this.parent = parent;
 
-    Map<Attribute, Object> attribs = Maps.newEnumMap(Attribute.class);
+    Map<Attribute, Object> attribs = new EnumMap<Attribute, Object>(Attribute.class);
     put(attribs, Attribute.PACKAGE, charSequenceToString(node.getPackageName()));
     put(attribs, Attribute.CLASS, charSequenceToString(node.getClassName()));
     put(attribs, Attribute.TEXT, charSequenceToString(node.getText()));
@@ -92,13 +91,13 @@ public class UiAutomationElement extends BaseUiElement {
     }
     put(attribs, Attribute.SELECTED, node.isSelected());
     put(attribs, Attribute.BOUNDS, getBounds(node));
-    attributes = ImmutableMap.copyOf(attribs);
+    attributes = Collections.unmodifiableMap(attribs);
 
     // Order matters as getVisibleBounds depends on visible
     visible = node.isVisibleToUser();
     visibleBounds = getVisibleBounds(node);
     List<UiAutomationElement> mutableChildren = buildChildren(context, node);
-    this.children = mutableChildren == null ? null : ImmutableList.copyOf(mutableChildren);
+    this.children = mutableChildren == null ? null : Collections.unmodifiableList(mutableChildren);
   }
 
   private void put(Map<Attribute, Object> attribs, Attribute key, Object value) {
@@ -114,7 +113,7 @@ public class UiAutomationElement extends BaseUiElement {
     if (childCount == 0) {
       children = null;
     } else {
-      children = Lists.newArrayListWithExpectedSize(childCount);
+      children = new ArrayList<UiAutomationElement>(childCount);
       for (int i = 0; i < childCount; i++) {
         AccessibilityNodeInfo child = node.getChild(i);
         if (child != null) {

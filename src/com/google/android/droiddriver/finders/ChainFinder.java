@@ -17,7 +17,7 @@
 package com.google.android.droiddriver.finders;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.common.base.Preconditions;
+import com.google.android.droiddriver.util.Preconditions;
 
 /**
  * Finds UiElement by applying Finders in turn: using the UiElement returned by

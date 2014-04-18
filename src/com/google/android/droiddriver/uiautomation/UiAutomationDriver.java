@@ -28,7 +28,6 @@ import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.primitives.Longs;
 
 /**
  * Implementation of DroidDriver that is driven via the accessibility layer.
@@ -92,7 +91,7 @@ public class UiAutomationDriver extends BaseDroidDriver {
             String.format("Timed out after %d milliseconds waiting for root AccessibilityNodeInfo",
                 timeoutMillis));
       }
-      SystemClock.sleep(Longs.min(250, remainingMillis));
+      SystemClock.sleep(Math.min(250, remainingMillis));
     }
   }
 

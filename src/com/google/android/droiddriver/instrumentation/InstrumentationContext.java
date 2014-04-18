@@ -26,12 +26,12 @@ import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.finders.ByXPath;
-import com.google.common.collect.MapMaker;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
 class InstrumentationContext extends DroidDriverContext {
-  private final Map<View, ViewElement> map = new MapMaker().weakKeys().weakValues().makeMap();
+  private final Map<View, ViewElement> map = new WeakHashMap<View, ViewElement>();
   private final InstrumentationDriver driver;
   private final InputInjector injector;
 

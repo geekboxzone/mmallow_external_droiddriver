@@ -16,7 +16,6 @@
 
 package com.google.android.droiddriver.helpers;
 
-import com.google.android.droiddriver.helpers.BaseDroidDriverTest;
 
 /**
  * When an {@code UnrecoverableFailure} occurs, the rest of the tests are going

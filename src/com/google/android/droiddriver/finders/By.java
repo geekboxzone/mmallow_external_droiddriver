@@ -16,28 +16,16 @@
 
 package com.google.android.droiddriver.finders;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.android.droiddriver.util.Preconditions.checkNotNull;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
-
-import java.util.List;
 
 /**
  * Convenience methods to create commonly used finders.
  */
 public class By {
-  private static final MatchFinder ANY = new MatchFinder(null) {
-    @Override
-    public String toString() {
-      return "any";
-    }
-  };
+  private static final MatchFinder ANY = new MatchFinder(null);
 
   /** Matches any UiElement. */
   public static MatchFinder any() {
@@ -48,7 +36,7 @@ public class By {
   public static final MatchStrategy<Object> OBJECT_EQUALS = new MatchStrategy<Object>() {
     @Override
     public boolean match(Object expected, Object actual) {
-      return Objects.equal(actual, expected);
+      return actual == expected || (actual != null && actual.equals(expected));
     }
 
     @Override
@@ -246,16 +234,15 @@ public class By {
     return new ChainFinder(first, second);
   }
 
-  private static List<Predicate<? super UiElement>> getPredicates(MatchFinder... finders) {
-    List<Predicate<? super UiElement>> predicates =
-        Lists.newArrayListWithExpectedSize(finders.length);
-    for (MatchFinder finder : finders) {
-      predicates.add(finder.predicate);
+  private static Predicate<? super UiElement>[] getPredicates(MatchFinder... finders) {
+    @SuppressWarnings("unchecked")
+    Predicate<? super UiElement>[] predicates = new Predicate[finders.length];
+    for (int i = 0; i < finders.length; i++) {
+      predicates[i] = finders[i].predicate;
     }
     return predicates;
   }
 
-  // Hamcrest style finder aggregators
   /**
    * Evaluates given {@finders} in short-circuit fashion in the order
    * they are passed. Costly finders (for example those returned by with*
@@ -265,12 +252,7 @@ public class By {
    * @return a finder that is the logical conjunction of given finders
    */
   public static MatchFinder allOf(final MatchFinder... finders) {
-    return new MatchFinder(Predicates.and(getPredicates(finders))) {
-      @Override
-      public String toString() {
-        return "allOf(" + Joiner.on(", ").join(finders) + ")";
-      }
-    };
+    return new MatchFinder(Predicates.allOf(getPredicates(finders)));
   }
 
   /**
@@ -282,110 +264,43 @@ public class By {
    * @return a finder that is the logical disjunction of given finders
    */
   public static MatchFinder anyOf(final MatchFinder... finders) {
-    return new MatchFinder(Predicates.or(getPredicates(finders))) {
-      @Override
-      public String toString() {
-        return "anyOf(" + Joiner.on(", ").join(finders) + ")";
-      }
-    };
+    return new MatchFinder(Predicates.anyOf(getPredicates(finders)));
   }
 
   /**
    * Matches a UiElement whose parent matches the given parentFinder. For
    * complex cases, consider {@link #xpath}.
    */
-  public static MatchFinder withParent(final MatchFinder parentFinder) {
+  public static MatchFinder withParent(MatchFinder parentFinder) {
     checkNotNull(parentFinder);
-    return new MatchFinder(new Predicate<UiElement>() {
-      @Override
-      public boolean apply(UiElement element) {
-        UiElement parent = element.getParent();
-        return parent != null && parentFinder.matches(parent);
-      }
-    }) {
-      @Override
-      public String toString() {
-        return "withParent(" + parentFinder + ")";
-      }
-    };
+    return new MatchFinder(Predicates.withParent(parentFinder.predicate));
   }
 
   /**
    * Matches a UiElement whose ancestor matches the given ancestorFinder. For
    * complex cases, consider {@link #xpath}.
    */
-  public static MatchFinder withAncestor(final MatchFinder ancestorFinder) {
+  public static MatchFinder withAncestor(MatchFinder ancestorFinder) {
     checkNotNull(ancestorFinder);
-    return new MatchFinder(new Predicate<UiElement>() {
-      @Override
-      public boolean apply(UiElement element) {
-        UiElement parent = element.getParent();
-        while (parent != null) {
-          if (ancestorFinder.matches(parent)) {
-            return true;
-          }
-          parent = parent.getParent();
-        }
-        return false;
-      }
-    }) {
-      @Override
-      public String toString() {
-        return "withAncestor(" + ancestorFinder + ")";
-      }
-    };
+    return new MatchFinder(Predicates.withAncestor(ancestorFinder.predicate));
   }
 
   /**
    * Matches a UiElement which has a visible sibling matching the given
    * siblingFinder. This could be inefficient; consider {@link #xpath}.
    */
-  public static MatchFinder withSibling(final MatchFinder siblingFinder) {
+  public static MatchFinder withSibling(MatchFinder siblingFinder) {
     checkNotNull(siblingFinder);
-    return new MatchFinder(new Predicate<UiElement>() {
-      @Override
-      public boolean apply(UiElement element) {
-        UiElement parent = element.getParent();
-        if (parent == null) {
-          return false;
-        }
-        for (UiElement sibling : parent.getChildren(UiElement.VISIBLE)) {
-          if (sibling != element && siblingFinder.matches(sibling)) {
-            return true;
-          }
-        }
-        return false;
-      }
-    }) {
-      @Override
-      public String toString() {
-        return "withSibling(" + siblingFinder + ")";
-      }
-    };
+    return new MatchFinder(Predicates.withSibling(siblingFinder.predicate));
   }
 
   /**
    * Matches a UiElement which has a visible child matching the given
    * childFinder. This could be inefficient; consider {@link #xpath}.
    */
-  public static MatchFinder withChild(final MatchFinder childFinder) {
+  public static MatchFinder withChild(MatchFinder childFinder) {
     checkNotNull(childFinder);
-    return new MatchFinder(new Predicate<UiElement>() {
-      @Override
-      public boolean apply(UiElement element) {
-        for (UiElement child : element.getChildren(UiElement.VISIBLE)) {
-          if (childFinder.matches(child)) {
-            return true;
-          }
-        }
-        return false;
-      }
-    }) {
-      @Override
-      public String toString() {
-        return "withChild(" + childFinder + ")";
-      }
-    };
+    return new MatchFinder(Predicates.withChild(childFinder.predicate));
   }
 
   /**
@@ -404,12 +319,12 @@ public class By {
           return false;
         }
       }
-    }) {
+
       @Override
       public String toString() {
         return "withDescendant(" + descendantFinder + ")";
       }
-    };
+    });
   }
 
   private By() {}

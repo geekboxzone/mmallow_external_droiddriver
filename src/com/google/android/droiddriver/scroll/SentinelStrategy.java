@@ -16,8 +16,8 @@
 package com.google.android.droiddriver.scroll;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import com.google.android.droiddriver.finders.Predicate;
+import com.google.android.droiddriver.finders.Predicates;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public interface SentinelStrategy extends ScrollStepStrategy {
 
     public MorePredicateGetter(Getter original, Predicate<? super UiElement> extraPredicate,
         String extraDescription) {
-      super(Predicates.and(original.predicate, extraPredicate), extraDescription
+      super(Predicates.allOf(original.predicate, extraPredicate), extraDescription
           + original.description);
       this.original = original;
     }
@@ -78,7 +78,7 @@ public interface SentinelStrategy extends ScrollStepStrategy {
    * Returns the first child as the sentinel.
    */
   public static final Getter FIRST_CHILD_GETTER =
-      new Getter(Predicates.alwaysTrue(), "FIRST_CHILD") {
+      new Getter(Predicates.any(), "FIRST_CHILD") {
         @Override
         protected UiElement getSentinel(List<? extends UiElement> children) {
           return children.isEmpty() ? null : children.get(0);
@@ -87,7 +87,7 @@ public interface SentinelStrategy extends ScrollStepStrategy {
   /**
    * Returns the last child as the sentinel.
    */
-  public static final Getter LAST_CHILD_GETTER = new Getter(Predicates.alwaysTrue(), "LAST_CHILD") {
+  public static final Getter LAST_CHILD_GETTER = new Getter(Predicates.any(), "LAST_CHILD") {
     @Override
     protected UiElement getSentinel(List<? extends UiElement> children) {
       return children.isEmpty() ? null : children.get(children.size() - 1);
@@ -103,7 +103,7 @@ public interface SentinelStrategy extends ScrollStepStrategy {
    * uiautomatorviewer does, but could be a problem with InstrumentationDriver.
    * </p>
    */
-  public static final Getter SECOND_LAST_CHILD_GETTER = new Getter(Predicates.alwaysTrue(),
+  public static final Getter SECOND_LAST_CHILD_GETTER = new Getter(Predicates.any(),
       "SECOND_LAST_CHILD") {
     @Override
     protected UiElement getSentinel(List<? extends UiElement> children) {
@@ -114,7 +114,7 @@ public interface SentinelStrategy extends ScrollStepStrategy {
    * Returns the second child as the sentinel. Useful when the activity shows a
    * fixed first child.
    */
-  public static final Getter SECOND_CHILD_GETTER = new Getter(Predicates.alwaysTrue(),
+  public static final Getter SECOND_CHILD_GETTER = new Getter(Predicates.any(),
       "SECOND_CHILD") {
     @Override
     protected UiElement getSentinel(List<? extends UiElement> children) {

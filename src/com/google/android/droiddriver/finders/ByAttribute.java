@@ -15,19 +15,12 @@
  */
 package com.google.android.droiddriver.finders;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.android.droiddriver.UiElement;
-import com.google.common.base.Predicate;
 
 /**
  * Matches UiElement by a single attribute.
  */
 public class ByAttribute<T> extends MatchFinder {
-  private final Attribute attribute;
-  private final MatchStrategy<? super T> strategy;
-  private final T expected;
-
   protected ByAttribute(final Attribute attribute, final MatchStrategy<? super T> strategy,
       final T expected) {
     super(new Predicate<UiElement>() {
@@ -36,14 +29,11 @@ public class ByAttribute<T> extends MatchFinder {
         T value = element.get(attribute);
         return strategy.match(expected, value);
       }
-    });
-    this.attribute = checkNotNull(attribute);
-    this.strategy = checkNotNull(strategy);
-    this.expected = checkNotNull(expected);
-  }
 
-  @Override
-  public String toString() {
-    return String.format("{%s %s %s}", attribute, strategy, expected);
+      @Override
+      public String toString() {
+        return String.format("{%s %s %s}", attribute, strategy, expected);
+      }
+    });
   }
 }

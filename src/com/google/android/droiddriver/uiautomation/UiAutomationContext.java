@@ -25,13 +25,13 @@ import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.finders.ByXPath;
-import com.google.common.collect.MapMaker;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 
 class UiAutomationContext extends DroidDriverContext {
-  private final Map<AccessibilityNodeInfo, UiAutomationElement> map = new MapMaker().weakKeys()
-      .weakValues().makeMap();
+  private final Map<AccessibilityNodeInfo, UiAutomationElement> map =
+      new WeakHashMap<AccessibilityNodeInfo, UiAutomationElement>();
   private final UiAutomation uiAutomation;
   private final InputInjector injector;
   private final UiAutomationDriver driver;

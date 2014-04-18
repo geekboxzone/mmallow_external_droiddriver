@@ -21,33 +21,26 @@ import android.util.Log;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 /**
  * Traverses the UiElement tree and returns the first UiElement satisfying
  * {@link #predicate}.
  */
-public abstract class MatchFinder implements Finder {
+public class MatchFinder implements Finder {
   protected final Predicate<? super UiElement> predicate;
 
   protected MatchFinder(Predicate<? super UiElement> predicate) {
     if (predicate == null) {
-      this.predicate = Predicates.alwaysTrue();
+      this.predicate = Predicates.any();
     } else {
       this.predicate = predicate;
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>
-   * It is recommended that this method return the description of the finder,
-   * for example, "ByAttribute{text equals OK}".
-   */
   @Override
-  public abstract String toString();
+  public String toString() {
+    return predicate.toString();
+  }
 
   @Override
   public UiElement find(UiElement context) {

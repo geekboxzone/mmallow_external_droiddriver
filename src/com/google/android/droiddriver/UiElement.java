@@ -22,10 +22,10 @@ import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
+import com.google.android.droiddriver.finders.Predicate;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.uiautomation.UiAutomationDriver;
-import com.google.common.base.Predicate;
 
 import java.util.List;
 

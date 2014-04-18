@@ -31,7 +31,6 @@ import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.primitives.Longs;
 
 /**
  * Implementation of DroidDriver that is driven via instrumentation.
@@ -103,7 +102,7 @@ public class InstrumentationDriver extends BaseDroidDriver {
         throw new TimeoutException(String.format(
             "Timed out after %d milliseconds waiting for foreground activity", timeoutMillis));
       }
-      SystemClock.sleep(Longs.min(250, remainingMillis));
+      SystemClock.sleep(Math.min(250, remainingMillis));
     }
   }
 

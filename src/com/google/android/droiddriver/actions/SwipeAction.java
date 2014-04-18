@@ -30,9 +30,8 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Events;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.primitives.Ints;
+import com.google.android.droiddriver.util.Strings;
+import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
 /**
  * A {@link ScrollAction} that swipes the touch screen. Note the scroll
@@ -165,7 +164,7 @@ public class SwipeAction extends ScrollAction {
       float topMarginRatio, float leftMarginRatio, float bottomMarginRatio, float rightMarginRatio) {
     super(timeoutMillis);
     this.direction = direction;
-    this.steps = Ints.max(2, steps);
+    this.steps = Math.max(2, steps);
     this.drag = drag;
     this.topMarginRatio = topMarginRatio;
     this.bottomMarginRatio = bottomMarginRatio;
@@ -242,7 +241,7 @@ public class SwipeAction extends ScrollAction {
 
   @Override
   public String toString() {
-    ToStringHelper toStringHelper = Objects.toStringHelper(this);
+    ToStringHelper toStringHelper = Strings.toStringHelper(this);
     toStringHelper.addValue(direction);
     toStringHelper.add("steps", steps);
     if (drag) {

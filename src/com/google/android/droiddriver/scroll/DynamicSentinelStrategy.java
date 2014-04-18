@@ -25,7 +25,7 @@ import com.google.android.droiddriver.finders.Finder;
 import com.google.android.droiddriver.scroll.Direction.DirectionConverter;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Objects;
+import com.google.android.droiddriver.util.Strings;
 
 /**
  * Determines whether scrolling is possible by checking whether the sentinel
@@ -117,7 +117,7 @@ public class DynamicSentinelStrategy extends BaseSentinelStrategy {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this).addValue(uniqueStringFinder).toString();
+      return Strings.toStringHelper(this).addValue(uniqueStringFinder).toString();
     }
   }
 

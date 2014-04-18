@@ -22,7 +22,7 @@ import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.util.Events;
-import com.google.common.base.Objects;
+import com.google.android.droiddriver.util.Strings;
 
 /**
  * An action to press a single key. While it is convenient for navigating the
@@ -70,6 +70,6 @@ public class SingleKeyAction extends KeyAction {
     String keyCodeString =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1 ? String.valueOf(keyCode)
             : KeyEvent.keyCodeToString(keyCode);
-    return Objects.toStringHelper(this).addValue(keyCodeString).toString();
+    return Strings.toStringHelper(this).addValue(keyCodeString).toString();
   }
 }

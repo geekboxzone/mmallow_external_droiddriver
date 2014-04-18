@@ -19,12 +19,21 @@ package com.google.android.droiddriver.util;
 import android.app.Activity;
 
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
-import com.google.common.base.Supplier;
 
 /**
  * Static helper methods for retrieving activities.
  */
 public class ActivityUtils {
+  public interface Supplier<T> {
+    /**
+     * Retrieves an instance of the appropriate type. The returned object may or
+     * may not be a new instance, depending on the implementation.
+     *
+     * @return an instance of the appropriate type
+     */
+    T get();
+  }
+
   private static Supplier<Activity> runningActivitySupplier;
 
   /**

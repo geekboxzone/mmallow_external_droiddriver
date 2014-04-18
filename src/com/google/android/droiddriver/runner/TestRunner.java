@@ -27,15 +27,15 @@ import android.util.Log;
 import com.android.internal.util.Predicate;
 import com.google.android.droiddriver.helpers.DroidDrivers;
 import com.google.android.droiddriver.util.ActivityUtils;
+import com.google.android.droiddriver.util.ActivityUtils.Supplier;
 import com.google.android.droiddriver.util.Logs;
-import com.google.common.base.Supplier;
-import com.google.common.collect.Lists;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestListener;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -122,7 +122,7 @@ public class TestRunner extends InstrumentationTestRunner {
 
   // Overrides InstrumentationTestRunner
   List<Predicate<TestMethod>> getBuilderRequirements() {
-    List<Predicate<TestMethod>> requirements = Lists.newArrayList();
+    List<Predicate<TestMethod>> requirements = new ArrayList<Predicate<TestMethod>>();
     requirements.add(new Predicate<TestMethod>() {
       @Override
       public boolean apply(TestMethod arg0) {

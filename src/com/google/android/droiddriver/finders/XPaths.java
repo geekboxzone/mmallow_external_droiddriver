@@ -16,8 +16,7 @@
 
 package com.google.android.droiddriver.finders;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
+import android.text.TextUtils;
 
 /**
  * Convenience methods and constants for XPath.
@@ -44,7 +43,7 @@ public class XPaths {
    *         this to build XPath instead of String literals.
    */
   public static String tag(Class<?> clazz) {
-    return tag(clazz.getName());
+    return tag(clazz.getSimpleName());
   }
 
   private static String simpleClassName(String name) {
@@ -116,7 +115,6 @@ public class XPaths {
    * produce very long XPath expressions if a value contains a long run of
    * double quotes.
    */
-  @VisibleForTesting
   static String quoteXPathLiteral(String value) {
     // if the value contains only single or double quotes, construct an XPath
     // literal
@@ -133,7 +131,7 @@ public class XPaths {
     // concat("foo", '"', "bar")
     StringBuilder sb = new StringBuilder();
     sb.append("concat(\"");
-    Joiner.on("\",'\"',\"").appendTo(sb, value.split("\""));
+    sb.append(TextUtils.join("\",'\"',\"", value.split("\"")));
     sb.append("\")");
     return sb.toString();
   }

@@ -22,17 +22,16 @@ import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.Finder;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Longs;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Default implementation of a {@link Poller}.
  */
 public class DefaultPoller implements Poller {
-  private final Collection<TimeoutListener> timeoutListeners = Lists.newLinkedList();
-  private final Collection<PollingListener> pollingListeners = Lists.newLinkedList();
+  private final Collection<TimeoutListener> timeoutListeners = new LinkedList<TimeoutListener>();
+  private final Collection<PollingListener> pollingListeners = new LinkedList<PollingListener>();
   private long timeoutMillis = 10000;
   private long intervalMillis = 500;
 
@@ -85,7 +84,7 @@ public class DefaultPoller implements Poller {
         throw new TimeoutException(String.format(
             "Timed out after %d milliseconds waiting for %s %s", timeoutMillis, finder, checker));
       }
-      SystemClock.sleep(Longs.min(intervalMillis, remainingMillis));
+      SystemClock.sleep(Math.min(intervalMillis, remainingMillis));
     }
   }
 
