@@ -34,7 +34,7 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  * This does not work if a child is larger than the physical size of the
  * container.
  */
-public class StaticSentinelStrategy extends BaseSentinelStrategy {
+public class StaticSentinelStrategy extends SentinelStrategy {
   /**
    * Defaults to FIRST_CHILD_GETTER for backward scrolling, LAST_CHILD_GETTER
    * for forward scrolling, and the standard {@link DirectionConverter}.

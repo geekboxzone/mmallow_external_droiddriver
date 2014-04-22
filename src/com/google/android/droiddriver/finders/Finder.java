@@ -39,7 +39,7 @@ public interface Finder {
    *
    * <p>
    * It is recommended that this method return the description of the finder,
-   * for example, "{text equals OK}".
+   * for example, "{text=OK}".
    */
   @Override
   String toString();

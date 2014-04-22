@@ -29,7 +29,7 @@ import com.google.android.droiddriver.util.Logs;
 public class MatchFinder implements Finder {
   protected final Predicate<? super UiElement> predicate;
 
-  protected MatchFinder(Predicate<? super UiElement> predicate) {
+  public MatchFinder(Predicate<? super UiElement> predicate) {
     if (predicate == null) {
       this.predicate = Predicates.any();
     } else {

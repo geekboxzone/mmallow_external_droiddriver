@@ -44,7 +44,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   private static boolean classSetUpDone = false;
   // In case of device-wide fatal errors, e.g. OOME, the remaining tests will
   // fail and the messages will not help, so skip them.
-  protected static boolean skipRemainingTests = false;
+  private static boolean skipRemainingTests = false;
   // Prevent crash by uncaught exception.
   private static volatile Throwable uncaughtException;
   static {

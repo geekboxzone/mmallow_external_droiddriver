@@ -34,7 +34,7 @@ import com.google.android.droiddriver.util.Strings;
  * used, which skips invisible children, or in the case of dynamic list, which
  * shows more items when scrolling beyond the end.
  */
-public class DynamicSentinelStrategy extends BaseSentinelStrategy {
+public class DynamicSentinelStrategy extends SentinelStrategy {
 
   /**
    * Interface for determining whether sentinel is updated.
@@ -184,8 +184,8 @@ public class DynamicSentinelStrategy extends BaseSentinelStrategy {
    */
   public DynamicSentinelStrategy(IsUpdatedStrategy isUpdatedStrategy, Getter backwardGetter,
       Getter forwardGetter, DirectionConverter directionConverter) {
-    super(new MorePredicateGetter(backwardGetter, UiElement.VISIBLE, "VISIBLE_"),
-        new MorePredicateGetter(forwardGetter, UiElement.VISIBLE, "VISIBLE_"), directionConverter);
+    super(new MorePredicateGetter(backwardGetter, UiElement.VISIBLE), new MorePredicateGetter(
+        forwardGetter, UiElement.VISIBLE), directionConverter);
     this.isUpdatedStrategy = isUpdatedStrategy;
   }
 

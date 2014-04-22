@@ -71,15 +71,17 @@ public class TestRunner extends InstrumentationTestRunner {
       public void endTest(Test test) {
         // Try to finish activity on best-effort basis - TestListener should
         // not throw.
+        final Activity[] activitiesCopy;
+        synchronized (activities) {
+          if (activities.isEmpty()) {
+            return;
+          }
+          activitiesCopy = activities.toArray(new Activity[activities.size()]);
+        }
+
         runOnMainSyncWithTimeLimit(new Runnable() {
           @Override
           public void run() {
-            Activity[] activitiesCopy;;
-            synchronized (activities) {
-              activitiesCopy = new Activity[activities.size()];
-              activitiesCopy = activities.toArray(activitiesCopy);
-            }
-
             for (Activity activity : activitiesCopy) {
               if (!activity.isFinishing()) {
                 try {
@@ -202,7 +204,7 @@ public class TestRunner extends InstrumentationTestRunner {
       Logs.log(Log.WARN, e, String.format(
           "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync",
           timeoutMillis));
-      futureTask.cancel(true);
+      futureTask.cancel(false);
       return false;
     }
   }
