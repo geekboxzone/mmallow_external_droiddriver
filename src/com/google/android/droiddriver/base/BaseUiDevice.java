@@ -39,9 +39,10 @@ public abstract class BaseUiDevice implements UiDevice {
   private static final SingleKeyAction POWER_OFF = new SingleKeyAction(KeyEvent.KEYCODE_POWER, 0,
       false);
   // power on should always trigger new events
-  private static final SingleKeyAction POWER_ON = new SingleKeyAction(KeyEvent.KEYCODE_POWER, 1000L,
-      false);
+  private static final SingleKeyAction POWER_ON = new SingleKeyAction(KeyEvent.KEYCODE_POWER,
+      1000L, false);
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isScreenOn() {
     PowerManager pm =
@@ -53,7 +54,10 @@ public abstract class BaseUiDevice implements UiDevice {
   @Override
   public void wakeUp() {
     if (!isScreenOn()) {
-      perform(POWER_ON);
+      // Cannot call perform(POWER_ON) because perform() checks the UiElement is
+      // visible.
+      POWER_ON.perform(getContext().getInjector(), null);
+      getContext().tryWaitForIdleSync(POWER_ON.getTimeoutMillis());
     }
   }
 
