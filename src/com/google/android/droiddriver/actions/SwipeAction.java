@@ -16,13 +16,7 @@
 
 package com.google.android.droiddriver.actions;
 
-import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.DOWN;
-import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.LEFT;
-import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.RIGHT;
-import static com.google.android.droiddriver.scroll.Direction.PhysicalDirection.UP;
-
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.SystemClock;
 import android.view.ViewConfiguration;
 
@@ -34,89 +28,70 @@ import com.google.android.droiddriver.util.Strings;
 import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
 /**
- * A {@link ScrollAction} that swipes the touch screen. Note the scroll
- * direction enum values specify where the content will move, instead of the
- * finger. This class includes some common instances that use the finger
- * direction in the names, hopefully to mitigate this confusion.
+ * A {@link ScrollAction} that swipes the touch screen.
  */
 public class SwipeAction extends ScrollAction {
-  // The action is a fling if the ACTION_MOVE velocity is greater than
-  // ViewConfiguration#getScaledMinimumFlingVelocity. The velocity is calculated
-  // as <distance between ACTION_MOVE points> / ACTION_MOVE_INTERVAL
+  // Milliseconds between synthesized ACTION_MOVE events.
   // Note: ACTION_MOVE_INTERVAL is the minimum interval between injected events;
   // the actual interval typically is longer.
   private static final int ACTION_MOVE_INTERVAL = 5;
-  // ViewConfiguration.MINIMUM_FLING_VELOCITY = 50, so if there is no scale, in
-  // theory a swipe of 20 steps is a scroll instead of fling on devices that
-  // have 20 * 50 * 5 = 5000 pixels in one direction. Make it 40 for safety.
-  private static final int SCROLL_STEPS = 40;
-  // TODO: Find the exact version-dependent fling steps. It is observed that 2
-  // does not work on GINGERBREAD; we haven't tested all versions so <JELLY_BEAN
-  // is used as a guess.
-  private static final int FLING_STEPS = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ? 3
-      : 2;
-
   /**
-   * Common instances for convenience. The direction in names reflects the
-   * direction of finger rather than the scroll direction.
+   * The magic number from UiAutomator. This value is empirical. If it actually
+   * results in a fling, you can change it with {@link #setScrollSteps}.
    */
-  private static final SwipeAction SWIPE_DOWN = new SwipeAction(UP, SCROLL_STEPS);
-  private static final SwipeAction SWIPE_UP = new SwipeAction(DOWN, SCROLL_STEPS);
-  private static final SwipeAction SWIPE_RIGHT = new SwipeAction(LEFT, SCROLL_STEPS);
-  private static final SwipeAction SWIPE_LEFT = new SwipeAction(RIGHT, SCROLL_STEPS);
+  private static int scrollSteps = 55;
+  private static int flingSteps = 3;
 
-  private static final SwipeAction FLING_DOWN = new SwipeAction(UP, FLING_STEPS);
-  private static final SwipeAction FLING_UP = new SwipeAction(DOWN, FLING_STEPS);
-  private static final SwipeAction FLING_RIGHT = new SwipeAction(LEFT, FLING_STEPS);
-  private static final SwipeAction FLING_LEFT = new SwipeAction(RIGHT, FLING_STEPS);
+  /** Returns the {@link #scrollSteps} used in {@link #toScroll}. */
+  public static int getScrollSteps() {
+    return scrollSteps;
+  }
 
-  /**
-   * Gets canned common instances for scrolling. Note the scroll direction
-   * specifies where the content will move, instead of the finger.
-   */
-  // TODO: We may use "smart" steps that depend on the size of the UiElement and
-  // ViewConfiguration#getScaledMinimumFlingVelocity.
-  public static SwipeAction toScroll(PhysicalDirection direction) {
-    switch (direction) {
-      case UP:
-        return SWIPE_DOWN;
-      case DOWN:
-        return SWIPE_UP;
-      case LEFT:
-        return SWIPE_RIGHT;
-      case RIGHT:
-        return SWIPE_LEFT;
-      default:
-        throw new ActionException("Unknown scroll direction: " + direction);
-    }
+  /** Sets the {@link #scrollSteps} used in {@link #toScroll}. */
+  public static void setScrollSteps(int scrollSteps) {
+    SwipeAction.scrollSteps = scrollSteps;
+  }
+
+  /** Returns the {@link #flingSteps} used in {@link #toFling}. */
+  public static int getFlingSteps() {
+    return flingSteps;
+  }
+
+  /** Sets the {@link #flingSteps} used in {@link #toFling}. */
+  public static void setFlingSteps(int flingSteps) {
+    SwipeAction.flingSteps = flingSteps;
   }
 
   /**
-   * Gets canned common instances for flinging. Note the scroll direction
-   * specifies where the content will move, instead of the finger.
+   * Gets {@link SwipeAction} instances for scrolling.
+   * <p>
+   * Note: This may result in flinging instead of scrolling, depending on the
+   * size of the target UiElement and the SDK version of the device. If it does
+   * not behave as expected, you can change steps with {@link #setScrollSteps}.
+   * </p>
+   *
+   * @param direction specifies where the view port will move, instead of the
+   *        finger.
+   * @see ViewConfiguration#getScaledMinimumFlingVelocity
+   */
+  public static SwipeAction toScroll(PhysicalDirection direction) {
+    return new SwipeAction(direction, scrollSteps);
+  }
+
+  /**
+   * Gets {@link SwipeAction} instances for flinging.
    * <p>
    * Note: This may not actually fling, depending on the size of the target
    * UiElement and the SDK version of the device. If it does not behave as
-   * expected, you can use SwipeAction instances with custom steps.
+   * expected, you can change steps with {@link #setFlingSteps}.
    * </p>
    *
+   * @param direction specifies where the view port will move, instead of the
+   *        finger.
    * @see ViewConfiguration#getScaledMinimumFlingVelocity
    */
-  // TODO: We may use "smart" steps that depend on the size of the UiElement and
-  // ViewConfiguration#getScaledMinimumFlingVelocity.
   public static SwipeAction toFling(PhysicalDirection direction) {
-    switch (direction) {
-      case UP:
-        return FLING_DOWN;
-      case DOWN:
-        return FLING_UP;
-      case LEFT:
-        return FLING_RIGHT;
-      case RIGHT:
-        return FLING_LEFT;
-      default:
-        throw new ActionException("Unknown scroll direction: " + direction);
-    }
+    return new SwipeAction(direction, flingSteps);
   }
 
   private final PhysicalDirection direction;
@@ -135,21 +110,14 @@ public class SwipeAction extends ScrollAction {
   }
 
   /**
-   * Defaults timeoutMillis to 1000 and to swipe rather than flinging.
-   */
-  public SwipeAction(PhysicalDirection direction, boolean drag) {
-    this(direction, SCROLL_STEPS, drag, 1000L);
-  }
-
-  /**
    * Defaults all margin ratios to 0.1F.
    */
   public SwipeAction(PhysicalDirection direction, int steps, boolean drag, long timeoutMillis) {
-    this(direction, SCROLL_STEPS, drag, timeoutMillis, 0.1F, 0.1F, 0.1F, 0.1F);
+    this(direction, steps, drag, timeoutMillis, 0.1F, 0.1F, 0.1F, 0.1F);
   }
 
   /**
-   * @param direction the scroll direction specifying where the content will
+   * @param direction the scroll direction specifying where the view port will
    *        move, instead of the finger.
    * @param steps minimum 2; (steps-1) is the number of {@code ACTION_MOVE} that
    *        will be injected between {@code ACTION_DOWN} and {@code ACTION_UP}.
