@@ -32,7 +32,7 @@ public interface Action {
    * @param element the Ui element to perform the action on
    * @return Whether the action is successful. Some actions throw exceptions in
    *         case of failure, when that behavior is more appropriate. For
-   *         example, ClickAction.
+   *         example, if event injection returns false.
    */
   boolean perform(InputInjector injector, UiElement element);
 

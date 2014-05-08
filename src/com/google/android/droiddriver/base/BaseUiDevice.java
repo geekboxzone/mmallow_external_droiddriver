@@ -69,6 +69,11 @@ public abstract class BaseUiDevice implements UiDevice {
   }
 
   @Override
+  public void pressBack() {
+    perform(SingleKeyAction.BACK);
+  }
+
+  @Override
   public boolean perform(Action action) {
     return getContext().getDriver().getRootElement().perform(action);
   }

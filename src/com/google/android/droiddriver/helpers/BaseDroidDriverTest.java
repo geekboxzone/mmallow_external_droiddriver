@@ -235,6 +235,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
         if (shouldSkipRemainingTests(exception) || runCount >= tolerance - 1) {
           throw exception;
         }
+        Logs.log(Log.WARN, exception);
       } catch (IllegalAccessException e) {
         e.fillInStackTrace();
         throw e;

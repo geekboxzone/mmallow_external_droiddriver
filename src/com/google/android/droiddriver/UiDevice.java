@@ -35,6 +35,9 @@ public interface UiDevice {
   /** Puts device to sleep if the screen is on */
   void sleep();
 
+  /** Simulates pressing "back" button */
+  void pressBack();
+
   /**
    * Executes a global action without the context of a certain UiElement.
    *
