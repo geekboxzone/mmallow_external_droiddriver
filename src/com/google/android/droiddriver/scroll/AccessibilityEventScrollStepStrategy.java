@@ -194,7 +194,7 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
 
   @Override
   public void doScroll(final UiElement container, final PhysicalDirection direction) {
-    SwipeAction.toScroll(direction).perform(container.getInjector(), container);
+    container.scroll(direction);
   }
 
   /**
