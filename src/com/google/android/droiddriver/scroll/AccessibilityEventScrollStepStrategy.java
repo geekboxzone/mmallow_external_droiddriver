@@ -194,7 +194,10 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
 
   @Override
   public void doScroll(final UiElement container, final PhysicalDirection direction) {
-    container.scroll(direction);
+    // We do not call container.scroll(direction) because container.scroll internally calls
+    // UiAutomation.executeAndWaitForEvent which clears the AccessibilityEvent Queue, preventing us
+    // from fetching the last accessibility event to determine if scrolling has finished.
+    SwipeAction.toScroll(direction).perform(container.getInjector(), container);
   }
 
   /**

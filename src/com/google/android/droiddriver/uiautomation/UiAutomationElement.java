@@ -175,6 +175,10 @@ public class UiAutomationElement extends BaseUiElement {
     return context.getInjector();
   }
 
+  /**
+   * Note: The {@code UiAutomationElement} implementation of {@code doPerformAndWait} clears the
+   * {@code AccessibilityEvent} queue.
+   */
   @Override
   protected void doPerformAndWait(final FutureTask<Boolean> futureTask, final long timeoutMillis) {
     context.callUiAutomation(new UiAutomationCallable<Void>() {
