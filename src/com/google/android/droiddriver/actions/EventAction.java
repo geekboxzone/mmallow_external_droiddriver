@@ -16,40 +16,32 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.view.InputEvent;
+
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.base.BaseUiElement;
 
 /**
- * Interface for performing action on a UiElement. An action is a high-level
- * user interaction that can be performed in various ways, for example, via
- * synthesized events, or the Accessibility API.
+ * Implements {@link Action} by injecting synthesized events.
  */
-public interface Action {
+public abstract class EventAction extends BaseAction {
+  protected EventAction(long timeoutMillis) {
+    super(timeoutMillis);
+  }
+
+  @Override
+  public boolean perform(UiElement element) {
+    return perform(((BaseUiElement) element).getInjector(), element);
+  }
+
   /**
-   * Performs the action.
+   * Performs the action by injecting synthesized events.
    *
-   * @param element the Ui element to perform the action on
+   * @param injector the injector to inject {@link InputEvent}s
+   * @param element the UiElement to perform the action on
    * @return Whether the action is successful. Some actions throw exceptions in
    *         case of failure, when that behavior is more appropriate. For
    *         example, if event injection returns false.
    */
-  boolean perform(UiElement element);
-
-  /**
-   * Gets the timeout to wait for an indicator that the action has been carried
-   * out. Different DroidDriver implementations use this value in different
-   * ways. For example, UiAutomationDriver waits for AccessibilityEvent up to
-   * this value. InstrumentationDriver ignores this value because it
-   * synchronizes on the event loop.
-   */
-  long getTimeoutMillis();
-
-  /**
-   * {@inheritDoc}
-   *
-   * <p>
-   * It is recommended that this method return the description of the action,
-   * for example, "SwipeAction{DOWN}".
-   */
-  @Override
-  String toString();
+  protected abstract boolean perform(InputInjector injector, UiElement element);
 }

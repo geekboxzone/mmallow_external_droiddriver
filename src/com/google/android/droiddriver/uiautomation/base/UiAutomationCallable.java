@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.actions;
+package com.google.android.droiddriver.uiautomation.base;
 
-/**
- * Base class for {@link Action} that scrolls.
- */
-public abstract class ScrollAction extends BaseAction {
-  protected ScrollAction(long timeoutMillis) {
-    super(timeoutMillis);
-  }
+import android.app.UiAutomation;
+
+public interface UiAutomationCallable<T> {
+  T call(UiAutomation uiAutomation);
 }

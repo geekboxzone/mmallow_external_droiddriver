@@ -66,6 +66,8 @@ public class TestRunner extends InstrumentationTestRunner {
    */
   @Override
   public void onStart() {
+    DroidDrivers.initInstrumentation(this, getArguments());
+
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override
       public void endTest(Test test) {

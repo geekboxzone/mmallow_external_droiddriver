@@ -22,7 +22,7 @@ import com.google.android.droiddriver.exceptions.ActionException;
 /**
  * Base class for {@link Action} that injects key events.
  */
-public abstract class KeyAction extends BaseAction {
+public abstract class KeyAction extends EventAction {
   private final boolean checkFocused;
 
   protected KeyAction(long timeoutMillis, boolean checkFocused) {

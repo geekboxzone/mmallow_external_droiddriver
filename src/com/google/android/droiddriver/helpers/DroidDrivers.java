@@ -18,17 +18,22 @@ package com.google.android.droiddriver.helpers;
 
 import android.app.Instrumentation;
 import android.os.Build;
+import android.os.Bundle;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
 import com.google.android.droiddriver.uiautomation.UiAutomationDriver;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Static utility methods pertaining to {@link DroidDriver} instances.
  */
 public class DroidDrivers {
   private static DroidDriver driver;
+  private static Instrumentation instrumentation;
+  private static Bundle options;
 
   /**
    * Gets the singleton driver. Throws if {@link #init} has not been called.
@@ -54,6 +59,34 @@ public class DroidDrivers {
   }
 
   /**
+   * Initializes for the convenience methods {@link #getInstrumentation()} and
+   * {@link #getOptions()}. Called by
+   * {@link com.google.android.droiddriver.runner.TestRunner}. If a custom
+   * runner is used, this method must be called appropriately, otherwise the two
+   * convenience methods won't work.
+   */
+  public static void initInstrumentation(Instrumentation instrumentation, Bundle arguments) {
+    if (DroidDrivers.instrumentation != null) {
+      throw new DroidDriverException("DroidDrivers.initInstrumentation() can only be called once");
+    }
+    DroidDrivers.instrumentation = instrumentation;
+    DroidDrivers.options = arguments;
+  }
+
+  public static Instrumentation getInstrumentation() {
+    return instrumentation;
+  }
+
+  /**
+   * Gets the <a href=
+   * "http://developer.android.com/tools/testing/testing_otheride.html#AMOptionsSyntax"
+   * >am instrument options</a>.
+   */
+  public static Bundle getOptions() {
+    return options;
+  }
+
+  /**
    * Returns whether the running target (device or emulator) has
    * {@link android.app.UiAutomation} API, which is introduced in SDK API 18
    * (JELLY_BEAN_MR2).
@@ -63,10 +96,33 @@ public class DroidDrivers {
   }
 
   /**
-   * Returns a new UiAutomationDriver if {@link android.app.UiAutomation} is
-   * available; otherwise a new InstrumentationDriver.
+   * Returns a new DroidDriver instance. If am instrument options have "driver",
+   * treat it as the fully-qualified-class-name and create a new instance of it
+   * with {@code instrumentation} as the argument; otherwise a new
+   * platform-dependent default DroidDriver instance.
    */
   public static DroidDriver newDriver(Instrumentation instrumentation) {
+    String driverClass = options == null ? null : options.getString("driver");
+    if (driverClass != null) {
+      try {
+        return (DroidDriver) Class.forName(driverClass).getConstructor(Instrumentation.class)
+            .newInstance(instrumentation);
+      } catch (ClassNotFoundException e) {
+        throw new DroidDriverException(e);
+      } catch (NoSuchMethodException e) {
+        throw new DroidDriverException(e);
+      } catch (InstantiationException e) {
+        throw new DroidDriverException(e);
+      } catch (IllegalAccessException e) {
+        throw new DroidDriverException(e);
+      } catch (IllegalArgumentException e) {
+        throw new DroidDriverException(e);
+      } catch (InvocationTargetException e) {
+        throw new DroidDriverException(e);
+      }
+    }
+
+    // If "driver" is not specified, return default.
     if (hasUiAutomation()) {
       return newUiAutomationDriver(instrumentation);
     }
@@ -81,9 +137,8 @@ public class DroidDrivers {
   /** Returns a new UiAutomationDriver */
   public static UiAutomationDriver newUiAutomationDriver(Instrumentation instrumentation) {
     if (!hasUiAutomation()) {
-      throw new DroidDriverException(
-          "http://developer.android.com/reference/android/app/UiAutomation.html" +
-          " is not available below API 18");
+      throw new DroidDriverException("UiAutomation is not available below API 18. "
+          + "See http://developer.android.com/reference/android/app/UiAutomation.html");
     }
     if (instrumentation.getUiAutomation() == null) {
       throw new DroidDriverException(

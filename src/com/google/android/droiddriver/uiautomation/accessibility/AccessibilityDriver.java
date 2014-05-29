@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation;
+package com.google.android.droiddriver.uiautomation.accessibility;
 
 import android.app.Instrumentation;
-import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.uiautomation.base.BaseUiAutomationContext;
+import com.google.android.droiddriver.uiautomation.base.BaseUiAutomationDriver;
 
-class UiAutomationContext extends BaseUiAutomationContext<UiAutomationElement> {
-  UiAutomationContext(Instrumentation instrumentation, UiAutomationDriver driver) {
-    super(instrumentation, driver);
+/**
+ * Implementation of DroidDriver that gets attributes via the Accessibility API
+ * and is acted upon via the Accessibility API.
+ */
+public class AccessibilityDriver extends BaseUiAutomationDriver<AccessibilityElement> {
+  public AccessibilityDriver(Instrumentation instrumentation) {
+    super(instrumentation);
   }
 
   @Override
-  protected UiAutomationElement newUiElement(AccessibilityNodeInfo node, UiAutomationElement parent) {
-    return new UiAutomationElement(this, node, parent);
+  protected AccessibilityContext newContext(Instrumentation instrumentation) {
+    return new AccessibilityContext(instrumentation, this);
   }
 }

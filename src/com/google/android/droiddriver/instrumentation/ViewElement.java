@@ -26,6 +26,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Checkable;
 import android.widget.TextView;
 
+import com.google.android.droiddriver.actions.EventUiElementActor;
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
@@ -218,6 +219,7 @@ public class ViewElement extends BaseUiElement {
    * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
    */
   public ViewElement(final InstrumentationContext context, View view, ViewElement parent) {
+    super(EventUiElementActor.INSTANCE);
     this.context = Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(view);
     this.parent = parent;

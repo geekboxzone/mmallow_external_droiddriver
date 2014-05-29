@@ -19,7 +19,6 @@ package com.google.android.droiddriver;
 import android.graphics.Rect;
 
 import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.Predicate;
@@ -152,7 +151,6 @@ public interface UiElement {
    * @param text The text to enter.
    * @throws ElementNotVisibleException when the element is not visible
    */
-  // TODO: Should this clear the text before setting?
   void setText(String text);
 
   /**
@@ -180,7 +178,11 @@ public interface UiElement {
   void doubleClick();
 
   /**
-   * Scrolls in the given direction. Scrolling down means swiping upwards.
+   * Scrolls in the given direction.
+   *
+   * @param direction specifies where the view port will move, instead of the
+   *        finger.
+   * @throws ElementNotVisibleException when the element is not visible
    */
   void scroll(PhysicalDirection direction);
 
@@ -226,9 +228,4 @@ public interface UiElement {
    * Gets the parent.
    */
   UiElement getParent();
-
-  /**
-   * Gets the {@link InputInjector} for injecting InputEvent.
-   */
-  InputInjector getInjector();
 }

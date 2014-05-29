@@ -28,9 +28,9 @@ import com.google.android.droiddriver.util.Strings;
 import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
 /**
- * A {@link ScrollAction} that swipes the touch screen.
+ * An action that swipes the touch screen.
  */
-public class SwipeAction extends ScrollAction {
+public class SwipeAction extends EventAction {
   // Milliseconds between synthesized ACTION_MOVE events.
   // Note: ACTION_MOVE_INTERVAL is the minimum interval between injected events;
   // the actual interval typically is longer.

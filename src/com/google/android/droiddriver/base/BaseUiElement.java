@@ -20,9 +20,8 @@ import android.graphics.Rect;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.actions.ClickAction;
-import com.google.android.droiddriver.actions.SwipeAction;
-import com.google.android.droiddriver.actions.TextAction;
+import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.Predicate;
@@ -37,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -47,6 +47,12 @@ public abstract class BaseUiElement implements UiElement {
   // The two constants are used internally and must match to-uiautomator.xsl.
   public static final String ATTRIB_VISIBLE_BOUNDS = "VisibleBounds";
   public static final String ATTRIB_NOT_VISIBLE = "NotVisible";
+
+  private final UiElementActor uiElementActor;
+
+  protected BaseUiElement(UiElementActor UiElementActor) {
+    this.uiElementActor = UiElementActor;
+  }
 
   @SuppressWarnings("unchecked")
   @Override
@@ -152,6 +158,11 @@ public abstract class BaseUiElement implements UiElement {
     return selectionStart >= 0 && selectionStart != selectionEnd;
   }
 
+  /**
+   * Gets the {@link InputInjector} for injecting InputEvent.
+   */
+  public abstract InputInjector getInjector();
+
   @Override
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
@@ -160,7 +171,7 @@ public abstract class BaseUiElement implements UiElement {
   }
 
   protected boolean doPerform(Action action) {
-    return action.perform(getInjector(), this);
+    return action.perform(this);
   }
 
   protected abstract void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis);
@@ -180,44 +191,40 @@ public abstract class BaseUiElement implements UiElement {
     doPerformAndWait(futureTask, action.getTimeoutMillis());
     try {
       return futureTask.get();
-    } catch (Exception e) {
-      // should not reach here b/c futureTask has run
-      return false;
+    } catch (ExecutionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof RuntimeException) {
+        throw (RuntimeException) cause;
+      }
+      throw new DroidDriverException(cause);
+    } catch (InterruptedException e) {
+      throw new DroidDriverException(e);
     }
   }
 
   @Override
   public void setText(String text) {
-    perform(new TextAction(text));
-    // TextAction may not be effective immediately and reflected by getText(),
-    // so the following will fail.
-    // if (Logs.DEBUG) {
-    // String actual = getText();
-    // if (!text.equals(actual)) {
-    // throw new DroidDriverException(String.format(
-    // "setText failed: expected=\"%s\", actual=\"%s\"", text, actual));
-    // }
-    // }
+    uiElementActor.setText(this, text);
   }
 
   @Override
   public void click() {
-    perform(ClickAction.SINGLE);
+    uiElementActor.click(this);
   }
 
   @Override
   public void longClick() {
-    perform(ClickAction.LONG);
+    uiElementActor.longClick(this);
   }
 
   @Override
   public void doubleClick() {
-    perform(ClickAction.DOUBLE);
+    uiElementActor.doubleClick(this);
   }
 
   @Override
   public void scroll(PhysicalDirection direction) {
-    perform(SwipeAction.toScroll(direction));
+    uiElementActor.scroll(this, direction);
   }
 
   protected abstract Map<Attribute, Object> getAttributes();
