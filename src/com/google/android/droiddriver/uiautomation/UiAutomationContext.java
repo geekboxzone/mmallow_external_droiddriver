@@ -17,17 +17,40 @@
 package com.google.android.droiddriver.uiautomation;
 
 import android.app.Instrumentation;
+import android.app.UiAutomation;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.google.android.droiddriver.uiautomation.base.BaseUiAutomationContext;
+import com.google.android.droiddriver.base.DroidDriverContext;
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
 
-class UiAutomationContext extends BaseUiAutomationContext<UiAutomationElement> {
-  UiAutomationContext(Instrumentation instrumentation, UiAutomationDriver driver) {
+public class UiAutomationContext extends
+    DroidDriverContext<AccessibilityNodeInfo, UiAutomationElement> {
+  private final UiAutomation uiAutomation;
+
+  protected UiAutomationContext(Instrumentation instrumentation, UiAutomationDriver driver) {
     super(instrumentation, driver);
+    this.uiAutomation = instrumentation.getUiAutomation();
   }
 
   @Override
-  protected UiAutomationElement newUiElement(AccessibilityNodeInfo node, UiAutomationElement parent) {
-    return new UiAutomationElement(this, node, parent);
+  public UiAutomationDriver getDriver() {
+    return (UiAutomationDriver) super.getDriver();
+  }
+
+  public interface UiAutomationCallable<T> {
+    T call(UiAutomation uiAutomation);
+  }
+
+  /**
+   * Wraps calls to UiAutomation API. Currently supports fail-fast if
+   * UiAutomation throws IllegalStateException, which occurs when the connection
+   * to UiAutomation service is lost.
+   */
+  public <T> T callUiAutomation(UiAutomationCallable<T> uiAutomationCallable) {
+    try {
+      return uiAutomationCallable.call(uiAutomation);
+    } catch (IllegalStateException e) {
+      throw new UnrecoverableException(e);
+    }
   }
 }

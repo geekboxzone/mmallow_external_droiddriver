@@ -56,10 +56,10 @@ public class ByXPath implements Finder {
   // on children they are in the same document to be appended.
   private static Document document;
   // The two maps should be kept in sync
-  private static final Map<BaseUiElement, Element> TO_DOM_MAP =
-      new HashMap<BaseUiElement, Element>();
-  private static final Map<Element, BaseUiElement> FROM_DOM_MAP =
-      new HashMap<Element, BaseUiElement>();
+  private static final Map<BaseUiElement<?, ?>, Element> TO_DOM_MAP =
+      new HashMap<BaseUiElement<?, ?>, Element>();
+  private static final Map<Element, BaseUiElement<?, ?>> FROM_DOM_MAP =
+      new HashMap<Element, BaseUiElement<?, ?>>();
 
   public static void clearData() {
     TO_DOM_MAP.clear();
@@ -86,7 +86,7 @@ public class ByXPath implements Finder {
 
   @Override
   public UiElement find(UiElement context) {
-    Element domNode = getDomNode((BaseUiElement) context, UiElement.VISIBLE);
+    Element domNode = getDomNode((BaseUiElement<?, ?>) context, UiElement.VISIBLE);
     try {
       getDocument().appendChild(domNode);
       Element foundNode = (Element) xPathExpression.evaluate(domNode, XPathConstants.NODE);
@@ -124,7 +124,8 @@ public class ByXPath implements Finder {
   /**
    * Returns the DOM node representing this UiElement.
    */
-  private static Element getDomNode(BaseUiElement uiElement, Predicate<? super UiElement> predicate) {
+  private static Element getDomNode(BaseUiElement<?, ?> uiElement,
+      Predicate<? super UiElement> predicate) {
     Element domNode = TO_DOM_MAP.get(uiElement);
     if (domNode == null) {
       domNode = buildDomNode(uiElement, predicate);
@@ -132,7 +133,7 @@ public class ByXPath implements Finder {
     return domNode;
   }
 
-  private static Element buildDomNode(BaseUiElement uiElement,
+  private static Element buildDomNode(BaseUiElement<?, ?> uiElement,
       Predicate<? super UiElement> predicate) {
     String className = uiElement.getClassName();
     if (className == null) {
@@ -175,7 +176,7 @@ public class ByXPath implements Finder {
       }
     }
 
-    for (BaseUiElement child : uiElement.getChildren(predicate)) {
+    for (BaseUiElement<?, ?> child : uiElement.getChildren(predicate)) {
       element.appendChild(getDomNode(child, predicate));
     }
     return element;
@@ -194,7 +195,7 @@ public class ByXPath implements Finder {
     }
   }
 
-  public static boolean dumpDom(String path, BaseUiElement uiElement) {
+  public static boolean dumpDom(String path, BaseUiElement<?, ?> uiElement) {
     BufferedOutputStream bos = null;
     try {
       bos = FileUtils.open(path);

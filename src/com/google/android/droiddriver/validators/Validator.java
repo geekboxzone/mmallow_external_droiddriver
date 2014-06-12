@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation.base;
+package com.google.android.droiddriver.validators;
 
-import android.app.UiAutomation;
+import com.google.android.droiddriver.UiElement;
 
-public interface UiAutomationCallable<T> {
-  T call(UiAutomation uiAutomation);
+/**
+ * Interface for validating a UiElement, checked when an action is performed.
+ * For example, in general accessibility mandates that an actionable UiElement
+ * has content description or text.
+ */
+public interface Validator {
+  /**
+   * Returns true if {@code element} is valid.
+   */
+  boolean isValid(UiElement element);
 }

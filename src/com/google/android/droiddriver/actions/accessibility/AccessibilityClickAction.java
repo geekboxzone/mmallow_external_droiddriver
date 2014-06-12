@@ -22,7 +22,7 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.exceptions.ActionException;
 
 /**
- * An {@link AccessibilityAction} that clicks on an UiElement.
+ * An {@link AccessibilityAction} that clicks on a UiElement.
  */
 public abstract class AccessibilityClickAction extends AccessibilityAction {
 

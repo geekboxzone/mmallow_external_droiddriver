@@ -17,23 +17,69 @@
 package com.google.android.droiddriver.instrumentation;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Bitmap.Config;
+import android.util.Log;
+import android.view.View;
 
 import com.google.android.droiddriver.base.BaseUiDevice;
+import com.google.android.droiddriver.base.DroidDriverContext;
+import com.google.android.droiddriver.util.Logs;
 
 class InstrumentationUiDevice extends BaseUiDevice {
-  private final InstrumentationContext context;
+  private final DroidDriverContext<View, ViewElement> context;
 
-  InstrumentationUiDevice(InstrumentationContext context) {
+  InstrumentationUiDevice(DroidDriverContext<View, ViewElement> context) {
     this.context = context;
   }
 
   @Override
   protected Bitmap takeScreenshot() {
-    return context.getDriver().takeScreenshot();
+    ScreenshotRunnable screenshotRunnable =
+        new ScreenshotRunnable(context.getDriver().getRootElement().getRawElement());
+    context.runOnMainSync(screenshotRunnable);
+    return screenshotRunnable.screenshot;
   }
 
   @Override
-  protected InstrumentationContext getContext() {
+  protected DroidDriverContext<View, ViewElement> getContext() {
     return context;
+  }
+
+  private static class ScreenshotRunnable implements Runnable {
+    private final View rootView;
+    Bitmap screenshot;
+
+    private ScreenshotRunnable(View rootView) {
+      this.rootView = rootView;
+    }
+
+    @Override
+    public void run() {
+      try {
+        rootView.destroyDrawingCache();
+        rootView.buildDrawingCache(false);
+        Bitmap drawingCache = rootView.getDrawingCache();
+        int[] xy = new int[2];
+        rootView.getLocationOnScreen(xy);
+        if (xy[0] == 0 && xy[1] == 0) {
+          screenshot = Bitmap.createBitmap(drawingCache);
+        } else {
+          Canvas canvas = new Canvas();
+          Rect rect = new Rect(0, 0, drawingCache.getWidth(), drawingCache.getHeight());
+          rect.offset(xy[0], xy[1]);
+          screenshot =
+              Bitmap.createBitmap(rect.width() + xy[0], rect.height() + xy[1], Config.ARGB_8888);
+          canvas.setBitmap(screenshot);
+          canvas.drawBitmap(drawingCache, null, new RectF(rect), null);
+          canvas.setBitmap(null);
+        }
+        rootView.destroyDrawingCache();
+      } catch (Throwable e) {
+        Logs.log(Log.ERROR, e);
+      }
+    }
   }
 }

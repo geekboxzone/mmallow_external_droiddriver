@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation.base;
+package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.view.InputEvent;
 
 import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 
 public class UiAutomationInputInjector implements InputInjector {
-  private final BaseUiAutomationContext<?> context;
+  private final UiAutomationContext context;
 
-  public UiAutomationInputInjector(BaseUiAutomationContext<?> context) {
+  public UiAutomationInputInjector(UiAutomationContext context) {
     this.context = context;
   }
 

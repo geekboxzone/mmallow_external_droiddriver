@@ -20,9 +20,9 @@ import android.graphics.Rect;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.actions.InputInjector;
+import com.google.android.droiddriver.actions.EventUiElementActor;
+import com.google.android.droiddriver.actions.UiElementActor;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
-import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.Predicate;
 import com.google.android.droiddriver.finders.Predicates;
@@ -30,6 +30,7 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.Strings;
 import com.google.android.droiddriver.util.Strings.ToStringHelper;
+import com.google.android.droiddriver.validators.Validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,18 +42,19 @@ import java.util.concurrent.FutureTask;
 
 /**
  * Base UiElement that implements the common operations.
+ *
+ * @param <R> the type of the raw element this class wraps, for example, View or
+ *        AccessibilityNodeInfo
+ * @param <E> the type of the concrete subclass of BaseUiElement
  */
-public abstract class BaseUiElement implements UiElement {
+public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements UiElement {
   // These two attribute names are used for debugging only.
   // The two constants are used internally and must match to-uiautomator.xsl.
   public static final String ATTRIB_VISIBLE_BOUNDS = "VisibleBounds";
   public static final String ATTRIB_NOT_VISIBLE = "NotVisible";
 
-  private final UiElementActor uiElementActor;
-
-  protected BaseUiElement(UiElementActor UiElementActor) {
-    this.uiElementActor = UiElementActor;
-  }
+  private UiElementActor uiElementActor = EventUiElementActor.INSTANCE;
+  private Validator[] validators = {};
 
   @SuppressWarnings("unchecked")
   @Override
@@ -158,15 +160,14 @@ public abstract class BaseUiElement implements UiElement {
     return selectionStart >= 0 && selectionStart != selectionEnd;
   }
 
-  /**
-   * Gets the {@link InputInjector} for injecting InputEvent.
-   */
-  public abstract InputInjector getInjector();
-
   @Override
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
-    checkVisible();
+    for (Validator validator : validators) {
+      if (!validator.isValid(this)) {
+        throw new DroidDriverException(validator + " failed");
+      }
+    }
     return performAndWait(action);
   }
 
@@ -229,17 +230,11 @@ public abstract class BaseUiElement implements UiElement {
 
   protected abstract Map<Attribute, Object> getAttributes();
 
-  protected abstract List<? extends BaseUiElement> getChildren();
-
-  private void checkVisible() {
-    if (!isVisible()) {
-      throw new ElementNotVisibleException(this);
-    }
-  }
+  protected abstract List<E> getChildren();
 
   @Override
-  public List<? extends BaseUiElement> getChildren(Predicate<? super UiElement> predicate) {
-    List<? extends BaseUiElement> children = getChildren();
+  public List<E> getChildren(Predicate<? super UiElement> predicate) {
+    List<E> children = getChildren();
     if (children == null) {
       return Collections.emptyList();
     }
@@ -247,8 +242,8 @@ public abstract class BaseUiElement implements UiElement {
       return children;
     }
 
-    List<BaseUiElement> filteredChildren = new ArrayList<BaseUiElement>(children.size());
-    for (BaseUiElement child : children) {
+    List<E> filteredChildren = new ArrayList<E>(children.size());
+    for (E child : children) {
       if (predicate.apply(child)) {
         filteredChildren.add(child);
       }
@@ -282,5 +277,21 @@ public abstract class BaseUiElement implements UiElement {
         toStringHelper.add(attr.getName(), value);
       }
     }
+  }
+
+  /**
+   * Gets the raw element used to create this UiElement. The attributes of this
+   * UiElement are based on a snapshot of the raw element at construction time.
+   * If the raw element is updated later, the attributes may not match.
+   */
+  // TODO: expose in UiElement?
+  public abstract R getRawElement();
+
+  public void setUiElementActor(UiElementActor uiElementActor) {
+    this.uiElementActor = uiElementActor;
+  }
+
+  public void setValidators(Validator[] validators) {
+    this.validators = validators;
   }
 }

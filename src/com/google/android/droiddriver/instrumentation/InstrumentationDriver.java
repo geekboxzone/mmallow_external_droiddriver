@@ -17,16 +17,13 @@
 package com.google.android.droiddriver.instrumentation;
 
 import android.app.Instrumentation;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseDroidDriver;
+import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
@@ -35,23 +32,30 @@ import com.google.android.droiddriver.util.Logs;
 /**
  * Implementation of DroidDriver that is driven via instrumentation.
  */
-public class InstrumentationDriver extends BaseDroidDriver {
-  private final InstrumentationContext context;
+public class InstrumentationDriver extends BaseDroidDriver<View, ViewElement> {
+  private final DroidDriverContext<View, ViewElement> context;
+  private final InputInjector injector;
   private final InstrumentationUiDevice uiDevice;
 
   public InstrumentationDriver(Instrumentation instrumentation) {
-    this.context = new InstrumentationContext(instrumentation, this);
+    context = new DroidDriverContext<View, ViewElement>(instrumentation, this);
+    injector = new InstrumentationInputInjector(instrumentation);
     uiDevice = new InstrumentationUiDevice(context);
   }
 
   @Override
-  protected ViewElement getNewRootElement() {
-    return context.getUiElement(findRootView(), null /* parent */);
+  public InputInjector getInjector() {
+    return injector;
   }
 
   @Override
-  protected InstrumentationContext getContext() {
-    return context;
+  protected ViewElement newRootElement() {
+    return context.newRootElement(findRootView());
+  }
+
+  @Override
+  protected ViewElement newUiElement(View rawElement, ViewElement parent) {
+    return new ViewElement(context, rawElement, parent);
   }
 
   private static class FindRootViewRunnable implements Runnable {
@@ -104,47 +108,6 @@ public class InstrumentationDriver extends BaseDroidDriver {
       }
       SystemClock.sleep(Math.min(250, remainingMillis));
     }
-  }
-
-  private static class ScreenshotRunnable implements Runnable {
-    private final View rootView;
-    Bitmap screenshot;
-
-    private ScreenshotRunnable(View rootView) {
-      this.rootView = rootView;
-    }
-
-    @Override
-    public void run() {
-      try {
-        rootView.destroyDrawingCache();
-        rootView.buildDrawingCache(false);
-        Bitmap drawingCache = rootView.getDrawingCache();
-        int[] xy = new int[2];
-        rootView.getLocationOnScreen(xy);
-        if (xy[0] == 0 && xy[1] == 0) {
-          screenshot = Bitmap.createBitmap(drawingCache);
-        } else {
-          Canvas canvas = new Canvas();
-          Rect rect = new Rect(0, 0, drawingCache.getWidth(), drawingCache.getHeight());
-          rect.offset(xy[0], xy[1]);
-          screenshot =
-              Bitmap.createBitmap(rect.width() + xy[0], rect.height() + xy[1], Config.ARGB_8888);
-          canvas.setBitmap(screenshot);
-          canvas.drawBitmap(drawingCache, null, new RectF(rect), null);
-          canvas.setBitmap(null);
-        }
-        rootView.destroyDrawingCache();
-      } catch (Throwable e) {
-        Logs.log(Log.ERROR, e);
-      }
-    }
-  }
-
-  Bitmap takeScreenshot() {
-    ScreenshotRunnable screenshotRunnable = new ScreenshotRunnable(findRootView());
-    context.runOnMainSync(screenshotRunnable);
-    return screenshotRunnable.screenshot;
   }
 
   @Override

@@ -19,6 +19,7 @@ package com.google.android.droiddriver.base;
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.ByXPath;
@@ -28,10 +29,10 @@ import com.google.android.droiddriver.util.Logs;
 /**
  * Base DroidDriver that implements the common operations.
  */
-public abstract class BaseDroidDriver implements DroidDriver {
+public abstract class BaseDroidDriver<R, E extends BaseUiElement<R, E>> implements DroidDriver {
 
   private Poller poller = new DefaultPoller();
-  private BaseUiElement rootElement;
+  private E rootElement;
 
   @Override
   public UiElement find(Finder finder) {
@@ -88,11 +89,16 @@ public abstract class BaseDroidDriver implements DroidDriver {
     this.poller = poller;
   }
 
-  protected abstract BaseUiElement getNewRootElement();
+  public abstract InputInjector getInjector();
 
-  protected abstract DroidDriverContext getContext();
+  protected abstract E newRootElement();
 
-  protected BaseUiElement getRootElement() {
+  /**
+   * Returns a new UiElement of type {@code E}.
+   */
+  protected abstract E newUiElement(R rawElement, E parent);
+
+  public E getRootElement() {
     if (rootElement == null) {
       refreshUiElementTree();
     }
@@ -101,8 +107,7 @@ public abstract class BaseDroidDriver implements DroidDriver {
 
   @Override
   public void refreshUiElementTree() {
-    getContext().clearData();
-    rootElement = getNewRootElement();
+    rootElement = newRootElement();
   }
 
   @Override

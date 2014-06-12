@@ -26,9 +26,9 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Checkable;
 import android.widget.TextView;
 
-import com.google.android.droiddriver.actions.EventUiElementActor;
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseUiElement;
+import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.util.Preconditions;
@@ -44,7 +44,7 @@ import java.util.concurrent.FutureTask;
 /**
  * A UiElement that is backed by a View.
  */
-public class ViewElement extends BaseUiElement {
+public class ViewElement extends BaseUiElement<View, ViewElement> {
   private static class SnapshotViewAttributesRunnable implements Runnable {
     private final View view;
     final Map<Attribute, Object> attribs = new EnumMap<Attribute, Object>(Attribute.class);
@@ -205,7 +205,8 @@ public class ViewElement extends BaseUiElement {
     CLASS_NAME_OVERRIDES.put(actualClassName, overridingClassName);
   }
 
-  private final InstrumentationContext context;
+  private final DroidDriverContext<View, ViewElement> context;
+  private final View view;
   private final Map<Attribute, Object> attributes;
   private final boolean visible;
   private final Rect visibleBounds;
@@ -218,10 +219,9 @@ public class ViewElement extends BaseUiElement {
    * updated, a new {@code ViewElement} instance will be created in
    * {@link com.google.android.droiddriver.DroidDriver#refreshUiElementTree}.
    */
-  public ViewElement(final InstrumentationContext context, View view, ViewElement parent) {
-    super(EventUiElementActor.INSTANCE);
+  public ViewElement(DroidDriverContext<View, ViewElement> context, View view, ViewElement parent) {
     this.context = Preconditions.checkNotNull(context);
-    Preconditions.checkNotNull(view);
+    this.view = Preconditions.checkNotNull(view);
     this.parent = parent;
     SnapshotViewAttributesRunnable attributesSnapshot = new SnapshotViewAttributesRunnable(view);
     context.runOnMainSync(attributesSnapshot);
@@ -237,7 +237,7 @@ public class ViewElement extends BaseUiElement {
     } else {
       List<ViewElement> children = new ArrayList<ViewElement>(attributesSnapshot.childViews.size());
       for (View childView : attributesSnapshot.childViews) {
-        children.add(context.getUiElement(childView, this));
+        children.add(context.getElement(childView, this));
       }
       this.children = Collections.unmodifiableList(children);
     }
@@ -270,12 +270,17 @@ public class ViewElement extends BaseUiElement {
 
   @Override
   public InputInjector getInjector() {
-    return context.getInjector();
+    return context.getDriver().getInjector();
   }
 
   @Override
   protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
     futureTask.run();
     context.tryWaitForIdleSync(timeoutMillis);
+  }
+
+  @Override
+  public View getRawElement() {
+    return view;
   }
 }

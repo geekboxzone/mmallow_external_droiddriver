@@ -56,7 +56,7 @@ public abstract class BaseUiDevice implements UiDevice {
     if (!isScreenOn()) {
       // Cannot call perform(POWER_ON) because perform() checks the UiElement is
       // visible.
-      POWER_ON.perform(getContext().getInjector(), null);
+      POWER_ON.perform(getContext().getDriver().getInjector(), null);
       getContext().tryWaitForIdleSync(POWER_ON.getTimeoutMillis());
     }
   }
@@ -112,5 +112,5 @@ public abstract class BaseUiDevice implements UiDevice {
 
   protected abstract Bitmap takeScreenshot();
 
-  protected abstract DroidDriverContext getContext();
+  protected abstract DroidDriverContext<?, ?> getContext();
 }

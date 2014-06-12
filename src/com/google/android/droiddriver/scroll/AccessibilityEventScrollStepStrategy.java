@@ -159,7 +159,7 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
 
   @Override
   public String toString() {
-    return String.format("AccessibilityEventScrollStepStrategy{scrollEventTimeoutMillis=%d}",
+    return String.format("%s{scrollEventTimeoutMillis=%d}", getClass().getSimpleName(),
         scrollEventTimeoutMillis);
   }
 
@@ -194,9 +194,10 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
 
   @Override
   public void doScroll(final UiElement container, final PhysicalDirection direction) {
-    // We do not call container.scroll(direction) because container.scroll internally calls
-    // UiAutomation.executeAndWaitForEvent which clears the AccessibilityEvent Queue, preventing us
-    // from fetching the last accessibility event to determine if scrolling has finished.
+    // We do not call container.scroll(direction) because container.scroll
+    // internally calls UiAutomation.executeAndWaitForEvent which clears the
+    // AccessibilityEvent Queue, preventing us from fetching the last
+    // accessibility event to determine if scrolling has finished.
     SwipeAction.toScroll(direction).perform(container);
   }
 

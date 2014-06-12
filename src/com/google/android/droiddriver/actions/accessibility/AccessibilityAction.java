@@ -21,7 +21,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.BaseAction;
-import com.google.android.droiddriver.uiautomation.base.BaseUiAutomationElement;
+import com.google.android.droiddriver.uiautomation.UiAutomationElement;
 
 /**
  * Implements {@link Action} via the Accessibility API.
@@ -33,7 +33,7 @@ public abstract class AccessibilityAction extends BaseAction {
 
   @Override
   public boolean perform(UiElement element) {
-    return perform(((BaseUiAutomationElement<?>) element).getNode(), element);
+    return perform(((UiAutomationElement) element).getRawElement(), element);
   }
 
   /**

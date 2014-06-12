@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation.accessibility;
+package com.google.android.droiddriver.validators;
 
-import android.app.Instrumentation;
-
-import com.google.android.droiddriver.uiautomation.base.BaseUiAutomationDriver;
+import com.google.android.droiddriver.UiElement;
 
 /**
- * Implementation of DroidDriver that gets attributes via the Accessibility API
- * and is acted upon via the Accessibility API.
+ * Validates visibility.
  */
-public class AccessibilityDriver extends BaseUiAutomationDriver<AccessibilityElement> {
-  public AccessibilityDriver(Instrumentation instrumentation) {
-    super(instrumentation);
-  }
-
+public class VisibilityValidator implements Validator {
   @Override
-  protected AccessibilityContext newContext(Instrumentation instrumentation) {
-    return new AccessibilityContext(instrumentation, this);
+  public boolean isValid(UiElement element) {
+    return element.isVisible();
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.uiautomation.base;
+package com.google.android.droiddriver.uiautomation;
 
 import android.app.UiAutomation;
 import android.graphics.Bitmap;
@@ -22,12 +22,13 @@ import android.util.Log;
 
 import com.google.android.droiddriver.base.BaseUiDevice;
 import com.google.android.droiddriver.exceptions.UnrecoverableException;
+import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.android.droiddriver.util.Logs;
 
 class UiAutomationUiDevice extends BaseUiDevice {
-  private final BaseUiAutomationContext<?> context;
+  private final UiAutomationContext context;
 
-  UiAutomationUiDevice(BaseUiAutomationContext<?> context) {
+  UiAutomationUiDevice(UiAutomationContext context) {
     this.context = context;
   }
 
@@ -49,7 +50,7 @@ class UiAutomationUiDevice extends BaseUiDevice {
   }
 
   @Override
-  protected BaseUiAutomationContext<?> getContext() {
+  protected UiAutomationContext getContext() {
     return context;
   }
 }

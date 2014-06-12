@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.base;
+package com.google.android.droiddriver.actions;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;

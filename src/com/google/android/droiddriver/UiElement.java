@@ -19,7 +19,7 @@ package com.google.android.droiddriver;
 import android.graphics.Rect;
 
 import com.google.android.droiddriver.actions.Action;
-import com.google.android.droiddriver.exceptions.ElementNotVisibleException;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.Predicate;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
@@ -140,7 +140,6 @@ public interface UiElement {
    * Executes the given action.
    *
    * @param action The action to execute
-   * @throws ElementNotVisibleException when the element is not visible
    * @return true if the action is successful
    */
   boolean perform(Action action);
@@ -149,31 +148,24 @@ public interface UiElement {
    * Sets the text of this element.
    *
    * @param text The text to enter.
-   * @throws ElementNotVisibleException when the element is not visible
    */
   void setText(String text);
 
   /**
    * Clicks this element. The click will be at the center of the visible
    * element.
-   *
-   * @throws ElementNotVisibleException when the element is not visible
    */
   void click();
 
   /**
    * Long-clicks this element. The click will be at the center of the visible
    * element.
-   *
-   * @throws ElementNotVisibleException when the element is not visible
    */
   void longClick();
 
   /**
    * Double-clicks this element. The click will be at the center of the visible
    * element.
-   *
-   * @throws ElementNotVisibleException when the element is not visible
    */
   void doubleClick();
 
@@ -182,7 +174,6 @@ public interface UiElement {
    *
    * @param direction specifies where the view port will move, instead of the
    *        finger.
-   * @throws ElementNotVisibleException when the element is not visible
    */
   void scroll(PhysicalDirection direction);
 
@@ -228,4 +219,9 @@ public interface UiElement {
    * Gets the parent.
    */
   UiElement getParent();
+
+  /**
+   * Gets the {@link InputInjector} for injecting InputEvent.
+   */
+  InputInjector getInjector();
 }

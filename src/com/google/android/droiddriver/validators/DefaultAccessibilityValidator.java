@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.exceptions;
+package com.google.android.droiddriver.validators;
+
+import android.text.TextUtils;
 
 import com.google.android.droiddriver.UiElement;
 
 /**
- * Thrown when an element is not visible on screen, therefore cannot be
- * interacted with.
+ * Validates accessibility.
  */
-@SuppressWarnings("serial")
-public class ElementNotVisibleException extends DroidDriverException {
-  public ElementNotVisibleException(UiElement element) {
-    super("Invisible on screen: " + element);
+// TODO: Treats various types of UiElement as TalkBack does.
+public class DefaultAccessibilityValidator implements Validator {
+  @Override
+  public boolean isValid(UiElement element) {
+    return element.getParent() != null // don't check root
+        && TextUtils.isEmpty(element.getContentDescription())
+        && TextUtils.isEmpty(element.getText());
   }
 }

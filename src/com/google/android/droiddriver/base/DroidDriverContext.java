@@ -20,11 +20,13 @@ import android.app.Instrumentation;
 import android.os.Looper;
 import android.util.Log;
 
-import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.util.Logs;
 
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -32,23 +34,45 @@ import java.util.concurrent.TimeUnit;
 /**
  * Internal helper for DroidDriver implementation.
  */
-public abstract class DroidDriverContext {
+public class DroidDriverContext<R, E extends BaseUiElement<R, E>> {
   private final Instrumentation instrumentation;
+  private final BaseDroidDriver<R, E> driver;
+  private final Map<R, E> map;
 
-  protected DroidDriverContext(Instrumentation instrumentation) {
+  public DroidDriverContext(Instrumentation instrumentation, BaseDroidDriver<R, E> driver) {
     this.instrumentation = instrumentation;
+    this.driver = driver;
+    map = new WeakHashMap<R, E>();
   }
 
   public Instrumentation getInstrumentation() {
     return instrumentation;
   }
 
-  public abstract BaseDroidDriver getDriver();
+  public BaseDroidDriver<R, E> getDriver() {
+    return driver;
+  }
 
-  public abstract InputInjector getInjector();
+  public E getElement(R rawElement, E parent) {
+    E element = map.get(rawElement);
+    if (element == null) {
+      element = driver.newUiElement(rawElement, parent);
+      map.put(rawElement, element);
+    }
+    return element;
+  }
+
+  public E newRootElement(R rawRoot) {
+    clearData();
+    return getElement(rawRoot,  null /* parent */);
+  }
+
+  private void clearData() {
+    map.clear();
+    ByXPath.clearData();
+  }
 
   /** Clears UiElement instances in the context */
-  public abstract void clearData();
 
   /**
    * Tries to wait for an idle state on the main thread on best-effort basis up

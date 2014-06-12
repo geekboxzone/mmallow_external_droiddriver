@@ -19,7 +19,6 @@ package com.google.android.droiddriver.actions;
 import android.view.InputEvent;
 
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.base.BaseUiElement;
 
 /**
  * Implements {@link Action} by injecting synthesized events.
@@ -31,7 +30,7 @@ public abstract class EventAction extends BaseAction {
 
   @Override
   public boolean perform(UiElement element) {
-    return perform(((BaseUiElement) element).getInjector(), element);
+    return perform(element.getInjector(), element);
   }
 
   /**
