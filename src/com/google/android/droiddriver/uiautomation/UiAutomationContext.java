@@ -27,7 +27,7 @@ public class UiAutomationContext extends
     DroidDriverContext<AccessibilityNodeInfo, UiAutomationElement> {
   private final UiAutomation uiAutomation;
 
-  protected UiAutomationContext(Instrumentation instrumentation, UiAutomationDriver driver) {
+  public UiAutomationContext(Instrumentation instrumentation, UiAutomationDriver driver) {
     super(instrumentation, driver);
     this.uiAutomation = instrumentation.getUiAutomation();
   }

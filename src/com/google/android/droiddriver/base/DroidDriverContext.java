@@ -64,15 +64,13 @@ public class DroidDriverContext<R, E extends BaseUiElement<R, E>> {
 
   public E newRootElement(R rawRoot) {
     clearData();
-    return getElement(rawRoot,  null /* parent */);
+    return getElement(rawRoot, null /* parent */);
   }
 
   private void clearData() {
     map.clear();
     ByXPath.clearData();
   }
-
-  /** Clears UiElement instances in the context */
 
   /**
    * Tries to wait for an idle state on the main thread on best-effort basis up

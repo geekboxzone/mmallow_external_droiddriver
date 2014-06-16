@@ -46,6 +46,8 @@ public class UiAutomationDriver extends BaseDroidDriver<AccessibilityNodeInfo, U
   private final UiAutomationContext context;
   private final InputInjector injector;
   private final UiAutomationUiDevice uiDevice;
+  private AccessibilityNodeInfoCacheClearer clearer =
+      new WindowStateAccessibilityNodeInfoCacheClearer();
 
   public UiAutomationDriver(Instrumentation instrumentation) {
     context = new UiAutomationContext(instrumentation, this);
@@ -112,23 +114,41 @@ public class UiAutomationDriver extends BaseDroidDriver<AccessibilityNodeInfo, U
    */
   public void clearAccessibilityNodeInfoCache() {
     Logs.call(this, "clearAccessibilityNodeInfoCache");
-    uiDevice.sleep();
-    uiDevice.wakeUp();
+    clearer.clearAccessibilityNodeInfoCache(this);
+  }
+
+  public interface AccessibilityNodeInfoCacheClearer {
+    void clearAccessibilityNodeInfoCache(UiAutomationDriver driver);
   }
 
   /**
-   * {@link #clearAccessibilityNodeInfoCache} causes the screen to blink. This
-   * method clears the cache without blinking by employing an implementation
-   * detail of AccessibilityNodeInfoCache. This is a hack; use it at your own
-   * discretion.
+   * Clears AccessibilityNodeInfoCache by turning screen off then on.
    */
-  public void clearAccessibilityNodeInfoCacheHack() {
-    Logs.call(this, "clearAccessibilityNodeInfoCacheHack");
-    AccessibilityManager accessibilityManager =
-        (AccessibilityManager) context.getInstrumentation().getTargetContext()
-            .getSystemService(Context.ACCESSIBILITY_SERVICE);
-    accessibilityManager.sendAccessibilityEvent(AccessibilityEvent
-        .obtain(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED));
+  public static class ScreenOffAccessibilityNodeInfoCacheClearer implements
+      AccessibilityNodeInfoCacheClearer {
+    public void clearAccessibilityNodeInfoCache(UiAutomationDriver driver) {
+      driver.getUiDevice().sleep();
+      driver.getUiDevice().wakeUp();
+    }
+  }
+
+  /**
+   * Clears AccessibilityNodeInfoCache by exploiting an implementation detail of
+   * AccessibilityNodeInfoCache. This is a hack; use it at your own discretion.
+   */
+  public static class WindowStateAccessibilityNodeInfoCacheClearer implements
+      AccessibilityNodeInfoCacheClearer {
+    public void clearAccessibilityNodeInfoCache(UiAutomationDriver driver) {
+      AccessibilityManager accessibilityManager =
+          (AccessibilityManager) driver.context.getInstrumentation().getTargetContext()
+              .getSystemService(Context.ACCESSIBILITY_SERVICE);
+      accessibilityManager.sendAccessibilityEvent(AccessibilityEvent
+          .obtain(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED));
+    }
+  }
+
+  public void setAccessibilityNodeInfoCacheClearer(AccessibilityNodeInfoCacheClearer clearer) {
+    this.clearer = clearer;
   }
 
   @Override
