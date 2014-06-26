@@ -61,9 +61,4 @@ public abstract class ForwardingScrollStepStrategy implements ScrollStepStrategy
   public void doScroll(UiElement container, PhysicalDirection direction) {
     delegate().doScroll(container, direction);
   }
-
-  @Override
-  public String toString() {
-    return delegate().toString();
-  }
 }

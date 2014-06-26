@@ -158,12 +158,6 @@ public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy 
   }
 
   @Override
-  public String toString() {
-    return String.format("%s{scrollEventTimeoutMillis=%d}", getClass().getSimpleName(),
-        scrollEventTimeoutMillis);
-  }
-
-  @Override
   public void beginScrolling(DroidDriver driver, Finder containerFinder, Finder itemFinder,
       PhysicalDirection direction) {
     endData.reset();

@@ -54,10 +54,7 @@ public abstract class BaseUiDevice implements UiDevice {
   @Override
   public void wakeUp() {
     if (!isScreenOn()) {
-      // Cannot call perform(POWER_ON) because perform() checks the UiElement is
-      // visible.
-      POWER_ON.perform(getContext().getDriver().getInjector(), null);
-      getContext().tryWaitForIdleSync(POWER_ON.getTimeoutMillis());
+      perform(POWER_ON);
     }
   }
 

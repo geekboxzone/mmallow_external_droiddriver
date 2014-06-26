@@ -163,9 +163,11 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   @Override
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
-    for (Validator validator : validators) {
-      if (!validator.isValid(this)) {
-        throw new DroidDriverException(validator + " failed");
+    if (getParent() != null) {// don't check root
+      for (Validator validator : validators) {
+        if (!validator.isValid(this)) {
+          throw new DroidDriverException(validator + " failed");
+        }
       }
     }
     return performAndWait(action);

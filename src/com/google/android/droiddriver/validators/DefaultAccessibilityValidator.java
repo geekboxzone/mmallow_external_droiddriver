@@ -27,8 +27,12 @@ import com.google.android.droiddriver.UiElement;
 public class DefaultAccessibilityValidator implements Validator {
   @Override
   public boolean isValid(UiElement element) {
-    return element.getParent() != null // don't check root
-        && TextUtils.isEmpty(element.getContentDescription())
-        && TextUtils.isEmpty(element.getText());
+    return !TextUtils.isEmpty(element.getContentDescription())
+        || !TextUtils.isEmpty(element.getText());
+  }
+
+  @Override
+  public String toString() {
+    return "Check non-empty c ontent description or text";
   }
 }

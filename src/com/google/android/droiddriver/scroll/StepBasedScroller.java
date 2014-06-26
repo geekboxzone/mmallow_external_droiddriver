@@ -18,12 +18,10 @@ package com.google.android.droiddriver.scroll;
 import static com.google.android.droiddriver.scroll.Direction.LogicalDirection.BACKWARD;
 
 import android.util.Log;
-import android.view.KeyEvent;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.SingleKeyAction;
 import com.google.android.droiddriver.exceptions.ElementNotFoundException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.By;
@@ -41,10 +39,6 @@ import com.google.android.droiddriver.util.Logs;
  * possible.
  */
 public class StepBasedScroller implements Scroller {
-
-  private static final SingleKeyAction MOVE_HOME = new SingleKeyAction(KeyEvent.KEYCODE_MOVE_HOME,
-      1000L, false);
-
   private final int maxScrolls;
   private final long perScrollTimeoutMillis;
   private final Axis axis;
@@ -106,7 +100,7 @@ public class StepBasedScroller implements Scroller {
     ElementNotFoundException exception = new ElementNotFoundException(itemFinder);
     if (i == maxScrolls) {
       // This is often a program error -- maxScrolls is a safety net; we should
-      // have either found itemFinder, or stopped to scroll b/c of reaching the
+      // have either found itemFinder, or stopped scrolling b/c of reaching the
       // end. If maxScrolls is reasonably large, ScrollStepStrategy must be
       // wrong.
       Logs.logfmt(Log.WARN, exception, "Scrolled %s %d times; ScrollStepStrategy=%s",
@@ -147,24 +141,17 @@ public class StepBasedScroller implements Scroller {
         // fall through to scroll to find
       }
 
-      UiElement container = driver.on(containerFinder);
-      if (container.isFocused()) {
-        // Use KeyEvent to go to beginning
-        container.perform(MOVE_HOME);
-        Logs.log(Log.DEBUG, "MOVE_HOME used");
-      } else {
-        // Fling to beginning is not reliable; scroll to beginning
-        // container.perform(SwipeAction.toFling(backwardDirection));
-        try {
-          scrollStepStrategy.beginScrolling(driver, containerFinder, itemFinder, backwardDirection);
-          for (int i = 0; i < maxScrolls; i++) {
-            if (!scrollStepStrategy.scroll(driver, containerFinder, backwardDirection)) {
-              break;
-            }
+      // Fling to beginning is not reliable; scroll to beginning
+      // container.perform(SwipeAction.toFling(backwardDirection));
+      try {
+        scrollStepStrategy.beginScrolling(driver, containerFinder, itemFinder, backwardDirection);
+        for (int i = 0; i < maxScrolls; i++) {
+          if (!scrollStepStrategy.scroll(driver, containerFinder, backwardDirection)) {
+            break;
           }
-        } finally {
-          scrollStepStrategy.endScrolling(driver, containerFinder, itemFinder, backwardDirection);
         }
+      } finally {
+        scrollStepStrategy.endScrolling(driver, containerFinder, itemFinder, backwardDirection);
       }
     } else {
       // search backward first
