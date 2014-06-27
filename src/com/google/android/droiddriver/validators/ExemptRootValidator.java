@@ -20,20 +20,16 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 
 /**
- * Interface for validating a UiElement, checked when an action is performed.
- * For example, in general accessibility mandates that an actionable UiElement
- * has content description or text.
+ * Exempts root from validation.
  */
-public interface Validator {
-  /**
-   * Returns true if this {@link Validator} applies to {@code element} on this
-   * {@code action}.
-   */
-  boolean isApplicable(UiElement element, Action action);
+public class ExemptRootValidator implements Validator {
+  @Override
+  public boolean isApplicable(UiElement element, Action action) {
+    return element.getParent() == null; // don't check root
+  }
 
-  /**
-   * Returns {@code null} if {@code element} is valid on this {@code action},
-   * otherwise a string describing the failure.
-   */
-  String validate(UiElement element, Action action);
+  @Override
+  public String validate(UiElement element, Action action) {
+    return null;
+  }
 }

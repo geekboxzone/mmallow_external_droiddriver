@@ -20,13 +20,20 @@ import android.app.Instrumentation;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.validators.DefaultAccessibilityValidator;
+import com.google.android.droiddriver.validators.ExemptRootValidator;
+import com.google.android.droiddriver.validators.FirstApplicableValidator;
+import com.google.android.droiddriver.validators.ExemptedClassesValidator;
+import com.google.android.droiddriver.validators.ExemptScrollActionValidator;
 import com.google.android.droiddriver.validators.Validator;
 
 /**
  * A UiAutomationDriver that validates accessibility.
  */
 public class AccessibilityDriver extends UiAutomationDriver {
-  private static final Validator[] VALIDATORS = {new DefaultAccessibilityValidator()};
+  private Validator validator = new FirstApplicableValidator(new ExemptRootValidator(),
+      new ExemptScrollActionValidator(), new ExemptedClassesValidator(),
+      // TODO: ImageViewValidator
+      new DefaultAccessibilityValidator());
 
   public AccessibilityDriver(Instrumentation instrumentation) {
     super(instrumentation);
@@ -36,7 +43,21 @@ public class AccessibilityDriver extends UiAutomationDriver {
   protected UiAutomationElement newUiElement(AccessibilityNodeInfo rawElement,
       UiAutomationElement parent) {
     UiAutomationElement newUiElement = super.newUiElement(rawElement, parent);
-    newUiElement.setValidators(VALIDATORS);
+    newUiElement.setValidator(validator);
     return newUiElement;
+  }
+
+  /**
+   * Gets the current validator.
+   */
+  public Validator getValidator() {
+    return validator;
+  }
+
+  /**
+   * Sets the validator to check.
+   */
+  public void setValidator(Validator validator) {
+    this.validator = validator;
   }
 }

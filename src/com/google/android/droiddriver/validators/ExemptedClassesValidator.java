@@ -16,27 +16,45 @@
 
 package com.google.android.droiddriver.validators;
 
-import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.util.Logs;
 
 /**
- * Fall-back Validator for accessibility.
+ * Always validates the classes that TalkBack always has speech.
  */
-public class DefaultAccessibilityValidator implements Validator {
+public class ExemptedClassesValidator implements Validator {
+  private static final Class<?>[] EXEMPTED_CLASSES = {android.widget.Spinner.class,
+      android.widget.EditText.class, android.widget.SeekBar.class,
+      android.widget.AbsListView.class, android.widget.TabWidget.class};
+
   @Override
   public boolean isApplicable(UiElement element, Action action) {
-    return true;
+    String className = element.getClassName();
+    if (className == null || className.isEmpty()) {
+      return false;
+    }
+
+    Class<?> elementClass = null;
+    try {
+      elementClass = Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      Logs.log(Log.WARN, e);
+      return false;
+    }
+
+    for (Class<?> clazz : EXEMPTED_CLASSES) {
+      if (clazz.isAssignableFrom(elementClass)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
   public String validate(UiElement element, Action action) {
-    return hasContentDescriptionOrText(element) ? null : "no content description or text";
-  }
-
-  private boolean hasContentDescriptionOrText(UiElement element) {
-    return !TextUtils.isEmpty(element.getContentDescription())
-        || !TextUtils.isEmpty(element.getText());
+    return null;
   }
 }

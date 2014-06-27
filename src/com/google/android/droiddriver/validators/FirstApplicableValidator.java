@@ -20,20 +20,28 @@ import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 
 /**
- * Interface for validating a UiElement, checked when an action is performed.
- * For example, in general accessibility mandates that an actionable UiElement
- * has content description or text.
+ * Iterates an array of validators and validates against the first one that is
+ * applicable. Note the order of validators matters.
  */
-public interface Validator {
-  /**
-   * Returns true if this {@link Validator} applies to {@code element} on this
-   * {@code action}.
-   */
-  boolean isApplicable(UiElement element, Action action);
+public class FirstApplicableValidator implements Validator {
+  private final Validator[] validators;
 
-  /**
-   * Returns {@code null} if {@code element} is valid on this {@code action},
-   * otherwise a string describing the failure.
-   */
-  String validate(UiElement element, Action action);
+  public FirstApplicableValidator(Validator... validators) {
+    this.validators = validators;
+  }
+
+  @Override
+  public boolean isApplicable(UiElement element, Action action) {
+    return true;
+  }
+
+  @Override
+  public String validate(UiElement element, Action action) {
+    for (Validator validator : validators) {
+      if (validator.isApplicable(element, action)) {
+        return validator.validate(element, action);
+      }
+    }
+    return "no applicable validator";
+  }
 }

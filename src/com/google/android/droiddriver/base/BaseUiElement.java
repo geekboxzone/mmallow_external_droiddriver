@@ -54,7 +54,7 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   public static final String ATTRIB_NOT_VISIBLE = "NotVisible";
 
   private UiElementActor uiElementActor = EventUiElementActor.INSTANCE;
-  private Validator[] validators = {};
+  private Validator validator = null;
 
   @SuppressWarnings("unchecked")
   @Override
@@ -163,12 +163,16 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   @Override
   public boolean perform(Action action) {
     Logs.call(this, "perform", action);
-    if (getParent() != null) {// don't check root
-      for (Validator validator : validators) {
-        if (!validator.isValid(this)) {
-          throw new DroidDriverException(validator + " failed");
-        }
+    if (validator != null && validator.isApplicable(this, action)) {
+      String failure = validator.validate(this, action);
+      if (failure != null) {
+        throw new DroidDriverException(toString() + " failed validation: " + failure);
       }
+    }
+
+    // timeoutMillis <= 0 means no need to wait
+    if (action.getTimeoutMillis() <= 0) {
+      return doPerform(action);
     }
     return performAndWait(action);
   }
@@ -180,11 +184,6 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   protected abstract void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis);
 
   private boolean performAndWait(final Action action) {
-    // timeoutMillis <= 0 means no need to wait
-    if (action.getTimeoutMillis() <= 0) {
-      return doPerform(action);
-    }
-
     FutureTask<Boolean> futureTask = new FutureTask<Boolean>(new Callable<Boolean>() {
       @Override
       public Boolean call() {
@@ -192,6 +191,7 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
       }
     });
     doPerformAndWait(futureTask, action.getTimeoutMillis());
+
     try {
       return futureTask.get();
     } catch (ExecutionException e) {
@@ -293,7 +293,10 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
     this.uiElementActor = uiElementActor;
   }
 
-  public void setValidators(Validator[] validators) {
-    this.validators = validators;
+  /**
+   * Sets the validator to check when {@link #perform(Action)} is called.
+   */
+  public void setValidator(Validator validator) {
+    this.validator = validator;
   }
 }

@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.droiddriver.validators;
-
-import com.google.android.droiddriver.UiElement;
-import com.google.android.droiddriver.actions.Action;
+package com.google.android.droiddriver.actions;
 
 /**
- * Validates visibility.
+ * Marker interface for a scroll action.
  */
-public class VisibilityValidator implements Validator {
-  @Override
-  public boolean isApplicable(UiElement element, Action action) {
-    return true;
-  }
-
-  @Override
-  public String validate(UiElement element, Action action) {
-    return element.isVisible() ? null : "invisible";
-  }
+public interface ScrollAction {
 }
