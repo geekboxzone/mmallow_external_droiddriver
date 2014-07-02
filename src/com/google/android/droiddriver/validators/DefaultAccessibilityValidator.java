@@ -17,9 +17,11 @@
 package com.google.android.droiddriver.validators;
 
 import android.text.TextUtils;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
+import com.google.android.droiddriver.uiautomation.UiAutomationElement;
 
 /**
  * Fall-back Validator for accessibility.
@@ -32,10 +34,54 @@ public class DefaultAccessibilityValidator implements Validator {
 
   @Override
   public String validate(UiElement element, Action action) {
-    return hasContentDescriptionOrText(element) ? null : "no content description or text";
+    return isSpeakingNode(element) ? null : "TalkBack cannot speak about it";
   }
 
-  private boolean hasContentDescriptionOrText(UiElement element) {
+  // Logic from TalkBack
+  private static boolean isAccessibilityFocusable(UiElement element) {
+    if (isActionableForAccessibility(element)) {
+      return true;
+    }
+
+    if (isTopLevelScrollItem(element) && (isSpeakingNode(element))) {
+      return true;
+    }
+    return false;
+  }
+
+  private static boolean isTopLevelScrollItem(UiElement element) {
+    UiElement parent = element.getParent();
+    return parent != null && parent.isScrollable();
+  }
+
+  private static boolean isActionableForAccessibility(UiElement element) {
+    if (element.isFocusable() || element.isClickable() || element.isLongClickable()) {
+      return true;
+    }
+
+    if (element instanceof UiAutomationElement) {
+      AccessibilityNodeInfo node = ((UiAutomationElement) element).getRawElement();
+      return (node.getActions() & AccessibilityNodeInfo.ACTION_FOCUS) == AccessibilityNodeInfo.ACTION_FOCUS;
+    }
+    return false;
+  }
+
+  private static boolean isSpeakingNode(UiElement element) {
+    return hasContentDescriptionOrText(element) || element.isCheckable()
+        || hasNonActionableSpeakingChildren(element);
+  }
+
+  private static boolean hasNonActionableSpeakingChildren(UiElement element) {
+    // Recursively check visible and non-focusable descendant nodes.
+    for (UiElement child : element.getChildren(UiElement.VISIBLE)) {
+      if (!isAccessibilityFocusable(child) && isSpeakingNode(child)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean hasContentDescriptionOrText(UiElement element) {
     return !TextUtils.isEmpty(element.getContentDescription())
         || !TextUtils.isEmpty(element.getText());
   }
