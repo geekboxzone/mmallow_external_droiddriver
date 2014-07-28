@@ -17,6 +17,7 @@
 package com.google.android.droiddriver.util;
 
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -71,7 +72,11 @@ public class Events {
    * @throws ActionException if injection failed
    */
   public static void injectEvent(InputInjector injector, MotionEvent event) {
-    Logs.call(injector, "injectInputEvent", event);
+    injectEvent(Log.DEBUG, injector, event);
+  }
+
+  public static void injectEvent(int priority, InputInjector injector, MotionEvent event) {
+    Logs.call(priority, injector, "injectInputEvent", event);
     try {
       if (!injector.injectInputEvent(event)) {
         throw new ActionException("Failed to inject " + event);
@@ -93,7 +98,7 @@ public class Events {
   }
 
   public static void touchMove(InputInjector injector, long downTime, int x, int y) {
-    injectEvent(injector, newTouchMoveEvent(downTime, x, y));
+    injectEvent(Log.VERBOSE, injector, newTouchMoveEvent(downTime, x, y));
   }
 
   private Events() {}

@@ -24,10 +24,13 @@ import android.util.Log;
  */
 public class Logs {
   public static final String TAG = "DroidDriver";
-  public static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
   public static void call(Object self, String method, Object... args) {
-    if (DEBUG) {
+    call(Log.DEBUG, self, method, args);
+  }
+
+  public static void call(int priority, Object self, String method, Object... args) {
+    if (Log.isLoggable(TAG, priority)) {
       Log.d(
           TAG,
           String.format("Invoking %s.%s(%s)", self.getClass().getSimpleName(), method,

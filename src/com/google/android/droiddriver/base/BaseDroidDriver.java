@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.base;
 
+import android.util.Log;
+
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
 import com.google.android.droiddriver.UiElement;
@@ -36,7 +38,7 @@ public abstract class BaseDroidDriver<R, E extends BaseUiElement<R, E>> implemen
 
   @Override
   public UiElement find(Finder finder) {
-    Logs.call(this, "find", finder);
+    Logs.call(Log.VERBOSE, this, "find", finder);
     return finder.find(getRootElement());
   }
 

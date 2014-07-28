@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<!--  TODO: clean up path before open sourcing -->
-	<classpathentry kind="lib" path="../../prebuilts/sdk/current/android.jar"/>
+	<classpathentry kind="lib" path="../../prebuilts/sdk/19/android.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
