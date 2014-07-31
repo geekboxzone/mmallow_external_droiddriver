@@ -1,2 +1,11 @@
 bin/
 gen/
+
+# gradle junk
+.gradle
+build
+
+# Android Studio junk
+.idea/
+*.iml
+local.properties
