@@ -152,6 +152,13 @@ public interface UiElement {
   void setText(String text);
 
   /**
+  * Replace the text of this element.
+  *
+  * @param text The text that be replaced with
+  */
+  void replaceText(String text);
+
+  /**
    * Clicks this element. The click will be at the center of the visible
    * element.
    */
