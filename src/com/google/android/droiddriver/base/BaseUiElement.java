@@ -17,17 +17,21 @@
 package com.google.android.droiddriver.base;
 
 import android.graphics.Rect;
+import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.EventUiElementActor;
+import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.actions.SingleKeyAction;
+import com.google.android.droiddriver.actions.TextAction;
 import com.google.android.droiddriver.actions.UiElementActor;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.finders.Attribute;
 import com.google.android.droiddriver.finders.Predicate;
 import com.google.android.droiddriver.finders.Predicates;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
+import com.google.android.droiddriver.util.Events;
 import com.google.android.droiddriver.util.Logs;
 import com.google.android.droiddriver.util.Strings;
 import com.google.android.droiddriver.util.Strings.ToStringHelper;
@@ -208,18 +212,29 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
 
   @Override
   public void setText(String text) {
-    uiElementActor.setText(this, text);
+    Logs.call(this, "setText", text);
+    clearText();
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    perform(new TextAction(text));
   }
 
-  @Override
-  public void replaceText(String text) {
-      if (this.getText() != null) {
-          int len = this.getText().length();
-          for (int i = 0; i < len; i++) {
-              this.perform(SingleKeyAction.DELETE);
-          }
-      }
-      this.setText(text);
+  private void clearText() {
+    longClick(); // Gain focus; single click always activates IME.
+    String text = getText();
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    InputInjector injector = getInjector();
+    SingleKeyAction.CTRL_MOVE_HOME.perform(injector, this);
+
+    final long shiftDownTime = Events.keyDown(injector, KeyEvent.KEYCODE_SHIFT_LEFT, 0);
+    SingleKeyAction.CTRL_MOVE_END.perform(injector, this);
+    Events.keyUp(injector, shiftDownTime, KeyEvent.KEYCODE_SHIFT_LEFT, 0);
+    SingleKeyAction.DELETE.perform(injector, this);
   }
 
   @Override
