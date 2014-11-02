@@ -145,20 +145,18 @@ public interface UiElement {
   boolean perform(Action action);
 
   /**
-   * Sets the text of this element. The implementation may not work on all
-   * UiElements if the underlying view is not EditText.
-   * <p>
-   * If IME is open after this call, you can call
-   *
-   * <pre>
-   * perform(SingleKeyAction.BACK);
-   * </pre>
-   *
-   * to close the IME.
+   * Sets the text of this element.
    *
    * @param text The text to enter.
    */
   void setText(String text);
+
+  /**
+  * Replace the text of this element.
+  *
+  * @param text The text that be replaced with
+  */
+  void replaceText(String text);
 
   /**
    * Clicks this element. The click will be at the center of the visible

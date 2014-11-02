@@ -24,6 +24,13 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  */
 public interface UiElementActor {
   /**
+   * Sets the text of this element.
+   *
+   * @param text The text to enter.
+   */
+  void setText(UiElement uiElement, String text);
+
+  /**
    * Clicks this element. The click will be at the center of the visible
    * element.
    */

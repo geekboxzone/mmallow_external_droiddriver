@@ -17,6 +17,7 @@
 package com.google.android.droiddriver.actions.accessibility;
 
 import com.google.android.droiddriver.UiElement;
+import com.google.android.droiddriver.actions.TextAction;
 import com.google.android.droiddriver.actions.UiElementActor;
 import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
 
@@ -25,6 +26,11 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  */
 public class AccessibilityUiElementActor implements UiElementActor {
   public static final AccessibilityUiElementActor INSTANCE = new AccessibilityUiElementActor();
+
+  @Override
+  public void setText(UiElement uiElement, String text) {
+    uiElement.perform(new TextAction(text));
+  }
 
   @Override
   public void click(UiElement uiElement) {
