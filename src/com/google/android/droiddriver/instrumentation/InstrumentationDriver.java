@@ -29,6 +29,8 @@ import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
 
+import java.util.List;
+
 /**
  * Implementation of DroidDriver that is driven via instrumentation.
  */
@@ -65,9 +67,9 @@ public class InstrumentationDriver extends BaseDroidDriver<View, ViewElement> {
     @Override
     public void run() {
       try {
-        View[] views = RootFinder.getRootViews();
-        if (views.length > 1) {
-          Logs.log(Log.VERBOSE, "views.length=" + views.length);
+        List<View> views = RootFinder.getRootViews();
+        if (views.size() > 1) {
+          Logs.log(Log.VERBOSE, "views.size()=" + views.size());
           for (View view : views) {
             if (view.hasWindowFocus()) {
               rootView = view;
