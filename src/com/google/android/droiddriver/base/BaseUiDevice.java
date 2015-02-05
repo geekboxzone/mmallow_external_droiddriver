@@ -36,11 +36,11 @@ import java.io.BufferedOutputStream;
  */
 public abstract class BaseUiDevice implements UiDevice {
   // power off may not trigger new events
-  private static final SingleKeyAction POWER_OFF = new SingleKeyAction(KeyEvent.KEYCODE_POWER, 0,
-      false);
+  private static final SingleKeyAction POWER_OFF = new SingleKeyAction(KeyEvent.KEYCODE_POWER,
+      0/* metaState */, 0/* timeoutMillis */, false);
   // power on should always trigger new events
   private static final SingleKeyAction POWER_ON = new SingleKeyAction(KeyEvent.KEYCODE_POWER,
-      1000L, false);
+      0/* metaState */, 1000L/* timeoutMillis */, false);
 
   @Override
   public boolean isScreenOn() {
