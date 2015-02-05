@@ -25,6 +25,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Class to find the root view.
  */
@@ -71,11 +74,16 @@ public class RootFinder {
   /**
    * @return a list of {@link View}s.
    */
-  public static View[] getRootViews() {
-    View[] views = null;
+  @SuppressWarnings("unchecked")
+  public static List<View> getRootViews() {
+    List<View> views = null;
 
     try {
-      views = (View[]) viewsField.get(windowManagerObj);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        views = (List<View>) viewsField.get(windowManagerObj);
+      } else {
+        views = Arrays.asList((View[]) viewsField.get(windowManagerObj));
+      }
       return views;
     } catch (RuntimeException re) {
       throw new DroidDriverException(String.format("Reflective access to %s on %s failed.",
