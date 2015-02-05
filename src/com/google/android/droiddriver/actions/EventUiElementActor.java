@@ -27,6 +27,11 @@ public class EventUiElementActor implements UiElementActor {
   public static final EventUiElementActor INSTANCE = new EventUiElementActor();
 
   @Override
+  public void setText(UiElement uiElement, String text) {
+    uiElement.perform(new TextAction(text));
+  }
+
+  @Override
   public void click(UiElement uiElement) {
     uiElement.perform(ClickAction.SINGLE);
   }
