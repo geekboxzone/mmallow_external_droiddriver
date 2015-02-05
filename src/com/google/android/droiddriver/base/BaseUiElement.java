@@ -213,9 +213,11 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
 
   @Override
   public void replaceText(String text) {
-      int len = this.getText().length();
-      for (int i = 0; i < len; i++) {
-          this.perform(SingleKeyAction.DELETE);
+      if (this.getText() != null) {
+          int len = this.getText().length();
+          for (int i = 0; i < len; i++) {
+              this.perform(SingleKeyAction.DELETE);
+          }
       }
       this.setText(text);
   }
