@@ -97,8 +97,8 @@ public final class Predicates {
    * order, and evaluation will be "short-circuited" as soon as a false
    * predicate is found.
    */
-  public static <T> Predicate<T> allOf(
-      @SuppressWarnings("unchecked") final Predicate<? super T>... components) {
+  @SuppressWarnings("unchecked")
+  public static <T> Predicate<T> allOf(final Predicate<? super T>... components) {
     return new Predicate<T>() {
       @Override
       public boolean apply(T input) {
@@ -123,8 +123,8 @@ public final class Predicates {
    * order, and evaluation will be "short-circuited" as soon as a true predicate
    * is found.
    */
-  public static <T> Predicate<T> anyOf(
-      @SuppressWarnings("unchecked") final Predicate<? super T>... components) {
+  @SuppressWarnings("unchecked")
+  public static <T> Predicate<T> anyOf(final Predicate<? super T>... components) {
     return new Predicate<T>() {
       @Override
       public boolean apply(T input) {
