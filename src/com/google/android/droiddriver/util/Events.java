@@ -19,6 +19,7 @@ package com.google.android.droiddriver.util;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.InputDevice;
+import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -32,7 +33,7 @@ public class Events {
   /**
    * @return a touch down event at the specified coordinates
    */
-  public static MotionEvent newTouchDownEvent(int x, int y) {
+  private static MotionEvent newTouchDownEvent(int x, int y) {
     long downTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
@@ -42,7 +43,7 @@ public class Events {
   /**
    * @return a touch up event at the specified coordinates
    */
-  public static MotionEvent newTouchUpEvent(long downTime, int x, int y) {
+  private static MotionEvent newTouchUpEvent(long downTime, int x, int y) {
     long eventTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
@@ -52,15 +53,16 @@ public class Events {
   /**
    * @return a touch move event at the specified coordinates
    */
-  public static MotionEvent newTouchMoveEvent(long downTime, int x, int y) {
+  private static MotionEvent newTouchMoveEvent(long downTime, int x, int y) {
     long eventTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 1);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
     return event;
   }
 
-  public static KeyEvent newKeyEvent(long downTime, int action, int keyCode) {
-    KeyEvent event = new KeyEvent(downTime, downTime, action, keyCode, 0 /* repeat */);
+  private static KeyEvent newKeyEvent(long downTime, long eventTime, int action, int keyCode,
+      int metaState) {
+    KeyEvent event = new KeyEvent(downTime, eventTime, action, keyCode, 0 /* repeat */, metaState);
     event.setSource(InputDevice.SOURCE_KEYBOARD);
     return event;
   }
@@ -71,18 +73,20 @@ public class Events {
    *
    * @throws ActionException if injection failed
    */
-  public static void injectEvent(InputInjector injector, MotionEvent event) {
+  private static void injectEvent(InputInjector injector, InputEvent event) {
     injectEvent(Log.DEBUG, injector, event);
   }
 
-  public static void injectEvent(int priority, InputInjector injector, MotionEvent event) {
+  private static void injectEvent(int priority, InputInjector injector, InputEvent event) {
     Logs.call(priority, injector, "injectInputEvent", event);
     try {
       if (!injector.injectInputEvent(event)) {
         throw new ActionException("Failed to inject " + event);
       }
     } finally {
-      event.recycle();
+      if (event instanceof MotionEvent) {
+        ((MotionEvent) event).recycle();
+      }
     }
   }
 
@@ -99,6 +103,18 @@ public class Events {
 
   public static void touchMove(InputInjector injector, long downTime, int x, int y) {
     injectEvent(Log.VERBOSE, injector, newTouchMoveEvent(downTime, x, y));
+  }
+
+  public static long keyDown(InputInjector injector, int keyCode, int metaState) {
+    long downTime = SystemClock.uptimeMillis();
+    KeyEvent downEvent = newKeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, keyCode, metaState);
+    injectEvent(injector, downEvent);
+    return downTime;
+  }
+
+  public static void keyUp(InputInjector injector, long downTime, int keyCode, int metaState) {
+    injectEvent(injector,
+        newKeyEvent(downTime, SystemClock.uptimeMillis(), KeyEvent.ACTION_UP, keyCode, metaState));
   }
 
   private Events() {}

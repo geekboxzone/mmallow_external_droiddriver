@@ -17,12 +17,12 @@
 package com.google.android.droiddriver.actions;
 
 import android.os.Build;
-import android.os.SystemClock;
 import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.util.Events;
 import com.google.android.droiddriver.util.Strings;
+import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
 /**
  * An action to press a single key. While it is convenient for navigating the
@@ -39,30 +39,42 @@ public class SingleKeyAction extends KeyAction {
   public static final SingleKeyAction SEARCH = new SingleKeyAction(KeyEvent.KEYCODE_SEARCH);
   public static final SingleKeyAction BACK = new SingleKeyAction(KeyEvent.KEYCODE_BACK);
   public static final SingleKeyAction DELETE = new SingleKeyAction(KeyEvent.KEYCODE_DEL);
+  public static final SingleKeyAction CTRL_MOVE_HOME = new SingleKeyAction(
+      KeyEvent.KEYCODE_MOVE_HOME, KeyEvent.META_CTRL_LEFT_ON);
+  public static final SingleKeyAction CTRL_MOVE_END = new SingleKeyAction(
+      KeyEvent.KEYCODE_MOVE_END, KeyEvent.META_CTRL_LEFT_ON);
 
   private final int keyCode;
+  private final int metaState;
 
   /**
-   * Defaults timeoutMillis to 100.
+   * Defaults metaState to 0.
    */
   public SingleKeyAction(int keyCode) {
-    this(keyCode, 100L, false);
+    this(keyCode, 0);
   }
 
-  public SingleKeyAction(int keyCode, long timeoutMillis, boolean checkFocused) {
+  /**
+   * Defaults timeoutMillis to 100 and checkFocused to false.
+   */
+  public SingleKeyAction(int keyCode, int metaState) {
+    this(keyCode, metaState, 100L, false);
+  }
+
+  public SingleKeyAction(int keyCode, int metaState, long timeoutMillis, boolean checkFocused) {
     super(timeoutMillis, checkFocused);
     this.keyCode = keyCode;
+    this.metaState = metaState;
   }
 
   @Override
   public boolean perform(InputInjector injector, UiElement element) {
     maybeCheckFocused(element);
 
-    final long downTime = SystemClock.uptimeMillis();
-    KeyEvent downEvent = Events.newKeyEvent(downTime, KeyEvent.ACTION_DOWN, keyCode);
-    KeyEvent upEvent = Events.newKeyEvent(downTime, KeyEvent.ACTION_UP, keyCode);
+    final long downTime = Events.keyDown(injector, keyCode, metaState);
+    Events.keyUp(injector, downTime, keyCode, metaState);
 
-    return injector.injectInputEvent(downEvent) && injector.injectInputEvent(upEvent);
+    return true;
   }
 
   @Override
@@ -70,6 +82,10 @@ public class SingleKeyAction extends KeyAction {
     String keyCodeString =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1 ? String.valueOf(keyCode)
             : KeyEvent.keyCodeToString(keyCode);
-    return Strings.toStringHelper(this).addValue(keyCodeString).toString();
+    ToStringHelper toStringHelper = Strings.toStringHelper(this);
+    if (metaState != 0) {
+      toStringHelper.add("metaState", metaState);
+    }
+    return toStringHelper.addValue(keyCodeString).toString();
   }
 }
