@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import com.google.android.droiddriver.UiElement;
 import com.google.android.droiddriver.actions.Action;
 import com.google.android.droiddriver.actions.EventUiElementActor;
+import com.google.android.droiddriver.actions.SingleKeyAction;
 import com.google.android.droiddriver.actions.UiElementActor;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
 import com.google.android.droiddriver.finders.Attribute;
@@ -208,6 +209,15 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   @Override
   public void setText(String text) {
     uiElementActor.setText(this, text);
+  }
+
+  @Override
+  public void replaceText(String text) {
+      int len = this.getText().length();
+      for (int i = 0; i < len; i++) {
+          this.perform(SingleKeyAction.DELETE);
+      }
+      this.setText(text);
   }
 
   @Override
