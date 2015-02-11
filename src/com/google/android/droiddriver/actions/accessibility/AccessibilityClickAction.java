@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.actions.accessibility;
 
+import android.annotation.TargetApi;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.UiElement;
@@ -24,6 +25,7 @@ import com.google.android.droiddriver.exceptions.ActionException;
 /**
  * An {@link AccessibilityAction} that clicks on a UiElement.
  */
+@TargetApi(18)
 public abstract class AccessibilityClickAction extends AccessibilityAction {
 
   public static final AccessibilityClickAction SINGLE = new SingleClick(1000L);

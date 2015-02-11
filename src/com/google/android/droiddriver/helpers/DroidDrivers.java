@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.helpers;
 
+import android.annotation.TargetApi;
 import android.app.Instrumentation;
 import android.os.Build;
 import android.os.Bundle;
@@ -135,6 +136,7 @@ public class DroidDrivers {
   }
 
   /** Returns a new UiAutomationDriver */
+  @TargetApi(18)
   public static UiAutomationDriver newUiAutomationDriver(Instrumentation instrumentation) {
     if (!hasUiAutomation()) {
       throw new DroidDriverException("UiAutomation is not available below API 18. "

@@ -1,13 +1,36 @@
-apply plugin: 'java'
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
+// If building from command line and you don't have the file local.properties that specifies
+// sdk.dir for the Android SDK path, you can run
+// $ ANDROID_HOME=/path/to/android-sdk gradle build
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        // this requires Gradle 2
+        classpath 'com.android.tools.build:gradle:1.0.1'
     }
 }
 
-dependencies {
-    compile files('../../prebuilts/sdk/19/android.jar')
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 12 // TODO: need to support SDK 9?
+        targetSdkVersion 21
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+        }
+    }
 }
