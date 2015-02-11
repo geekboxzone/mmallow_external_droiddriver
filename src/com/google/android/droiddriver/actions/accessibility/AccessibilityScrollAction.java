@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.actions.accessibility;
 
+import android.annotation.TargetApi;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.google.android.droiddriver.UiElement;
@@ -26,6 +27,7 @@ import com.google.android.droiddriver.util.Strings;
 /**
  * An {@link AccessibilityAction} that scrolls an UiElement.
  */
+@TargetApi(18)
 public class AccessibilityScrollAction extends AccessibilityAction implements ScrollAction {
   private final PhysicalDirection direction;
 

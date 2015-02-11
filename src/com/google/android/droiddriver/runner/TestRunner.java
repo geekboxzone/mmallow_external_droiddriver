@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.runner;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,8 +66,11 @@ public class TestRunner extends InstrumentationTestRunner {
    * Adds a {@link TestListener} that finishes all created activities.
    */
   @Override
+  @TargetApi(18)
   public void onStart() {
-    DroidDrivers.initInstrumentation(this, getArguments());
+    if (Build.VERSION.SDK_INT >= 18) {
+      DroidDrivers.initInstrumentation(this, getArguments());
+    }
 
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override

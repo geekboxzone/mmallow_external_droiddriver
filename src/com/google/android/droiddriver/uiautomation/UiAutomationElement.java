@@ -18,6 +18,7 @@ package com.google.android.droiddriver.uiautomation;
 
 import static com.google.android.droiddriver.util.Strings.charSequenceToString;
 
+import android.annotation.TargetApi;
 import android.app.UiAutomation;
 import android.app.UiAutomation.AccessibilityEventFilter;
 import android.graphics.Rect;
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * A UiElement that gets attributes via the Accessibility API.
  */
+@TargetApi(18)
 public class UiAutomationElement extends BaseUiElement<AccessibilityNodeInfo, UiAutomationElement> {
   private static final AccessibilityEventFilter ANY_EVENT_FILTER = new AccessibilityEventFilter() {
     @Override
