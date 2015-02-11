@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.annotation.TargetApi;
 import android.app.UiAutomation;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -25,6 +26,7 @@ import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 import com.google.android.droiddriver.util.Logs;
 
+@TargetApi(18)
 class UiAutomationUiDevice extends BaseUiDevice {
   private final UiAutomationContext context;
 
