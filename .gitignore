@@ -3,9 +3,15 @@ gen/
 
 # gradle junk
 .gradle
+gradle/
+gradlew
+gradlew.bat
 build
 
 # Android Studio junk
 .idea/
 *.iml
 local.properties
+
+.DS_Store
+

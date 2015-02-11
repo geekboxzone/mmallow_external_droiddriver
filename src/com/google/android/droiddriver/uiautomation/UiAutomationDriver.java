@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.annotation.TargetApi;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
@@ -34,6 +35,7 @@ import com.google.android.droiddriver.util.Logs;
  * Implementation of DroidDriver that gets attributes via the Accessibility API
  * and is acted upon via synthesized events.
  */
+@TargetApi(18)
 public class UiAutomationDriver extends BaseDroidDriver<AccessibilityNodeInfo, UiAutomationElement> {
   // TODO: magic const from UiAutomator, but may not be useful
   /**

@@ -15,6 +15,7 @@
  */
 package com.google.android.droiddriver.scroll;
 
+import android.annotation.TargetApi;
 import android.app.UiAutomation;
 import android.app.UiAutomation.AccessibilityEventFilter;
 import android.util.Log;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeoutException;
  * correct {@link AccessibilityEvent}s after scrolling.
  * </p>
  */
+@TargetApi(18)
 public class AccessibilityEventScrollStepStrategy implements ScrollStepStrategy {
   /**
    * Stores the data if we reached end at the last {@link #scroll}. If the data

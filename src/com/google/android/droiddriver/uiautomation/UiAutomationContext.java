@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.annotation.TargetApi;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -23,6 +24,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.UnrecoverableException;
 
+@TargetApi(18)
 public class UiAutomationContext extends
     DroidDriverContext<AccessibilityNodeInfo, UiAutomationElement> {
   private final UiAutomation uiAutomation;

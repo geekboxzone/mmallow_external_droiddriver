@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.validators;
 
+import android.annotation.TargetApi;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -26,6 +27,7 @@ import com.google.android.droiddriver.uiautomation.UiAutomationElement;
 /**
  * Fall-back Validator for accessibility.
  */
+@TargetApi(14)
 public class DefaultAccessibilityValidator implements Validator {
   @Override
   public boolean isApplicable(UiElement element, Action action) {

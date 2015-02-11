@@ -16,12 +16,14 @@
 
 package com.google.android.droiddriver.uiautomation;
 
+import android.annotation.TargetApi;
 import android.app.UiAutomation;
 import android.view.InputEvent;
 
 import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.uiautomation.UiAutomationContext.UiAutomationCallable;
 
+@TargetApi(18)
 public class UiAutomationInputInjector implements InputInjector {
   private final UiAutomationContext context;
 
