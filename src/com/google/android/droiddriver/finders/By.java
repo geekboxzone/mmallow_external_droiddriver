@@ -159,7 +159,7 @@ public class By {
   }
 
   /**
-   * Evaluates given {@finders} in short-circuit fashion in the order
+   * Evaluates given {@code finders} in short-circuit fashion in the order
    * they are passed. Costly finders (for example those returned by with*
    * methods that navigate the node tree) should be passed after cheap finders
    * (for example the ByAttribute finders).
@@ -171,7 +171,7 @@ public class By {
   }
 
   /**
-   * Evaluates given {@finders} in short-circuit fashion in the order
+   * Evaluates given {@code finders} in short-circuit fashion in the order
    * they are passed. Costly finders (for example those returned by with*
    * methods that navigate the node tree) should be passed after cheap finders
    * (for example the ByAttribute finders).
