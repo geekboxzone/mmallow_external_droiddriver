@@ -1,54 +1,23 @@
-## Working on AOSP
+# Contributing
 
-#### Downloading source
+DroidDriver issues are [tracked on GitHub](https://github.com/appium/droiddriver/issues)
 
-Follow instructions at https://source.android.com/source/downloading.html except those noted below. You need to set up authentication to be able to submit changes.
-DroidDriver is an "unbundled" project. If you specify the repo manifest branch "droiddriver-dev" (see below), you'll get only the relevant projects instead of the whole AOSP tree.
+The [`master` branch](https://github.com/appium/droiddriver/tree/master) on GitHub tracks [the AOSP master branch](https://android.googlesource.com/platform/external/droiddriver). [All releases](releasing_to_jcenter.md) are made from the master branch.
 
-Create a dir for AOSP, e.g. ~/android/aosp. It should be separate from your work on the internal repo to avoid confusion.
-Then get a local client of the repo:
+Code changes should be [submitted to AOSP](contributing_aosp.md) and then they'll be synced to GitHub once they've passed code reivew on Gerrit.
 
-```bash
-$ mkdir droiddriver-dev
-$ cd droiddriver-dev
-$ repo init -u https://android.googlesource.com/a/platform/manifest -b droiddriver-dev
-$ repo sync
-```
+#### Requirements
 
-The code should be downloaded to the current dir. You may see some lines in the output like:
-curl: (22) The requested URL returned error: 401 Unauthorized
-These messages seem non-fatal and you should see these dirs after it is done:
-build/  external/  frameworks/  Makefile  prebuilts/
+Gradle 2.2.1 or better is required to be installed on the system. In Android Studio, you'll need to provide the gradle location.
 
-#### Submitting Patches
+On Mac OSX with homebrew, `brew install gradle` will install gradle. To locate the path, use `brew info gradle` The homebrew path follows this format: `/usr/local/Cellar/gradle/2.2.1/libexec`
 
-[Submitting patches to Android](https://source.android.com/source/submit-patches.html)
+If you installed gradle using the zip (`gradle-2.2.1-bin.zip`), then the path will be the `gradle-2.2.1` folder.
 
-- `cd external/droiddriver/`
-- `repo start appium .`
-- `git pull git@github.com:appium/droiddriver.git`
-- `repo upload`
+#### Import into Android Studio
 
-After submitting a branch to gerrit for review, each commit will show up as an individual patch set on gerrit. First the code needs to be code reviewed (+2), then verified & submitted by an approver. Reviewers without approval rights are limited to adding a code review +1.
-
-If commits are uploaded together (on the same branch) then they are considered dependent upon eachother. To submit an individual commit without requiring other commits to be merged first, that commit must be cherry picked to a new branch. This can be done either locally or via the gerrit UI.
-
-#### Updating patches on Gerrit
-
-- `repo sync`
-- Use the `get fetch` command from the gerrit changeset under the Download menu
-- Make new commit then squash into previous commit to retain the gerrit change id
-- `repo upload`
-
-#### Building
-
-This sets up environment and some bash functions, particularly "tapas"
-(the counterpart of "lunch" for unbundled projects) and "m".
-
-```bash
-$ . build/envsetup.sh
-$ tapas droiddriver ManualDD
-$ m
-```
-
-ManualDD is an APK you can use to manually test DroidDriver.
+- Clone from git
+- Launch Android Studio and select `Open an existing Android Studio project`
+- Navigate to `droiddriver/build.gradle` and press Choose
+- Select `Use local gradle distribution` and enter the Gradle path
+- Android Studio will now import the project successfully
