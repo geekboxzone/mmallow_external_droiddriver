@@ -33,6 +33,16 @@ After submitting a branch to gerrit for review, each commit will show up as an i
 
 If commits are uploaded together (on the same branch) then they are considered dependent upon eachother. To submit an individual commit without requiring other commits to be merged first, that commit must be cherry picked to a new branch. This can be done either locally or via the gerrit UI.
 
+#### Working with gerrit
+
+Reviewers must be added to each changeset for them to approve the code. Reviews can be specified on command line in this format:
+
+`$ repo upload --re="<joe@example.com>,<john@example.com>" .`
+
+The '<>' above are literal. The emails must have been registered with Gerrit. You can also use the "--cc" flag.
+
+When commenting on the code, posts will show up as drafts. Drafts are not visible to other users. To post the drafts, press the reply button (keyboard shortcut 'a') and then click Post.
+
 #### Updating patches on Gerrit
 
 - `repo sync`
