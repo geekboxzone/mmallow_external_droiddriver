@@ -31,7 +31,7 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  */
 public class Scrollers {
   /**
-   * Augments the delegate {@link ScrollStepStrategy) - after a successful
+   * Augments the delegate {@link ScrollStepStrategy} - after a successful
    * scroll, waits until ProgressBar is gone.
    */
   public static abstract class ProgressBarScrollStepStrategy extends ForwardingScrollStepStrategy {
