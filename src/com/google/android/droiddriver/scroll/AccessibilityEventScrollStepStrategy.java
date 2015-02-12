@@ -41,7 +41,7 @@ import java.util.concurrent.TimeoutException;
  * This implementation behaves just like the <a href=
  * "http://developer.android.com/tools/help/uiautomator/UiScrollable.html"
  * >UiScrollable</a> class. It may not work in all cases. For instance,
- * sometimes {@link android.support.v4.widget.DrawerLayout} does not send
+ * sometimes {@code android.support.v4.widget.DrawerLayout} does not send
  * correct {@link AccessibilityEvent}s after scrolling.
  * </p>
  */
