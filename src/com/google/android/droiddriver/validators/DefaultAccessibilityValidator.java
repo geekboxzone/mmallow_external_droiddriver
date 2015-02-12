@@ -56,6 +56,7 @@ public class DefaultAccessibilityValidator implements Validator {
     return parent != null && parent.isScrollable();
   }
 
+  @SuppressWarnings("deprecation")
   private static boolean isActionableForAccessibility(UiElement element) {
     if (element.isFocusable() || element.isClickable() || element.isLongClickable()) {
       return true;

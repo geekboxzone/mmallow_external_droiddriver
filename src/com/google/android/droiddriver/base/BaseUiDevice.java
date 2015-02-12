@@ -42,6 +42,7 @@ public abstract class BaseUiDevice implements UiDevice {
   private static final SingleKeyAction POWER_ON = new SingleKeyAction(KeyEvent.KEYCODE_POWER,
       0/* metaState */, 1000L/* timeoutMillis */, false);
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isScreenOn() {
     PowerManager pm =

@@ -8,10 +8,18 @@ buildscript {
     dependencies {
         // this requires Gradle 2
         classpath 'com.android.tools.build:gradle:1.0.1'
+        classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
 
 apply plugin: 'com.android.library'
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+version = '1.0.0'
+group = 'io.appium'
 
 android {
     compileSdkVersion 21
@@ -20,6 +28,8 @@ android {
     defaultConfig {
         minSdkVersion 12 // TODO: need to support SDK 9?
         targetSdkVersion 21
+        versionCode 1
+        versionName version
     }
 
     compileOptions {
@@ -33,4 +43,41 @@ android {
             java.srcDirs = ['src']
         }
     }
+}
+
+apply plugin: 'com.github.dcendents.android-maven'
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
