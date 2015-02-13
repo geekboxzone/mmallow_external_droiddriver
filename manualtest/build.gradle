@@ -1,0 +1,40 @@
+//TODO: figure out how to enable breakpoints in droiddriver. Breakpoints in system (e.g. InstrumentationTestRunner) work.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        // this requires Gradle 2
+        classpath 'com.android.tools.build:gradle:1.0.1'
+    }
+}
+
+// This is actually a test without an AUT (application under test).
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
+
+    defaultConfig {
+        minSdkVersion 12
+        targetSdkVersion 21
+        // Force remove the suffix '.test'
+        testApplicationId 'com.google.android.droiddriver.manualtest'
+        testInstrumentationRunner 'com.google.android.droiddriver.runner.TestRunner'
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+        }
+        androidTest {
+            java.srcDirs = ['src']
+        }
+    }
+}
+
+dependencies {
+    androidTestCompile project(':droiddriver') // TODO: use droiddriver from jcenter
+}

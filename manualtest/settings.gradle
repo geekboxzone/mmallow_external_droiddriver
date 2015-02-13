@@ -1,0 +1,3 @@
+// This is a hack that can be removed if we use droiddriver from jcenter
+include(':droiddriver')
+project(':droiddriver').projectDir = file('..')
