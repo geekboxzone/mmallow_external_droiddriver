@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.droiddriver.manualtest"
-    android:versionCode="1"
-    android:versionName="1.0" >
-
-    <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="19" />
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.google.android.droiddriver.manualtest">
 
     <instrumentation
         android:name="com.google.android.droiddriver.runner.TestRunner"
         android:targetPackage="com.google.android.droiddriver.manualtest" />
 
-    <application>
+    <!-- Needed for Android.mk -->
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="19"
+        tools:ignore="OldTargetApi,GradleOverrides" />
+
+    <application
+        android:allowBackup="false"
+        tools:ignore="MissingApplicationIcon">
         <uses-library android:name="android.test.runner" />
     </application>
 
