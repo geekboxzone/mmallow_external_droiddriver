@@ -13,7 +13,7 @@ import com.google.android.droiddriver.helpers.DroidDrivers;
  * testing. Instead it is used for debugging failures. It assumes the device is
  * in a condition that is ready to reproduce a failure. For example,
  * {@link #testSetTextForPassword} assumes the password_edit field is displayed
- * on screen.
+ * on screen and has input focus.
  * <p>
  * Run it as (optionally with -e debug true)
  *
