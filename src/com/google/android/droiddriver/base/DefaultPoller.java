@@ -20,6 +20,7 @@ import android.os.SystemClock;
 
 import com.google.android.droiddriver.DroidDriver;
 import com.google.android.droiddriver.Poller;
+import com.google.android.droiddriver.exceptions.NoRunningActivityException;
 import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.Finder;
 
@@ -66,9 +67,16 @@ public class DefaultPoller implements Poller {
     long end = SystemClock.uptimeMillis() + timeoutMillis;
     while (true) {
       try {
-        driver.refreshUiElementTree();
+        try {
+          driver.refreshUiElementTree();
+        } catch (NoRunningActivityException nrae) {
+          if (checker == GONE) {
+            return null;
+          }
+          throw nrae;
+        }
         return checker.check(driver, finder);
-      } catch (UnsatisfiedConditionException e) {
+      } catch (UnsatisfiedConditionException uce) {
         // fall through to poll
       }
 
