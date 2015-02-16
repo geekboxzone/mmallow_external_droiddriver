@@ -25,7 +25,7 @@ tasks.withType(JavaCompile) {
 
 def ddArtifactId  = 'droiddriver'
 def ddGroup       = 'io.appium'
-def ddVersion     = '1.0.0-SNAPSHOT'
+def ddVersion     = '0.9.1-SNAPSHOT'
 def ddWebsite     = 'https://github.com/appium/droiddriver'
 def ddTracker     = 'https://github.com/appium/droiddriver/issues'
 def ddGit         = 'https://github.com/appium/droiddriver.git'
