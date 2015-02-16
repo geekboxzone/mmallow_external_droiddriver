@@ -27,7 +27,6 @@ import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.util.FileUtils;
 import com.google.android.droiddriver.util.Logs;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -35,9 +34,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
- * Base class for tests using DroidDriver that handles uncaught exceptions, for
- * example OOME, and takes screenshot on failure. It is NOT required, but
- * provides handy utility methods.
+ * Base class for tests using DroidDriver that reports uncaught exceptions, for * example OOME,
+ * instead of crash. Also supports other features, including taking screenshot on failure. It is NOT
+ * required, but provides handy features.
  */
 public abstract class BaseDroidDriverTest<T extends Activity> extends
     D2ActivityInstrumentationTestCase2<T> {
@@ -45,7 +44,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   // In case of device-wide fatal errors, e.g. OOME, the remaining tests will
   // fail and the messages will not help, so skip them.
   private static boolean skipRemainingTests = false;
-  // Prevent crash by uncaught exception.
+  // Store uncaught exception from AUT.
   private static volatile Throwable uncaughtException;
   static {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -94,8 +93,18 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
    */
   protected abstract void classSetUp();
 
+  protected boolean reportSkippedAsFailed() {
+    return false;
+  }
+
+  protected void skip() {
+    if (reportSkippedAsFailed()) {
+      fail("Skipped due to prior failure");
+    }
+  }
+
   /**
-   * Takes a screenshot on failure.
+   * Hook for handling failure, for example, taking a screenshot.
    */
   protected void onFailure(Throwable failure) throws Throwable {
     // If skipRemainingTests is true, the failure has already been reported.
@@ -106,7 +115,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       skipRemainingTests = true;
     }
 
-    // Give uncaughtException (thrown by app instead of tests) high priority
+    // Give uncaughtException (thrown by AUT instead of tests) high priority
     if (uncaughtException != null) {
       failure = uncaughtException;
     }
@@ -125,7 +134,10 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
       Logs.log(Log.WARN, e);
       if (e instanceof OutOfMemoryError && !(failure instanceof OutOfMemoryError)) {
         skipRemainingTests = true;
-        dumpHprof();
+        try {
+          dumpHprof();
+        } catch (Throwable ignored) {
+        }
       }
     }
 
@@ -145,7 +157,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
     return "dd/" + getClass().getSimpleName() + "." + getName();
   }
 
-  protected void dumpHprof() throws IOException, FileNotFoundException {
+  protected void dumpHprof() throws IOException {
     String path = FileUtils.getAbsoluteFile(getBaseFileName() + ".hprof").getPath();
     // create an empty readable file
     FileUtils.open(path).close();
@@ -153,12 +165,13 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   }
 
   /**
-   * Fixes JUnit3: always call tearDown even when setUp throws. Also calls
-   * {@link #onFailure}.
+   * Fixes JUnit3: always call tearDown even when setUp throws. Also adds the
+   * {@link #onFailure} hook.
    */
   @Override
   public void runBare() throws Throwable {
     if (skipRemainingTests) {
+      skip();
       return;
     }
     if (uncaughtException != null) {
@@ -189,10 +202,10 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   }
 
   /**
-   * Overrides super.runTest() to fail fast when the test is annotated as
-   * FlakyTest and we should skip remaining tests (the failure is fatal).
-   * When a flaky test is re-run, tearDown() and setUp() are called first in order
-   * to reset the test's state.
+   * Overrides to fail fast when the test is annotated as   FlakyTest and we should skip remaining
+   * tests (the failure is fatal). Most lines are copied from super classes.
+   * <p>
+   * When a flaky test is re-run, tearDown() and setUp() are called first in order to reset state.
    */
   @Override
   protected void runTest() throws Throwable {
