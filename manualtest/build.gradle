@@ -1,5 +1,3 @@
-//TODO: figure out how to enable breakpoints in droiddriver. Breakpoints in system (e.g. InstrumentationTestRunner) work.
-
 buildscript {
     repositories {
         jcenter()

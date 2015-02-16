@@ -18,6 +18,7 @@ package com.google.android.droiddriver.util;
 
 import android.app.Activity;
 
+import com.google.android.droiddriver.exceptions.UnrecoverableException;
 import com.google.android.droiddriver.instrumentation.InstrumentationDriver;
 
 /**
@@ -53,6 +54,10 @@ public class ActivityUtils {
    * @return the currently running activity, or null if no activity has focus.
    */
   public static synchronized Activity getRunningActivity() {
+    if (runningActivitySupplier == null) {
+      throw new UnrecoverableException("If you don't use DroidDriver TestRunner, you need to call" +
+          " ActivityUtils.setRunningActivitySupplier appropriately");
+    }
     return runningActivitySupplier.get();
   }
 }

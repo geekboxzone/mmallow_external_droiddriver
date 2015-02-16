@@ -25,7 +25,7 @@ import com.google.android.droiddriver.actions.InputInjector;
 import com.google.android.droiddriver.base.BaseDroidDriver;
 import com.google.android.droiddriver.base.DroidDriverContext;
 import com.google.android.droiddriver.exceptions.DroidDriverException;
-import com.google.android.droiddriver.exceptions.TimeoutException;
+import com.google.android.droiddriver.exceptions.NoRunningActivityException;
 import com.google.android.droiddriver.util.ActivityUtils;
 import com.google.android.droiddriver.util.Logs;
 
@@ -81,7 +81,6 @@ public class InstrumentationDriver extends BaseDroidDriver<View, ViewElement> {
         rootView = ActivityUtils.getRunningActivity().getWindow().getDecorView();
       } catch (Throwable e) {
         exception = e;
-        Logs.log(Log.ERROR, e);
       }
     }
   }
@@ -105,8 +104,8 @@ public class InstrumentationDriver extends BaseDroidDriver<View, ViewElement> {
       }
       long remainingMillis = end - SystemClock.uptimeMillis();
       if (remainingMillis < 0) {
-        throw new TimeoutException(String.format(
-            "Timed out after %d milliseconds waiting for foreground activity", timeoutMillis));
+        throw new NoRunningActivityException(String.format(
+            "Cannot find the running activity after %d milliseconds", timeoutMillis));
       }
       SystemClock.sleep(Math.min(250, remainingMillis));
     }
