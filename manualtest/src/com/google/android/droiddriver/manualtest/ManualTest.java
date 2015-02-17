@@ -37,9 +37,4 @@ public class ManualTest extends BaseDroidDriverTest<Activity> {
     // assertEquals(password, driver.on(password_edit).getText());
     assertEquals(null, driver.on(password_edit).getText());
   }
-
-  @Override
-  protected final void classSetUp() {
-    DroidDrivers.init(DroidDrivers.newDriver(getInstrumentation()));
-  }
 }
