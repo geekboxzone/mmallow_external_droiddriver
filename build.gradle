@@ -56,6 +56,12 @@ android {
             java.srcDirs = ['src']
         }
     }
+
+    lintOptions {
+        // Aborting on lint errors prevents jenkins from processing the Lint output
+        // https://wiki.jenkins-ci.org/display/JENKINS/Android%20Lint%20Plugin
+        abortOnError false
+    }
 }
 
 apply plugin: 'com.github.dcendents.android-maven'
