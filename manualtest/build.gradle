@@ -33,6 +33,14 @@ android {
     }
 }
 
+// Building with droiddriver source. Common tests should use droiddriver from jcenter by having
+// these lines instead:
+// repositories {
+//     jcenter()
+// }
+// dependencies {
+//     androidTestCompile 'io.appium:droiddriver:0.9.1-BETA' // or another version
+// }
 dependencies {
-    androidTestCompile project(':droiddriver') // TODO: use droiddriver from jcenter
+    androidTestCompile project(':droiddriver')
 }
