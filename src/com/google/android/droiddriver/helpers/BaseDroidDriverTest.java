@@ -17,6 +17,7 @@
 package com.google.android.droiddriver.helpers;
 
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.os.Debug;
 import android.test.FlakyTest;
@@ -40,6 +41,30 @@ import java.lang.reflect.Modifier;
  */
 public abstract class BaseDroidDriverTest<T extends Activity> extends
     D2ActivityInstrumentationTestCase2<T> {
+  /**
+   * Calls {@link DroidDrivers#init} once and only once.
+   */
+  public static class DroidDriversInitializer extends SingleRun {
+    private static DroidDriversInitializer instance;
+    protected final Instrumentation instrumentation;
+
+    protected DroidDriversInitializer(Instrumentation instrumentation) {
+      this.instrumentation = instrumentation;
+    }
+
+    @Override
+    protected void run() {
+      DroidDrivers.init(DroidDrivers.newDriver(instrumentation));
+    }
+
+    public static synchronized DroidDriversInitializer get(Instrumentation instrumentation) {
+      if (instance == null) {
+        instance = new DroidDriversInitializer(instrumentation);
+      }
+      return instance;
+    }
+  }
+
   private static boolean classSetUpDone = false;
   // In case of device-wide fatal errors, e.g. OOME, the remaining tests will
   // fail and the messages will not help, so skip them.
@@ -86,12 +111,17 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
   }
 
   /**
-   * Initializes test fixture once for all tests extending this class. Typically
-   * you call {@link DroidDrivers#init} with an appropriate instance. If an
-   * InstrumentationDriver is used, this is a good place to call
-   * {@link com.google.android.droiddriver.instrumentation.ViewElement#overrideClassName}
+   * Initializes test fixture once for all tests extending this class. This may have unexpected
+   * behavior - if multiple subclasses override this method, only the override is executed. The
+   * other overrides are silently ignored. You can either use {@link SingleRun} in {@link #setUp},
+   * or override this method, which is a simpler alternative with the aforementioned catch.
+   * <p/>
+   * If an InstrumentationDriver is used, this is a good place to call {@link
+   * com.google.android.droiddriver.instrumentation.ViewElement#overrideClassName}
    */
-  protected abstract void classSetUp();
+  protected void classSetUp() {
+    DroidDriversInitializer.get(getInstrumentation()).singleRun();
+  }
 
   protected boolean reportSkippedAsFailed() {
     return false;
