@@ -22,10 +22,10 @@
  * A UI test framework should model the UI of the AUT in a hierarchical way to maximize code reuse.
  * Common interactions should be abstracted as methods of page objects. Uncommon interactions may
  * not be abstracted, but carried out using "driver" directly.
- * <p/>
+ * <p>
  * The organization of the entities (pages, components) does not need to strictly follow the AUT
  * structure. The UI model can be greatly simplified to make it easy to use.
- * <p/>
+ * <p>
  * In general the framework should follow these principles:
  * <ul>
  *   <li>Layered abstraction: at the highest level, methods completely abstract the implementation
@@ -81,26 +81,26 @@
  *       Sometimes it shows as a test passes when run alone but fails when run with other tests.
  *       The work-around is to add a delay after calling startActivity.</li>
  *   <li>Error "android.content.res.Resources$NotFoundException: Unable to find resource ID ..."?
- *       <br/>
+ *       <br>
  *       This may occur if you reference the AUT's resource in tests, and the two APKs are out of
  *       sync. Solution: build and install both AUT and tests together.</li>
  *   <li>"You said the test runs on older devices as well as API18 devices, but mine is broken on
  *       X (e.g. GingerBread)!"
- *       <br/>
+ *       <br>
  *       This may occur if your AUT has different implementations on older devices. In this case,
  *       your tests have to match the different execution paths of AUT, which requires insight into
  *       the implementation of the AUT. A tip for testing older devices: uiautomatorviewer does not
  *       work on ore-API16 devices (the "Device screenshot" button won't work), but you can use it
  *       with dumps from DroidDriver (use to-uiautomator.xsl to convert the format).</li>
  *   <li>"com.android.launcher has stopped unexpectedly" and logcat says OutOfMemoryError
- *       <br/>
+ *       <br>
  *       This is sometimes seen on GingerBread or other low-memory and slow devices. GC is not fast
  *       enough to reclaim memory on those devices. A work-around: call gc more aggressively and
  *       sleep to let gc run, e.g.
  *       <pre>       
 public void setUp() throws Exception {
   super.setUp();
-  if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
+  if (Build.VERSION.SDK_INT &lt;= Build.VERSION_CODES.GINGERBREAD_MR1) {
     Runtime.getRuntime().gc();
     SystemClock.sleep(1000L);
   }

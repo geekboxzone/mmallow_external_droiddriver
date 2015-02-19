@@ -115,7 +115,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
    * behavior - if multiple subclasses override this method, only the first override is executed.
    * Other overrides are silently ignored. You can either use {@link SingleRun} in {@link #setUp},
    * or override this method, which is a simpler alternative with the aforementioned catch.
-   * <p/>
+   * <p>
    * If an InstrumentationDriver is used, this is a good place to call {@link
    * com.google.android.droiddriver.instrumentation.ViewElement#overrideClassName}
    */
