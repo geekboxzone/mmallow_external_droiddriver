@@ -107,7 +107,9 @@ task sourcesJar(type: Jar) {
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    options.addStringOption('Xdoclint:none', '-quiet')
+    if (System.getProperties().get('java.specification.version') == '1.8') {
+        options.addStringOption('Xdoclint:all,-missing', '-quiet')
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
