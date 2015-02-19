@@ -26,32 +26,28 @@ import com.google.android.droiddriver.scroll.Direction.PhysicalDirection;
  */
 public interface Scroller {
   /**
-   * Scrolls {@code containerFinder} in both directions if necessary to find
-   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
+   * Scrolls {@code containerFinder} in both directions if necessary to find {@code itemFinder},
+   * which is a descendant of {@code containerFinder}.
    *
-   * @param driver
-   * @param containerFinder Finder for the container that can scroll, for
-   *        instance a ListView
-   * @param itemFinder Finder for the desired item; relative to
-   *        {@code containerFinder}
+   * @param driver          a DroidDriver instance
+   * @param containerFinder Finder for the container that can scroll, for instance a ListView
+   * @param itemFinder      Finder for the desired item; relative to {@code containerFinder}
    * @return the UiElement matching {@code itemFinder}
    * @throws ElementNotFoundException If no match is found
    */
   UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder);
 
   /**
-   * Scrolls {@code containerFinder} in {@code direction} if necessary to find
-   * {@code itemFinder}, which is a descendant of {@code containerFinder}.
+   * Scrolls {@code containerFinder} in {@code direction} if necessary to find {@code itemFinder},
+   * which is a descendant of {@code containerFinder}.
    *
-   * @param driver
-   * @param containerFinder Finder for the container that can scroll, for
-   *        instance a ListView
-   * @param itemFinder Finder for the desired item; relative to
-   *        {@code containerFinder}
-   * @param direction
+   * @param driver          a DroidDriver instance
+   * @param containerFinder Finder for the container that can scroll, for instance a ListView
+   * @param itemFinder      Finder for the desired item; relative to {@code containerFinder}
+   * @param direction       specifies where the view port will move instead of the finger
    * @return the UiElement matching {@code itemFinder}
    * @throws ElementNotFoundException If no match is found
    */
   UiElement scrollTo(DroidDriver driver, Finder containerFinder, Finder itemFinder,
-      PhysicalDirection direction);
+                     PhysicalDirection direction);
 }
