@@ -181,8 +181,7 @@ public interface UiElement {
   /**
    * Scrolls in the given direction.
    *
-   * @param direction specifies where the view port will move, instead of the
-   *        finger.
+   * @param direction specifies where the view port will move instead of the finger
    */
   void scroll(PhysicalDirection direction);
 

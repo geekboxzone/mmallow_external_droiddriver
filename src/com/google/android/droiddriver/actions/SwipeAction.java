@@ -122,7 +122,7 @@ public class SwipeAction extends EventAction implements ScrollAction {
    * @param steps minimum 2; (steps-1) is the number of {@code ACTION_MOVE} that
    *        will be injected between {@code ACTION_DOWN} and {@code ACTION_UP}.
    * @param drag whether this is a drag
-   * @param timeoutMillis
+   * @param timeoutMillis the value returned by {@link #getTimeoutMillis}
    * @param topMarginRatio margin ratio from top
    * @param leftMarginRatio margin ratio from left
    * @param bottomMarginRatio margin ratio from bottom
