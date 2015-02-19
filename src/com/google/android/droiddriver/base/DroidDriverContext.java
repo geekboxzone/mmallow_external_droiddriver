@@ -25,6 +25,7 @@ import com.google.android.droiddriver.exceptions.TimeoutException;
 import com.google.android.droiddriver.finders.ByXPath;
 import com.google.android.droiddriver.util.Logs;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
@@ -92,7 +93,7 @@ public class DroidDriverContext<R, E extends BaseUiElement<R, E>> {
     } catch (ExecutionException e) {
       throw new DroidDriverException(e);
     } catch (java.util.concurrent.TimeoutException e) {
-      Logs.log(Log.DEBUG, String.format(
+      Logs.log(Log.DEBUG, String.format(Locale.US,
           "Timed out after %d milliseconds waiting for idle on main looper", timeoutMillis));
       return false;
     }
@@ -135,7 +136,7 @@ public class DroidDriverContext<R, E extends BaseUiElement<R, E>> {
   }
 
   private String getRunOnMainSyncTimeoutMessage(long timeoutMillis) {
-    return String.format(
+    return String.format(Locale.US,
         "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync", timeoutMillis);
   }
 
