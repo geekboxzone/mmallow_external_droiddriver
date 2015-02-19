@@ -56,7 +56,7 @@ public class ScrollerHelper {
    *
    * @param itemFinder Finder for the desired item; relative to
    *        {@code containerFinder}
-   * @param direction
+   * @param direction specifies where the view port will move instead of the finger
    * @return the UiElement matching {@code itemFinder}
    * @throws ElementNotFoundException If no match is found
    */

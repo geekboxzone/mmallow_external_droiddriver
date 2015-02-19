@@ -12,6 +12,7 @@ public class PollingListeners {
   /**
    * Tries to find {@code watchFinder}, and clicks it if found.
    *
+   * @param driver a DroidDriver instance
    * @param watchFinder Identifies the UI component to watch
    * @return whether {@code watchFinder} is found
    */
