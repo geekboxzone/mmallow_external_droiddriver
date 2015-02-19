@@ -107,7 +107,11 @@ task sourcesJar(type: Jar) {
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    if (System.getProperties().get('java.specification.version') == '1.8') {
+    if (System.getProperty('java.specification.version') == '1.8') {
+        // '-quiet' is not related to -Xdoclint. In fact it is default for the Javadoc task.
+        // It is needed here because of a Gradle bug: addStringOption(String option) does not work.
+        // addStringOption(String option, String value) adds both option and value to the generated
+        // file javadoc.options, and value must be a valid javadoc command line option.
         options.addStringOption('Xdoclint:all,-missing', '-quiet')
     }
 }
