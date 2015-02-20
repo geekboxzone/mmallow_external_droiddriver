@@ -19,8 +19,8 @@ android {
         minSdkVersion 12
         targetSdkVersion 21
         // Force remove the suffix '.test'
-        testApplicationId 'com.google.android.droiddriver.manualtest'
-        testInstrumentationRunner 'com.google.android.droiddriver.runner.TestRunner'
+        testApplicationId 'io.appium.droiddriver.manualtest'
+        testInstrumentationRunner 'io.appium.droiddriver.runner.TestRunner'
     }
 
     sourceSets {
