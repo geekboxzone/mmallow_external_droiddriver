@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.os.Build;
 import android.view.KeyEvent;
 
@@ -25,38 +27,35 @@ import com.google.android.droiddriver.util.Strings;
 import com.google.android.droiddriver.util.Strings.ToStringHelper;
 
 /**
- * An action to press a single key. While it is convenient for navigating the
- * UI, do not overuse it -- the application may interpret key codes in a custom
- * way and, more importantly, application users may not have access to it
- * because the device (physical or virtual keyboard) may not support all key
- * codes.
+ * An action to press a single key. While it is convenient for navigating the UI, do not overuse it
+ * - the application may interpret key codes in a custom way and, more importantly, application
+ * users may not have access to it because the device (physical or virtual keyboard) may not support
+ * all key codes.
  */
 public class SingleKeyAction extends KeyAction {
-  /**
-   * Common instances for convenience and memory preservation.
-   */
+  // Common instances for convenience and memory preservation.
   public static final SingleKeyAction MENU = new SingleKeyAction(KeyEvent.KEYCODE_MENU);
   public static final SingleKeyAction SEARCH = new SingleKeyAction(KeyEvent.KEYCODE_SEARCH);
   public static final SingleKeyAction BACK = new SingleKeyAction(KeyEvent.KEYCODE_BACK);
   public static final SingleKeyAction DELETE = new SingleKeyAction(KeyEvent.KEYCODE_DEL);
+  /** Requires SDK API 11 or higher */
+  @SuppressLint("InlinedApi")
   public static final SingleKeyAction CTRL_MOVE_HOME = new SingleKeyAction(
       KeyEvent.KEYCODE_MOVE_HOME, KeyEvent.META_CTRL_LEFT_ON);
+  /** Requires SDK API 11 or higher */
+  @SuppressLint("InlinedApi")
   public static final SingleKeyAction CTRL_MOVE_END = new SingleKeyAction(
       KeyEvent.KEYCODE_MOVE_END, KeyEvent.META_CTRL_LEFT_ON);
 
   private final int keyCode;
   private final int metaState;
 
-  /**
-   * Defaults metaState to 0.
-   */
+  /** Defaults metaState to 0 */
   public SingleKeyAction(int keyCode) {
     this(keyCode, 0);
   }
 
-  /**
-   * Defaults timeoutMillis to 100 and checkFocused to false.
-   */
+  /** Defaults timeoutMillis to 100 and checkFocused to false */
   public SingleKeyAction(int keyCode, int metaState) {
     this(keyCode, metaState, 100L, false);
   }
@@ -77,6 +76,7 @@ public class SingleKeyAction extends KeyAction {
     return true;
   }
 
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
   @Override
   public String toString() {
     String keyCodeString =

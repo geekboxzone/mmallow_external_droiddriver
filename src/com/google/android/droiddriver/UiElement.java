@@ -139,7 +139,7 @@ public interface UiElement {
   /**
    * Executes the given action.
    *
-   * @param action The action to execute
+   * @param action the action to execute
    * @return true if the action is successful
    */
   boolean perform(Action action);
@@ -148,15 +148,18 @@ public interface UiElement {
    * Sets the text of this element. The implementation may not work on all
    * UiElements if the underlying view is not EditText.
    * <p>
-   * If IME is open after this call, you can call
-   *
+   * If this element already has text, it is cleared first if the device has API 11 or higher.
+   * <p>
+   * TODO: Support this behavior on older devices.
+   * <p>
+   * If the {@code text} ends with {@code '\n'}, the IME may be closed automatically after this
+   * call. If the IME is open after this call, you can call
    * <pre>
    * perform(SingleKeyAction.BACK);
    * </pre>
-   *
    * to close the IME.
    *
-   * @param text The text to enter.
+   * @param text the text to enter
    */
   void setText(String text);
 

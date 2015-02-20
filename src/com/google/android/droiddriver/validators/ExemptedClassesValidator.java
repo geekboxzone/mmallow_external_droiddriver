@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.validators;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.droiddriver.UiElement;
@@ -33,7 +34,7 @@ public class ExemptedClassesValidator implements Validator {
   @Override
   public boolean isApplicable(UiElement element, Action action) {
     String className = element.getClassName();
-    if (className == null || className.isEmpty()) {
+    if (TextUtils.isEmpty(className)) {
       return false;
     }
 
