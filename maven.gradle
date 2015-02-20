@@ -1,0 +1,34 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                version = ddVersion
+                groupId = ddGroup
+                artifactId = ddArtifactId
+
+                description = ddDescription
+                url ddWebsite
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                scm {
+                    connection ddGit
+                    developerConnection ddGit
+                    url ddWebsite
+                }
+
+                issueManagement {
+                    url ddTracker
+                }
+            }
+        }
+    }
+}
