@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.util;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.droiddriver.exceptions.DroidDriverException;
@@ -34,13 +36,16 @@ public class FileUtils {
    * not exist, they will be created. The file will be readable and writable to
    * all.
    */
+  @TargetApi(Build.VERSION_CODES.GINGERBREAD)
   public static BufferedOutputStream open(String path) throws FileNotFoundException {
     File file = getAbsoluteFile(path);
 
     Logs.log(Log.INFO, "opening file " + file.getAbsolutePath());
     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
-    file.setReadable(true /* readable */, false/* ownerOnly */);
-    file.setWritable(true /* readable */, false/* ownerOnly */);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+      file.setReadable(true /* readable */, false/* ownerOnly */);
+      file.setWritable(true /* readable */, false/* ownerOnly */);
+    }
     return stream;
   }
 
@@ -60,6 +65,7 @@ public class FileUtils {
     return file;
   }
 
+  @TargetApi(Build.VERSION_CODES.GINGERBREAD)
   private static void mkdirs(File dir) {
     if (dir == null || dir.exists()) {
       return;
@@ -69,8 +75,10 @@ public class FileUtils {
     if (!dir.mkdir()) {
       throw new DroidDriverException("failed to mkdir " + dir);
     }
-    dir.setReadable(true /* readable */, false/* ownerOnly */);
-    dir.setWritable(true /* readable */, false/* ownerOnly */);
-    dir.setExecutable(true /* executable */, false/* ownerOnly */);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+      dir.setReadable(true /* readable */, false/* ownerOnly */);
+      dir.setWritable(true /* readable */, false/* ownerOnly */);
+      dir.setExecutable(true /* executable */, false/* ownerOnly */);
+    }
   }
 }

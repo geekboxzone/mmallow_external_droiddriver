@@ -31,7 +31,7 @@ public abstract class SingleRun {
    *
    * @return true if this is the first time it is called, otherwise false
    */
-  public boolean singleRun() {
+  public final boolean singleRun() {
     if (hasRun.compareAndSet(false, true)) {
       run();
       return true;
