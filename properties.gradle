@@ -1,8 +1,9 @@
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-ext.bintray_user = properties.getProperty('bintray.user')
-ext.bintray_key  = properties.getProperty('bintray.key')
+if (bintrayEnabled) {
+    Properties properties = new Properties()
+    properties.load(bintrayFile.newDataInputStream())
+    ext.bintray_user = properties.getProperty('bintray.user')
+    ext.bintray_key  = properties.getProperty('bintray.key')
+}
 
 ext.ddArtifactId  = 'droiddriver'
 ext.ddGroup       = 'io.appium'

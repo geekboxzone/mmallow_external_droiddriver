@@ -1,6 +1,6 @@
 # Releasing to JCenter
 
-Add the following credentials to `local.properties` Your API key can be [found here](https://bintray.com/user/edit/tab/apikey).
+Add the following credentials to `bintray.properties` Your API key can be [found here](https://bintray.com/user/edit/tab/apikey).
 
 ```
 bintray.user=USERNAME
