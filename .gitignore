@@ -11,7 +11,9 @@ build
 # Android Studio junk
 .idea/
 *.iml
-local.properties
+
+# Don't check in properties
+*.properties
 
 .DS_Store
 
