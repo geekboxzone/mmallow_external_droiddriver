@@ -12,3 +12,20 @@ Creating a release on jcenter is done by invoking the binaryUpload task. Note th
 Update the version number in `build.gradle` by modifying the value of `ddVersion`. Official releases should be made only after removing the `-SNAPSHOT` suffix. If the same version number is used as an existing release of droiddriver then jcenter will reject the upload.
 
 `gradle clean bintrayUpload`
+
+# Releasing snapshots to artifactory
+
+Snapshots of DroidDriver are released to `http://oss.jfrog.org/artifactory` in the oss-snapshot-local
+repository.
+
+`gradle clean artifactoryPublish`
+
+Note that resolving the snapshots requires adding the maven repo to the gradle build file:
+
+`maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }`
+
+# Known Issues
+
+- `[buildinfo] Properties file path was not found! (Relevant only for builds running on a CI Server)`
+The missing properties warning can be safely ignored. We're populating the values in Gradle so
+the artifactory plugin doesn't know that they're already set.
