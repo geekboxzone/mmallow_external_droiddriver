@@ -1,38 +1,33 @@
 // If building from command line and you don't have the file local.properties that specifies
 // sdk.dir for the Android SDK path, you can run
 // $ ANDROID_HOME=/path/to/android-sdk gradle build
+// Gradle >= 2.1 required
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        // this requires Gradle 2
         classpath 'com.android.tools.build:gradle:1.0.1'
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.3'
     }
 }
 
-// Requires Grade >= 2.1
 plugins {
     id 'com.jfrog.bintray' version '1.1'
 }
+
+apply from: 'properties.gradle'
+group = ddGroup
+version = ddVersion
+
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:deprecation'
 }
-
-def ddArtifactId  = 'droiddriver'
-def ddGroup       = 'io.appium'
-def ddVersion     = '0.9.1-SNAPSHOT'
-def ddWebsite     = 'https://github.com/appium/droiddriver'
-def ddTracker     = 'https://github.com/appium/droiddriver/issues'
-def ddGit         = 'https://github.com/appium/droiddriver.git'
-def ddDescription = 'Android UI testing framework'
-version = ddVersion
-group = ddGroup
 
 android {
     compileSdkVersion 21
@@ -64,41 +59,6 @@ android {
     }
 }
 
-apply plugin: 'com.github.dcendents.android-maven'
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                version = ddVersion
-                groupId = ddGroup
-                artifactId = ddArtifactId
-
-                description = ddDescription
-                url ddWebsite
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                scm {
-                    connection ddGit
-                    developerConnection ddGit
-                    url ddWebsite
-                }
-
-                issueManagement {
-                    url ddTracker
-                }
-            }
-        }
-    }
-}
-
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -126,28 +86,6 @@ artifacts {
     archives sourcesJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    publish = true
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.key')
-
-    configurations = ['archives']
-    pkg {
-        repo = 'maven'
-        userOrg = 'appium'
-        name = "${ddGroup}:${ddArtifactId}"
-        websiteUrl = ddWebsite
-        issueTrackerUrl = ddTracker
-        vcsUrl = ddGit
-        desc = ddDescription
-        licenses = ['The Apache Software License, Version 2.0']
-        publicDownloadNumbers = true
-        version {
-            name = ddVersion
-            desc = ddDescription
-        }
-    }
-}
+apply from: 'maven.gradle'
+apply from: 'jcenter.gradle'
+apply from: 'artifactory.gradle'
