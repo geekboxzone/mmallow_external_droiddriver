@@ -16,6 +16,8 @@
 
 package com.google.android.droiddriver.util;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.InputDevice;
@@ -33,37 +35,50 @@ public class Events {
   /**
    * @return a touch down event at the specified coordinates
    */
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
   private static MotionEvent newTouchDownEvent(int x, int y) {
     long downTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 1);
-    event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    // TODO: Fix this if 'source' is required on devices older than HONEYCOMB_MR1.
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+      event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    }
     return event;
   }
 
   /**
    * @return a touch up event at the specified coordinates
    */
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
   private static MotionEvent newTouchUpEvent(long downTime, int x, int y) {
     long eventTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 1);
-    event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+      event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    }
     return event;
   }
 
   /**
    * @return a touch move event at the specified coordinates
    */
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
   private static MotionEvent newTouchMoveEvent(long downTime, int x, int y) {
     long eventTime = SystemClock.uptimeMillis();
     MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 1);
-    event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+      event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+    }
     return event;
   }
 
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
   private static KeyEvent newKeyEvent(long downTime, long eventTime, int action, int keyCode,
       int metaState) {
     KeyEvent event = new KeyEvent(downTime, eventTime, action, keyCode, 0 /* repeat */, metaState);
-    event.setSource(InputDevice.SOURCE_KEYBOARD);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+      event.setSource(InputDevice.SOURCE_KEYBOARD);
+    }
     return event;
   }
 

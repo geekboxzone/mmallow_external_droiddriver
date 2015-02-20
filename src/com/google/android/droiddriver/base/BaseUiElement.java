@@ -17,6 +17,8 @@
 package com.google.android.droiddriver.base;
 
 import android.graphics.Rect;
+import android.os.Build;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 
 import com.google.android.droiddriver.UiElement;
@@ -213,8 +215,12 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   @Override
   public void setText(String text) {
     Logs.call(this, "setText", text);
-    clearText();
-    if (text == null || text.isEmpty()) {
+    longClick(); // Gain focus; single click always activates IME.
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+      clearText();
+    }
+
+    if (TextUtils.isEmpty(text)) {
       return;
     }
 
@@ -222,9 +228,8 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
   }
 
   private void clearText() {
-    longClick(); // Gain focus; single click always activates IME.
     String text = getText();
-    if (text == null || text.isEmpty()) {
+    if (TextUtils.isEmpty(text)) {
       return;
     }
 
