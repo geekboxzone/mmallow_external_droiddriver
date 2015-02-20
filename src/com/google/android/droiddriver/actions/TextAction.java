@@ -16,6 +16,7 @@
 
 package com.google.android.droiddriver.actions;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.SystemClock;
 import android.view.KeyCharacterMap;
@@ -31,6 +32,7 @@ import com.google.android.droiddriver.util.Strings;
  */
 public class TextAction extends KeyAction {
 
+  @SuppressLint("InlinedApi")
   @SuppressWarnings("deprecation")
   private static final KeyCharacterMap KEY_CHAR_MAP =
       Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? KeyCharacterMap
