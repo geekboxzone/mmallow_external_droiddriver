@@ -1,8 +1,12 @@
 // If building from command line and you don't have the file local.properties that specifies
 // sdk.dir for the Android SDK path, you can run
 // $ ANDROID_HOME=/path/to/android-sdk gradle build
+
 // Gradle >= 2.1 required
 buildscript {
+    ext.bintrayFile = project.rootProject.file('bintray.properties')
+    ext.bintrayEnabled = bintrayFile.exists()
+
     repositories {
         jcenter()
     }
@@ -10,12 +14,11 @@ buildscript {
         classpath 'com.android.tools.build:gradle:1.0.1'
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.3'
+        if (bintrayEnabled) {
+            classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.3'
+            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
+        }
     }
-}
-
-plugins {
-    id 'com.jfrog.bintray' version '1.1'
 }
 
 apply from: 'properties.gradle'
@@ -87,5 +90,9 @@ artifacts {
 }
 
 apply from: 'maven.gradle'
-apply from: 'jcenter.gradle'
-apply from: 'artifactory.gradle'
+
+if (bintrayEnabled) {
+    apply plugin: 'com.jfrog.bintray'
+    apply from: 'jcenter.gradle'
+    apply from: 'artifactory.gradle'
+}
