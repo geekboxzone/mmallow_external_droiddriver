@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.android.droiddriver.manualtest">
+    package="io.appium.droiddriver.manualtest">
 
     <instrumentation
-        android:name="com.google.android.droiddriver.runner.TestRunner"
-        android:targetPackage="com.google.android.droiddriver.manualtest" />
+        android:name="io.appium.droiddriver.runner.TestRunner"
+        android:targetPackage="io.appium.droiddriver.manualtest" />
 
     <!-- Needed for Android.mk -->
     <uses-sdk
