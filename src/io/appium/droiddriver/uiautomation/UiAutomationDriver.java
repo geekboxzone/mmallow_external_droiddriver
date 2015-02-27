@@ -37,13 +37,19 @@ import io.appium.droiddriver.util.Logs;
  */
 @TargetApi(18)
 public class UiAutomationDriver extends BaseDroidDriver<AccessibilityNodeInfo, UiAutomationElement> {
-  // TODO: magic const from UiAutomator, but may not be useful
+  // This is a magic const copied from UiAutomator.
   /**
    * This value has the greatest bearing on the appearance of test execution
    * speeds. This value is used as the minimum time to wait before considering
    * the UI idle after each action.
    */
   private static final long QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE = 500;// ms
+  private static long idleTimeoutMillis = QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE;
+
+  /** Sets the {@code idleTimeoutMillis} argument for calling {@link UiAutomation#waitForIdle} */
+  public static void setIdleTimeoutMillis(long idleTimeoutMillis) {
+    UiAutomationDriver.idleTimeoutMillis = idleTimeoutMillis;
+  }
 
   private final UiAutomationContext context;
   private final InputInjector injector;
@@ -79,7 +85,7 @@ public class UiAutomationDriver extends BaseDroidDriver<AccessibilityNodeInfo, U
       @Override
       public Void call(UiAutomation uiAutomation) {
         try {
-          uiAutomation.waitForIdle(QUIET_TIME_TO_BE_CONSIDERD_IDLE_STATE, timeoutMillis);
+          uiAutomation.waitForIdle(idleTimeoutMillis, timeoutMillis);
           return null;
         } catch (java.util.concurrent.TimeoutException e) {
           throw new TimeoutException(e);
