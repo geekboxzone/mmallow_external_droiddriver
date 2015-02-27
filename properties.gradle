@@ -7,7 +7,7 @@ if (bintrayEnabled) {
 
 ext.ddArtifactId  = 'droiddriver'
 ext.ddGroup       = 'io.appium'
-ext.ddVersion     = '0.9.1-SNAPSHOT'
+ext.ddVersion     = '1.0.0-SNAPSHOT'
 ext.ddWebsite     = 'https://github.com/appium/droiddriver'
 ext.ddTracker     = 'https://github.com/appium/droiddriver/issues'
 ext.ddGit         = 'https://github.com/appium/droiddriver.git'
