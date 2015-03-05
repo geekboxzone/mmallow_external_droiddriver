@@ -16,7 +16,6 @@
 
 package io.appium.droiddriver.runner;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,15 +63,22 @@ public class TestRunner extends InstrumentationTestRunner {
   /**
    * {@inheritDoc}
    * <p>
+   * Sets the values for the convenience methods {@link DroidDrivers#getInstrumentation()} and
+   * {@link DroidDrivers#getOptions()}.
+   */
+  @Override
+  public void onCreate(Bundle arguments) {
+    DroidDrivers.initInstrumentation(this, arguments);
+    super.onCreate(arguments);
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
    * Adds a {@link TestListener} that finishes all created activities.
    */
   @Override
-  @TargetApi(18)
   public void onStart() {
-    if (Build.VERSION.SDK_INT >= 18) {
-      DroidDrivers.initInstrumentation(this, getArguments());
-    }
-
     getAndroidTestRunner().addTestListener(new TestListener() {
       @Override
       public void endTest(Test test) {
