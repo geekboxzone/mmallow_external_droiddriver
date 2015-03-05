@@ -16,7 +16,7 @@ android {
     buildToolsVersion '21.1.2'
 
     defaultConfig {
-        minSdkVersion 12
+        minSdkVersion 8
         targetSdkVersion 21
         // Force remove the suffix '.test'
         testApplicationId 'io.appium.droiddriver.manualtest'
