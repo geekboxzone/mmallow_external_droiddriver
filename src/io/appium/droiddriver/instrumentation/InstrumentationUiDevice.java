@@ -24,8 +24,11 @@ import android.graphics.RectF;
 import android.util.Log;
 import android.view.View;
 
+import java.util.concurrent.Callable;
+
 import io.appium.droiddriver.base.BaseUiDevice;
 import io.appium.droiddriver.base.DroidDriverContext;
+import io.appium.droiddriver.util.InstrumentationUtils;
 import io.appium.droiddriver.util.Logs;
 
 class InstrumentationUiDevice extends BaseUiDevice {
@@ -37,10 +40,13 @@ class InstrumentationUiDevice extends BaseUiDevice {
 
   @Override
   protected Bitmap takeScreenshot() {
-    ScreenshotRunnable screenshotRunnable =
-        new ScreenshotRunnable(context.getDriver().getRootElement().getRawElement());
-    context.runOnMainSync(screenshotRunnable);
-    return screenshotRunnable.screenshot;
+    try {
+      return InstrumentationUtils.runOnMainSyncWithTimeout(new GetScreenshot(
+          context.getDriver().getRootElement().getRawElement()));
+    } catch (Throwable e) {
+      Logs.log(Log.ERROR, e);
+      return null;
+    }
   }
 
   @Override
@@ -48,38 +54,36 @@ class InstrumentationUiDevice extends BaseUiDevice {
     return context;
   }
 
-  private static class ScreenshotRunnable implements Runnable {
+  private static class GetScreenshot implements Callable<Bitmap> {
     private final View rootView;
-    Bitmap screenshot;
 
-    private ScreenshotRunnable(View rootView) {
+    private GetScreenshot(View rootView) {
       this.rootView = rootView;
     }
 
     @Override
-    public void run() {
-      try {
-        rootView.destroyDrawingCache();
-        rootView.buildDrawingCache(false);
-        Bitmap drawingCache = rootView.getDrawingCache();
-        int[] xy = new int[2];
-        rootView.getLocationOnScreen(xy);
-        if (xy[0] == 0 && xy[1] == 0) {
-          screenshot = Bitmap.createBitmap(drawingCache);
-        } else {
-          Canvas canvas = new Canvas();
-          Rect rect = new Rect(0, 0, drawingCache.getWidth(), drawingCache.getHeight());
-          rect.offset(xy[0], xy[1]);
-          screenshot =
-              Bitmap.createBitmap(rect.width() + xy[0], rect.height() + xy[1], Config.ARGB_8888);
-          canvas.setBitmap(screenshot);
-          canvas.drawBitmap(drawingCache, null, new RectF(rect), null);
-          canvas.setBitmap(null);
-        }
-        rootView.destroyDrawingCache();
-      } catch (Throwable e) {
-        Logs.log(Log.ERROR, e);
+    public Bitmap call() {
+      Bitmap screenshot;
+      rootView.destroyDrawingCache();
+      rootView.buildDrawingCache(false);
+      Bitmap drawingCache = rootView.getDrawingCache();
+
+      int[] xy = new int[2];
+      rootView.getLocationOnScreen(xy);
+      if (xy[0] == 0 && xy[1] == 0) {
+        screenshot = Bitmap.createBitmap(drawingCache);
+      } else {
+        Canvas canvas = new Canvas();
+        Rect rect = new Rect(0, 0, drawingCache.getWidth(), drawingCache.getHeight());
+        rect.offset(xy[0], xy[1]);
+        screenshot =
+            Bitmap.createBitmap(rect.width() + xy[0], rect.height() + xy[1], Config.ARGB_8888);
+        canvas.setBitmap(screenshot);
+        canvas.drawBitmap(drawingCache, null, new RectF(rect), null);
+        canvas.setBitmap(null);
       }
+      rootView.destroyDrawingCache();
+      return screenshot;
     }
   }
 }

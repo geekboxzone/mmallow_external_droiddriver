@@ -22,13 +22,14 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.appium.droiddriver.actions.InputInjector;
 import io.appium.droiddriver.base.BaseDroidDriver;
 import io.appium.droiddriver.base.DroidDriverContext;
-import io.appium.droiddriver.exceptions.DroidDriverException;
 import io.appium.droiddriver.exceptions.NoRunningActivityException;
 import io.appium.droiddriver.util.ActivityUtils;
+import io.appium.droiddriver.util.InstrumentationUtils;
 import io.appium.droiddriver.util.Logs;
 
 /**
@@ -60,39 +61,26 @@ public class InstrumentationDriver extends BaseDroidDriver<View, ViewElement> {
     return new ViewElement(context, rawElement, parent);
   }
 
-  private static class FindRootViewRunnable implements Runnable {
-    View rootView;
-    Throwable exception;
-
+  private static final Callable<View> FIND_ROOT_VIEW = new Callable<View>() {
     @Override
-    public void run() {
-      try {
-        List<View> views = RootFinder.getRootViews();
-        if (views.size() > 1) {
-          Logs.log(Log.VERBOSE, "views.size()=" + views.size());
-          for (View view : views) {
-            if (view.hasWindowFocus()) {
-              rootView = view;
-              return;
-            }
+    public View call() {
+      List<View> views = RootFinder.getRootViews();
+      if (views.size() > 1) {
+        Logs.log(Log.VERBOSE, "views.size()=" + views.size());
+        for (View view : views) {
+          if (view.hasWindowFocus()) {
+            return view;
           }
         }
-        // Fall back to DecorView.
-        rootView = ActivityUtils.getRunningActivity().getWindow().getDecorView();
-      } catch (Throwable e) {
-        exception = e;
       }
+      // Fall back to DecorView.
+      return ActivityUtils.getRunningActivity().getWindow().getDecorView();
     }
-  }
+  };
 
   private View findRootView() {
     waitForRunningActivity();
-    FindRootViewRunnable findRootViewRunnable = new FindRootViewRunnable();
-    context.runOnMainSync(findRootViewRunnable);
-    if (findRootViewRunnable.exception != null) {
-      throw new DroidDriverException(findRootViewRunnable.exception);
-    }
-    return findRootViewRunnable.rootView;
+    return InstrumentationUtils.runOnMainSyncWithTimeout(FIND_ROOT_VIEW);
   }
 
   private void waitForRunningActivity() {
