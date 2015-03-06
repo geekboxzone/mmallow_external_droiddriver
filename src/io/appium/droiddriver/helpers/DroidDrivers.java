@@ -19,7 +19,6 @@ package io.appium.droiddriver.helpers;
 import android.annotation.TargetApi;
 import android.app.Instrumentation;
 import android.os.Build;
-import android.os.Bundle;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -27,83 +26,53 @@ import io.appium.droiddriver.DroidDriver;
 import io.appium.droiddriver.exceptions.DroidDriverException;
 import io.appium.droiddriver.instrumentation.InstrumentationDriver;
 import io.appium.droiddriver.uiautomation.UiAutomationDriver;
+import io.appium.droiddriver.util.InstrumentationUtils;
 
 /**
- * Static utility methods pertaining to {@link DroidDriver} instances.
+ * Static utility methods using a singleton {@link DroidDriver} instance. This class is NOT
+ * required, but it is handy and using a singleton driver can avoid memory leak when you have many
+ * instances around (for example, one in every test - JUnit framework keeps the test instances in
+ * memory after running them).
  */
 public class DroidDrivers {
   private static DroidDriver driver;
-  private static Instrumentation instrumentation;
-  private static Bundle options;
 
   /**
-   * Gets the singleton driver. Throws if {@link #init} has not been called.
+   * Gets the singleton driver. Throws if {@link #setSingleton} has not been called.
    */
   public static DroidDriver get() {
-    if (DroidDrivers.driver == null) {
-      throw new DroidDriverException("init() has not been called");
+    if (driver == null) {
+      throw new DroidDriverException("setSingleton() has not been called");
     }
-    return DroidDrivers.driver;
+    return driver;
   }
 
   /**
-   * Initializes the singleton driver. The singleton driver is NOT required, but
-   * it is handy and using a singleton driver can avoid memory leak if you have
-   * many instances around (for example, one in every test -- JUnit framework
-   * keeps the test instances in memory after running them).
+   * Sets the singleton driver.
    */
-  public static void init(DroidDriver driver) {
+  public static void setSingleton(DroidDriver driver) {
     if (DroidDrivers.driver != null) {
-      throw new DroidDriverException("init() can only be called once");
+      throw new DroidDriverException("setSingleton() can only be called once");
     }
     DroidDrivers.driver = driver;
   }
 
   /**
-   * Initializes for the convenience methods {@link #getInstrumentation()} and
-   * {@link #getOptions()}. Called by
-   * {@link io.appium.droiddriver.runner.TestRunner}. If a custom
-   * runner is used, this method must be called appropriately, otherwise the two
-   * convenience methods won't work.
-   */
-  public static void initInstrumentation(Instrumentation instrumentation, Bundle arguments) {
-    if (DroidDrivers.instrumentation != null) {
-      throw new DroidDriverException("DroidDrivers.initInstrumentation() can only be called once");
-    }
-    DroidDrivers.instrumentation = instrumentation;
-    DroidDrivers.options = arguments;
-  }
-
-  public static Instrumentation getInstrumentation() {
-    return instrumentation;
-  }
-
-  /**
-   * Gets the <a href=
-   * "http://developer.android.com/tools/testing/testing_otheride.html#AMOptionsSyntax"
-   * >am instrument options</a>.
-   */
-  public static Bundle getOptions() {
-    return options;
-  }
-
-  /**
-   * Returns whether the running target (device or emulator) has
-   * {@link android.app.UiAutomation} API, which is introduced in SDK API 18
-   * (JELLY_BEAN_MR2).
+   * Returns whether the running target (device or emulator) has {@link android.app.UiAutomation}
+   * API, which is introduced in SDK API 18 (JELLY_BEAN_MR2).
    */
   public static boolean hasUiAutomation() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
   }
 
   /**
-   * Returns a new DroidDriver instance. If am instrument options have "driver",
-   * treat it as the fully-qualified-class-name and create a new instance of it
-   * with {@code instrumentation} as the argument; otherwise a new
-   * platform-dependent default DroidDriver instance.
+   * Returns a new DroidDriver instance. If am instrument options have "driver", treat it as the
+   * fully-qualified-class-name and create a new instance of it with {@code instrumentation} as the
+   * argument; otherwise a new platform-dependent default DroidDriver instance.
    */
-  public static DroidDriver newDriver(Instrumentation instrumentation) {
-    String driverClass = options == null ? null : options.getString("driver");
+  public static DroidDriver newDriver() {
+    Instrumentation instrumentation = InstrumentationUtils.getInstrumentation();
+    String driverClass = InstrumentationUtils.getD2Option("driver");
     if (driverClass != null) {
       try {
         return (DroidDriver) Class.forName(driverClass).getConstructor(Instrumentation.class)
@@ -123,29 +92,24 @@ public class DroidDrivers {
       }
     }
 
-    // If "driver" is not specified, return default.
+    // If "dd.driver" is not specified, return default.
     if (hasUiAutomation()) {
-      return newUiAutomationDriver(instrumentation);
+      checkUiAutomation();
+      return new UiAutomationDriver(instrumentation);
     }
-    return newInstrumentationDriver(instrumentation);
-  }
-
-  /** Returns a new InstrumentationDriver */
-  public static InstrumentationDriver newInstrumentationDriver(Instrumentation instrumentation) {
     return new InstrumentationDriver(instrumentation);
   }
 
-  /** Returns a new UiAutomationDriver */
+  /** Checks if UiAutomation API is available */
   @TargetApi(18)
-  public static UiAutomationDriver newUiAutomationDriver(Instrumentation instrumentation) {
+  public static void checkUiAutomation() {
     if (!hasUiAutomation()) {
       throw new DroidDriverException("UiAutomation is not available below API 18. "
           + "See http://developer.android.com/reference/android/app/UiAutomation.html");
     }
-    if (instrumentation.getUiAutomation() == null) {
+    if (InstrumentationUtils.getInstrumentation().getUiAutomation() == null) {
       throw new DroidDriverException(
           "uiAutomation==null: did you forget to set '-w' flag for 'am instrument'?");
     }
-    return new UiAutomationDriver(instrumentation);
   }
 }

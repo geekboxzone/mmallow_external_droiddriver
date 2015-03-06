@@ -5,6 +5,9 @@ import android.app.Activity;
 import io.appium.droiddriver.finders.By;
 import io.appium.droiddriver.finders.Finder;
 import io.appium.droiddriver.helpers.BaseDroidDriverTest;
+import io.appium.droiddriver.helpers.DroidDrivers;
+import io.appium.droiddriver.helpers.DroidDriversInitializer;
+import io.appium.droiddriver.uiautomation.UiAutomationDriver;
 
 /**
  * This is for manually testing DroidDriver. It is not meant for continuous
@@ -22,6 +25,12 @@ import io.appium.droiddriver.helpers.BaseDroidDriverTest;
 public class ManualTest extends BaseDroidDriverTest<Activity> {
   public ManualTest() {
     super(Activity.class);
+  }
+
+  // This does not instrument a certain AUT, so InstrumentationDriver won't work
+  protected void classSetUp() {
+    DroidDrivers.checkUiAutomation();
+    DroidDriversInitializer.get(new UiAutomationDriver(getInstrumentation())).singleRun();
   }
 
   public void testSetTextForPassword() {

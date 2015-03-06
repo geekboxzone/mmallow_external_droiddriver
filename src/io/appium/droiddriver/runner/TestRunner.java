@@ -35,12 +35,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 
 import io.appium.droiddriver.helpers.DroidDrivers;
 import io.appium.droiddriver.util.ActivityUtils;
 import io.appium.droiddriver.util.ActivityUtils.Supplier;
+import io.appium.droiddriver.util.InstrumentationUtils;
 import io.appium.droiddriver.util.Logs;
 
 /**
@@ -63,12 +62,11 @@ public class TestRunner extends InstrumentationTestRunner {
   /**
    * {@inheritDoc}
    * <p>
-   * Sets the values for the convenience methods {@link DroidDrivers#getInstrumentation()} and
-   * {@link DroidDrivers#getOptions()}.
+   * Initializes {@link InstrumentationUtils}.
    */
   @Override
   public void onCreate(Bundle arguments) {
-    DroidDrivers.initInstrumentation(this, arguments);
+    InstrumentationUtils.init(this, arguments);
     super.onCreate(arguments);
   }
 
@@ -92,21 +90,25 @@ public class TestRunner extends InstrumentationTestRunner {
           activitiesCopy = activities.toArray(new Activity[activities.size()]);
         }
 
-        runOnMainSyncWithTimeLimit(new Runnable() {
-          @Override
-          public void run() {
-            for (Activity activity : activitiesCopy) {
-              if (!activity.isFinishing()) {
-                try {
-                  Logs.log(Log.INFO, "Stopping activity: " + activity);
-                  activity.finish();
-                } catch (Throwable e) {
-                  Logs.log(Log.ERROR, e, "Failed to stop activity");
+        try {
+          InstrumentationUtils.runOnMainSyncWithTimeout(new Runnable() {
+            @Override
+            public void run() {
+              for (Activity activity : activitiesCopy) {
+                if (!activity.isFinishing()) {
+                  try {
+                    Logs.log(Log.INFO, "Stopping activity: " + activity);
+                    activity.finish();
+                  } catch (Throwable e) {
+                    Logs.log(Log.ERROR, e, "Failed to stop activity");
+                  }
                 }
               }
             }
-          }
-        });
+          });
+        } catch (Throwable e) {
+          Logs.log(Log.ERROR, e);
+        }
 
         // We've done what we can. Clear activities if any are left.
         synchronized (activities) {
@@ -196,29 +198,6 @@ public class TestRunner extends InstrumentationTestRunner {
     super.callActivityOnPause(activity);
     if (activity == runningActivity) {
       runningActivity = null;
-    }
-  }
-
-  private boolean runOnMainSyncWithTimeLimit(Runnable runnable) {
-    // Do we need it configurable? Now only used in endTest.
-    long timeoutMillis = 10000L;
-    final FutureTask<?> futureTask = new FutureTask<Void>(runnable, null);
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        runOnMainSync(futureTask);
-      }
-    }).start();
-
-    try {
-      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
-      return true;
-    } catch (Throwable e) {
-      Logs.log(Log.WARN, e, String.format(
-          "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync",
-          timeoutMillis));
-      futureTask.cancel(false);
-      return false;
     }
   }
 }
