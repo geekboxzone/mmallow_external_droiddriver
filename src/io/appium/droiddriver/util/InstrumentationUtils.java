@@ -22,6 +22,8 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +43,7 @@ public class InstrumentationUtils {
     public void run() {
     }
   };
+  private static final Executor RUN_ON_MAIN_SYNC_EXECUTOR = Executors.newSingleThreadExecutor();
 
   /**
    * Initializes this class. If you use a runner that is not DroidDriver-aware, you need to call
@@ -112,8 +115,8 @@ public class InstrumentationUtils {
       Logs.log(Log.INFO,
           "Timed out after " + timeoutMillis + " milliseconds waiting for idle on main looper");
       return false;
-    } catch (Throwable e) {
-      throw new DroidDriverException(e);
+    } catch (Throwable t) {
+      throw DroidDriverException.propagate(t);
     }
     return true;
   }
@@ -132,12 +135,10 @@ public class InstrumentationUtils {
    * Runs {@code callable} on the main thread on best-effort basis up to a time limit, which
    * defaults to {@code 10000L} and can be set as an am instrument option under the key {@code
    * dd.runOnMainSyncTimeout}. <p>This is a safer variation of {@link Instrumentation#runOnMainSync}
-   * because the latter may hang. But it is heavy because a new thread is created for each call. You
-   * may turn off this behavior by setting {@code "-e dd.runOnMainSyncTimeout 0"} on the am command
-   * line.</p>The {@code callable} may never run, for example, in case that the main Looper has
-   * exited due to uncaught exception.
+   * because the latter may hang. You may turn off this behavior by setting {@code "-e
+   * dd.runOnMainSyncTimeout 0"} on the am command line.</p>The {@code callable} may never run, for
+   * example, if the main Looper has exited due to uncaught exception.
    */
-  // TODO: call runOnMainSync on a single worker thread?
   public static <V> V runOnMainSyncWithTimeout(Callable<V> callable) {
     validateNotAppThread();
     final RunOnMainSyncFutureTask<V> futureTask = new RunOnMainSyncFutureTask<>(callable);
@@ -146,12 +147,12 @@ public class InstrumentationUtils {
       // Call runOnMainSync on current thread without time limit.
       futureTask.runOnMainSyncNoThrow();
     } else {
-      new Thread() {
+      RUN_ON_MAIN_SYNC_EXECUTOR.execute(new Runnable() {
         @Override
         public void run() {
           futureTask.runOnMainSyncNoThrow();
         }
-      }.start();
+      });
     }
 
     try {
@@ -159,8 +160,8 @@ public class InstrumentationUtils {
     } catch (java.util.concurrent.TimeoutException e) {
       throw new TimeoutException("Timed out after " + runOnMainSyncTimeoutMillis
           + " milliseconds waiting for Instrumentation.runOnMainSync", e);
-    } catch (Throwable e) {
-      throw new DroidDriverException(e);
+    } catch (Throwable t) {
+      throw DroidDriverException.propagate(t);
     } finally {
       futureTask.cancel(false);
     }

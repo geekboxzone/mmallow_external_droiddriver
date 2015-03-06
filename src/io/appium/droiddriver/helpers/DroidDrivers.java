@@ -20,8 +20,6 @@ import android.annotation.TargetApi;
 import android.app.Instrumentation;
 import android.os.Build;
 
-import java.lang.reflect.InvocationTargetException;
-
 import io.appium.droiddriver.DroidDriver;
 import io.appium.droiddriver.exceptions.DroidDriverException;
 import io.appium.droiddriver.instrumentation.InstrumentationDriver;
@@ -77,18 +75,8 @@ public class DroidDrivers {
       try {
         return (DroidDriver) Class.forName(driverClass).getConstructor(Instrumentation.class)
             .newInstance(instrumentation);
-      } catch (ClassNotFoundException e) {
-        throw new DroidDriverException(e);
-      } catch (NoSuchMethodException e) {
-        throw new DroidDriverException(e);
-      } catch (InstantiationException e) {
-        throw new DroidDriverException(e);
-      } catch (IllegalAccessException e) {
-        throw new DroidDriverException(e);
-      } catch (IllegalArgumentException e) {
-        throw new DroidDriverException(e);
-      } catch (InvocationTargetException e) {
-        throw new DroidDriverException(e);
+      } catch (Throwable t) {
+        throw DroidDriverException.propagate(t);
       }
     }
 

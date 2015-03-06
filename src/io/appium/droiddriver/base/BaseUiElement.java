@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 import io.appium.droiddriver.UiElement;
@@ -201,14 +200,8 @@ public abstract class BaseUiElement<R, E extends BaseUiElement<R, E>> implements
 
     try {
       return futureTask.get();
-    } catch (ExecutionException e) {
-      Throwable cause = e.getCause();
-      if (cause instanceof RuntimeException) {
-        throw (RuntimeException) cause;
-      }
-      throw new DroidDriverException(cause);
-    } catch (InterruptedException e) {
-      throw new DroidDriverException(e);
+    } catch (Throwable t) {
+      throw DroidDriverException.propagate(t);
     }
   }
 
