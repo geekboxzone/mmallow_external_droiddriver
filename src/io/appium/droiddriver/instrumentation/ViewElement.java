@@ -30,13 +30,14 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import io.appium.droiddriver.actions.InputInjector;
 import io.appium.droiddriver.base.BaseUiElement;
 import io.appium.droiddriver.base.DroidDriverContext;
-import io.appium.droiddriver.exceptions.DroidDriverException;
 import io.appium.droiddriver.finders.Attribute;
+import io.appium.droiddriver.util.InstrumentationUtils;
 import io.appium.droiddriver.util.Preconditions;
 
 import static io.appium.droiddriver.util.Strings.charSequenceToString;
@@ -45,55 +46,51 @@ import static io.appium.droiddriver.util.Strings.charSequenceToString;
  * A UiElement that is backed by a View.
  */
 public class ViewElement extends BaseUiElement<View, ViewElement> {
-  private static class SnapshotViewAttributesRunnable implements Runnable {
+  private static class AttributesSnapshot implements Callable<Void> {
     private final View view;
     final Map<Attribute, Object> attribs = new EnumMap<Attribute, Object>(Attribute.class);
     boolean visible;
     Rect visibleBounds;
     List<View> childViews;
-    Throwable exception;
 
-    private SnapshotViewAttributesRunnable(View view) {
+    private AttributesSnapshot(View view) {
       this.view = view;
     }
 
     @Override
-    public void run() {
-      try {
-        put(Attribute.PACKAGE, view.getContext().getPackageName());
-        put(Attribute.CLASS, getClassName());
-        put(Attribute.TEXT, getText());
-        put(Attribute.CONTENT_DESC, charSequenceToString(view.getContentDescription()));
-        put(Attribute.RESOURCE_ID, getResourceId());
-        put(Attribute.CHECKABLE, view instanceof Checkable);
-        put(Attribute.CHECKED, isChecked());
-        put(Attribute.CLICKABLE, view.isClickable());
-        put(Attribute.ENABLED, view.isEnabled());
-        put(Attribute.FOCUSABLE, view.isFocusable());
-        put(Attribute.FOCUSED, view.isFocused());
-        put(Attribute.LONG_CLICKABLE, view.isLongClickable());
-        put(Attribute.PASSWORD, isPassword());
-        put(Attribute.SCROLLABLE, isScrollable());
-        if (view instanceof TextView) {
-          TextView textView = (TextView) view;
-          if (textView.hasSelection()) {
-            attribs.put(Attribute.SELECTION_START, textView.getSelectionStart());
-            attribs.put(Attribute.SELECTION_END, textView.getSelectionEnd());
-          }
+    public Void call() {
+      put(Attribute.PACKAGE, view.getContext().getPackageName());
+      put(Attribute.CLASS, getClassName());
+      put(Attribute.TEXT, getText());
+      put(Attribute.CONTENT_DESC, charSequenceToString(view.getContentDescription()));
+      put(Attribute.RESOURCE_ID, getResourceId());
+      put(Attribute.CHECKABLE, view instanceof Checkable);
+      put(Attribute.CHECKED, isChecked());
+      put(Attribute.CLICKABLE, view.isClickable());
+      put(Attribute.ENABLED, view.isEnabled());
+      put(Attribute.FOCUSABLE, view.isFocusable());
+      put(Attribute.FOCUSED, view.isFocused());
+      put(Attribute.LONG_CLICKABLE, view.isLongClickable());
+      put(Attribute.PASSWORD, isPassword());
+      put(Attribute.SCROLLABLE, isScrollable());
+      if (view instanceof TextView) {
+        TextView textView = (TextView) view;
+        if (textView.hasSelection()) {
+          attribs.put(Attribute.SELECTION_START, textView.getSelectionStart());
+          attribs.put(Attribute.SELECTION_END, textView.getSelectionEnd());
         }
-        put(Attribute.SELECTED, view.isSelected());
-        put(Attribute.BOUNDS, getBounds());
-
-        // Order matters as setVisible() depends on setVisibleBounds().
-        this.visibleBounds = getVisibleBounds();
-        // isShown() checks the visibility flag of this view and ancestors; it
-        // needs to have the VISIBLE flag as well as non-empty bounds to be
-        // visible.
-        this.visible = view.isShown() && !visibleBounds.isEmpty();
-        setChildViews();
-      } catch (Throwable e) {
-        exception = e;
       }
+      put(Attribute.SELECTED, view.isSelected());
+      put(Attribute.BOUNDS, getBounds());
+
+      // Order matters as setVisible() depends on setVisibleBounds().
+      this.visibleBounds = getVisibleBounds();
+      // isShown() checks the visibility flag of this view and ancestors; it
+      // needs to have the VISIBLE flag as well as non-empty bounds to be
+      // visible.
+      this.visible = view.isShown() && !visibleBounds.isEmpty();
+      setChildViews();
+      return null;
     }
 
     private void put(Attribute key, Object value) {
@@ -223,11 +220,8 @@ public class ViewElement extends BaseUiElement<View, ViewElement> {
     this.context = Preconditions.checkNotNull(context);
     this.view = Preconditions.checkNotNull(view);
     this.parent = parent;
-    SnapshotViewAttributesRunnable attributesSnapshot = new SnapshotViewAttributesRunnable(view);
-    context.runOnMainSync(attributesSnapshot);
-    if (attributesSnapshot.exception != null) {
-      throw new DroidDriverException(attributesSnapshot.exception);
-    }
+    AttributesSnapshot attributesSnapshot = new AttributesSnapshot(view);
+    InstrumentationUtils.runOnMainSyncWithTimeout(attributesSnapshot);
 
     attributes = Collections.unmodifiableMap(attributesSnapshot.attribs);
     this.visibleBounds = attributesSnapshot.visibleBounds;
@@ -276,7 +270,7 @@ public class ViewElement extends BaseUiElement<View, ViewElement> {
   @Override
   protected void doPerformAndWait(FutureTask<Boolean> futureTask, long timeoutMillis) {
     futureTask.run();
-    context.tryWaitForIdleSync(timeoutMillis);
+    InstrumentationUtils.tryWaitForIdleSync(timeoutMillis);
   }
 
   @Override

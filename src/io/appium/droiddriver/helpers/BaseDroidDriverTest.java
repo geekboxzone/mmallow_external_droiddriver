@@ -17,7 +17,6 @@
 package io.appium.droiddriver.helpers;
 
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
 import android.os.Debug;
 import android.test.FlakyTest;
@@ -41,29 +40,6 @@ import io.appium.droiddriver.util.Logs;
  */
 public abstract class BaseDroidDriverTest<T extends Activity> extends
     D2ActivityInstrumentationTestCase2<T> {
-  /**
-   * Calls {@link DroidDrivers#init} once and only once.
-   */
-  public static class DroidDriversInitializer extends SingleRun {
-    private static DroidDriversInitializer instance;
-    protected final Instrumentation instrumentation;
-
-    protected DroidDriversInitializer(Instrumentation instrumentation) {
-      this.instrumentation = instrumentation;
-    }
-
-    @Override
-    protected void run() {
-      DroidDrivers.init(DroidDrivers.newDriver(instrumentation));
-    }
-
-    public static synchronized DroidDriversInitializer get(Instrumentation instrumentation) {
-      if (instance == null) {
-        instance = new DroidDriversInitializer(instrumentation);
-      }
-      return instance;
-    }
-  }
 
   private static boolean classSetUpDone = false;
   // In case of device-wide fatal errors, e.g. OOME, the remaining tests will
@@ -120,7 +96,7 @@ public abstract class BaseDroidDriverTest<T extends Activity> extends
    * io.appium.droiddriver.instrumentation.ViewElement#overrideClassName}
    */
   protected void classSetUp() {
-    DroidDriversInitializer.get(getInstrumentation()).singleRun();
+    DroidDriversInitializer.get(DroidDrivers.newDriver()).singleRun();
   }
 
   protected boolean reportSkippedAsFailed() {
