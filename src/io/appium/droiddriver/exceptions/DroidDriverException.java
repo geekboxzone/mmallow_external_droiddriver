@@ -34,4 +34,37 @@ public class DroidDriverException extends RuntimeException {
   public DroidDriverException(String message, Throwable cause) {
     super(message, cause);
   }
+
+  /**
+   * Adapted from <a href="http://guava-libraries.googlecode.com">Guava libraries</a>. <p>
+   * Propagates {@code throwable} as-is if it is an instance of {@link RuntimeException} or {@link
+   * Error}, or else as a last resort, wraps it in a {@code DroidDriverException} and then
+   * propagates. <p> This method always throws an exception. The {@code DroidDriverException} return
+   * type is only for client code to make Java type system happy in case a return value is required
+   * by the enclosing method. Example usage:
+   * <pre>
+   *   T doSomething() {
+   *     try {
+   *       return someMethodThatCouldThrowAnything();
+   *     } catch (IKnowWhatToDoWithThisException e) {
+   *       return handle(e);
+   *     } catch (Throwable t) {
+   *       throw DroidDriverException.propagate(t);
+   *     }
+   *   }
+   * </pre>
+   *
+   * @param throwable the Throwable to propagate
+   * @return nothing will ever be returned; this return type is only for your convenience, as
+   * illustrated in the example above
+   */
+  public static DroidDriverException propagate(Throwable throwable) {
+    if (throwable instanceof RuntimeException) {
+      throw (RuntimeException) throwable;
+    }
+    if (throwable instanceof Error) {
+      throw (Error) throwable;
+    }
+    throw new DroidDriverException(throwable);
+  }
 }
