@@ -17,20 +17,11 @@
 package io.appium.droiddriver.base;
 
 import android.app.Instrumentation;
-import android.os.Looper;
-import android.util.Log;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 
-import io.appium.droiddriver.exceptions.DroidDriverException;
-import io.appium.droiddriver.exceptions.TimeoutException;
 import io.appium.droiddriver.finders.ByXPath;
-import io.appium.droiddriver.util.Logs;
 
 /**
  * Internal helper for DroidDriver implementation.
@@ -71,79 +62,5 @@ public class DroidDriverContext<R, E extends BaseUiElement<R, E>> {
   private void clearData() {
     map.clear();
     ByXPath.clearData();
-  }
-
-  /**
-   * Tries to wait for an idle state on the main thread on best-effort basis up
-   * to {@code timeoutMillis}. The main thread may not enter the idle state when
-   * animation is playing, for example, the ProgressBar.
-   */
-  public boolean tryWaitForIdleSync(long timeoutMillis) {
-    validateNotAppThread();
-    FutureTask<?> futureTask = new FutureTask<Void>(new Runnable() {
-      @Override
-      public void run() {}
-    }, null);
-    instrumentation.waitForIdle(futureTask);
-
-    try {
-      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      throw new DroidDriverException(e);
-    } catch (ExecutionException e) {
-      throw new DroidDriverException(e);
-    } catch (java.util.concurrent.TimeoutException e) {
-      Logs.log(Log.DEBUG, String.format(Locale.US,
-          "Timed out after %d milliseconds waiting for idle on main looper", timeoutMillis));
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Tries to run {@code runnable} on the main thread on best-effort basis up to
-   * {@code timeoutMillis}. The {@code runnable} may never run, for example, in
-   * case that the main Looper has exited due to uncaught exception.
-   */
-  public boolean tryRunOnMainSync(Runnable runnable, long timeoutMillis) {
-    validateNotAppThread();
-    final FutureTask<?> futureTask = new FutureTask<Void>(runnable, null);
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        instrumentation.runOnMainSync(futureTask);
-      }
-    }).start();
-
-    try {
-      futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      throw new DroidDriverException(e);
-    } catch (ExecutionException e) {
-      throw new DroidDriverException(e);
-    } catch (java.util.concurrent.TimeoutException e) {
-      Logs.log(Log.WARN, getRunOnMainSyncTimeoutMessage(timeoutMillis));
-      return false;
-    }
-    return true;
-  }
-
-  public void runOnMainSync(Runnable runnable) {
-    long timeoutMillis = getDriver().getPoller().getTimeoutMillis();
-    if (!tryRunOnMainSync(runnable, timeoutMillis)) {
-      throw new TimeoutException(getRunOnMainSyncTimeoutMessage(timeoutMillis));
-    }
-  }
-
-  private String getRunOnMainSyncTimeoutMessage(long timeoutMillis) {
-    return String.format(Locale.US,
-        "Timed out after %d milliseconds waiting for Instrumentation.runOnMainSync", timeoutMillis);
-  }
-
-  private void validateNotAppThread() {
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-      throw new DroidDriverException(
-          "This method can not be called from the main application thread");
-    }
   }
 }

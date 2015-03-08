@@ -16,8 +16,11 @@
 
 package io.appium.droiddriver.finders;
 
+import android.content.Context;
+
 import io.appium.droiddriver.UiElement;
 import io.appium.droiddriver.exceptions.ElementNotFoundException;
+import io.appium.droiddriver.util.InstrumentationUtils;
 
 import static io.appium.droiddriver.util.Preconditions.checkNotNull;
 
@@ -44,7 +47,16 @@ public class By {
     return new MatchFinder(Predicates.attributeFalse(attribute));
   }
 
-  /** Matches a UiElement by resource id. */
+  /** Matches a UiElement by a resource id defined in the AUT. */
+  public static MatchFinder resourceId(int resourceId) {
+    Context targetContext = InstrumentationUtils.getInstrumentation().getTargetContext();
+    return resourceId(targetContext.getResources().getResourceName(resourceId));
+  }
+
+  /**
+   * Matches a UiElement by the string representation of a resource id. This works for resources
+   * not belonging to the AUT.
+   */
   public static MatchFinder resourceId(String resourceId) {
     return new MatchFinder(Predicates.attributeEquals(Attribute.RESOURCE_ID, resourceId));
   }

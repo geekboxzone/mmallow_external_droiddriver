@@ -26,13 +26,9 @@ import android.util.Log;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 
-import io.appium.droiddriver.exceptions.DroidDriverException;
-import io.appium.droiddriver.exceptions.TimeoutException;
-import io.appium.droiddriver.helpers.DroidDrivers;
 import io.appium.droiddriver.util.ActivityUtils;
+import io.appium.droiddriver.util.InstrumentationUtils;
 import io.appium.droiddriver.util.Logs;
 
 /**
@@ -50,12 +46,11 @@ public class D2AndroidJUnitRunner extends AndroidJUnitRunner {
   };
 
   /**
-   * {@inheritDoc} <p> Sets the values for the convenience methods {@link
-   * DroidDrivers#getInstrumentation()} and {@link DroidDrivers#getOptions()}.
+   * {@inheritDoc} <p> Initializes {@link InstrumentationUtils}.
    */
   @Override
   public void onCreate(Bundle arguments) {
-    DroidDrivers.initInstrumentation(this, arguments);
+    InstrumentationUtils.init(this, arguments);
     super.onCreate(arguments);
   }
 
@@ -74,67 +69,14 @@ public class D2AndroidJUnitRunner extends AndroidJUnitRunner {
             return GET_RUNNING_ACTIVITY.call();
           }
 
-          return runOnMainSyncWithTimeout(GET_RUNNING_ACTIVITY);
+          return InstrumentationUtils.runOnMainSyncWithTimeout(GET_RUNNING_ACTIVITY);
         } catch (Exception e) {
           Logs.log(Log.WARN, e);
           return null;
         }
       }
     });
+
     super.onStart();
-  }
-
-  /**
-   * Runs {@code callable} on the main thread on best-effort basis up to a time limit, which
-   * defaults to {@code 10000L} and can be set as an <a href= "http://developer.android.com/tools/testing/testing_otheride.html#AMOptionsSyntax">
-   * am instrument option</a> under the key {@code dd.runOnMainSyncTimeout}. <p>This is a safer
-   * variation of {@link #runOnMainSync} because the latter may hang. But it is heavy because a new
-   * thread is created for each call unless the am command line specifies {@code
-   * dd.runOnMainSyncTimeout <=0} such as "-e dd.runOnMainSyncTimeout 0".</p>The {@code callable}
-   * may never run, for example, in case that the main Looper has exited due to uncaught exception.
-   */
-  // TODO: move this to DroidDrivers
-  // TODO: call runOnMainSync on a single worker thread?
-  private <V> V runOnMainSyncWithTimeout(Callable<V> callable) {
-    final RunOnMainSyncFutureTask<V> futureTask = new RunOnMainSyncFutureTask<>(callable);
-
-    String timeoutMillisString = DroidDrivers.getOptions().getString("dd.runOnMainSyncTimeout");
-    long timeoutMillis = timeoutMillisString == null? 10000L : Long.parseLong(timeoutMillisString);
-    if (timeoutMillis <= 0L) {
-      // Call runOnMainSync on current thread without time limit.
-      futureTask.runOnMainSyncNoThrow();
-    } else {
-      new Thread() {
-        @Override
-        public void run() {
-          futureTask.runOnMainSyncNoThrow();
-        }
-      }.start();
-    }
-
-    try {
-      return futureTask.get(timeoutMillis, TimeUnit.MILLISECONDS);
-    } catch (java.util.concurrent.TimeoutException e) {
-      throw new TimeoutException("Timed out after " + timeoutMillis
-          + " milliseconds waiting for Instrumentation.runOnMainSync", e);
-    } catch (Throwable e) {
-      throw new DroidDriverException(e);
-    } finally {
-      futureTask.cancel(false);
-    }
-  }
-
-  private class RunOnMainSyncFutureTask<V> extends FutureTask<V> {
-    public RunOnMainSyncFutureTask(Callable<V> callable) {
-      super(callable);
-    }
-
-    public void runOnMainSyncNoThrow() {
-      try {
-        runOnMainSync(this);
-      } catch (Throwable e) {
-        setException(e);
-      }
-    }
   }
 }
