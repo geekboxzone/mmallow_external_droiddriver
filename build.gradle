@@ -4,8 +4,8 @@
 
 // Gradle >= 2.1 required
 buildscript {
-    ext.bintrayFile = project.rootProject.file('bintray.properties')
-    ext.bintrayEnabled = bintrayFile.exists()
+    ext.bintrayEnabled = project.hasProperty('bintrayUser') &&
+                         project.hasProperty('bintrayKey')
 
     repositories {
         jcenter()

@@ -1,24 +1,19 @@
 # Releasing to JCenter
 
-Add the following credentials to `bintray.properties` Your API key can be [found here](https://bintray.com/user/edit/tab/apikey).
+Creating a release on jcenter is done by invoking the binaryUpload task with a bintray user and API key. Your API key can be [found here](https://bintray.com/user/edit/tab/apikey).
 
-```
-bintray.user=USERNAME
-bintray.key=APIKEY
-```
+`gradle -PbintrayUser=myusername -PbintrayKey=123 clean bintrayUpload`
 
-Creating a release on jcenter is done by invoking the binaryUpload task. Note that you'll need to be a member of the appium organization on jcenter before publishing. Existing members are able to invite new ones.
+Note that you'll need to be a member of the appium organization on jcenter before publishing. Existing members are able to invite new ones.
 
 Update the version number in `build.gradle` by modifying the value of `ddVersion`. Official releases should be made only after removing the `-SNAPSHOT` suffix. If the same version number is used as an existing release of droiddriver then jcenter will reject the upload.
-
-`gradle clean bintrayUpload`
 
 # Releasing snapshots to artifactory
 
 Snapshots of DroidDriver are released to `http://oss.jfrog.org/artifactory` in the oss-snapshot-local
 repository.
 
-`gradle clean artifactoryPublish`
+`gradle -PbintrayUser=myusername -PbintrayKey=123 clean artifactoryPublish`
 
 Note that resolving the snapshots requires adding the maven repo to the gradle build file:
 
