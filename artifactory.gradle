@@ -16,8 +16,8 @@ artifactory {
     publish { // gradle clean artifactoryPublish
         repository {
             repoKey = 'oss-snapshot-local'
-            username = bintray_user
-            password = bintray_key
+            username = bintrayUser
+            password = bintrayKey
             maven = true
         }
         defaults {
