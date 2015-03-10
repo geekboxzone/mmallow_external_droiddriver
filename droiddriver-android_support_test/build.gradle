@@ -12,13 +12,25 @@ buildscript {
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 
+ext.ddSnapshot = hasProperty('ddSnapshot')
+
 repositories {
     jcenter()
+    if (ddSnapshot) {
+        // For development only - droiddriver SNAPSHOTs published here
+        maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+    }
 }
 
 dependencies {
-    // During development, this should be set to droiddriver SNAPSHOT
-    compile 'io.appium:droiddriver:0.9.1'
+    if (ddSnapshot) {
+        // For development only.
+        compile 'io.appium:droiddriver:1.0.0-SNAPSHOT'
+    } else {
+        // This is broken now b/c droiddriver-1.0.0 is not published yet
+        compile 'io.appium:droiddriver:1.0.0'
+    }
+
     compile 'com.android.support.test:testing-support-lib:0.1'
 }
 
