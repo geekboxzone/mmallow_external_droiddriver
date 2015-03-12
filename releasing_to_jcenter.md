@@ -13,7 +13,7 @@ Update the version number in `build.gradle` by modifying the value of `ddVersion
 Snapshots of DroidDriver are released to `http://oss.jfrog.org/artifactory` in the oss-snapshot-local
 repository.
 
-`gradle -PbintrayUser=myusername -PbintrayKey=123 clean artifactoryPublish`
+`gradle -PbintrayUser=myusername -PbintrayKey=123 clean assemble artifactoryPublish`
 
 Note that resolving the snapshots requires adding the maven repo to the gradle build file:
 
