@@ -32,7 +32,7 @@ public abstract class AccessibilityAction extends BaseAction {
   }
 
   @Override
-  public boolean perform(UiElement element) {
+  public final boolean perform(UiElement element) {
     return perform(((UiAutomationElement) element).getRawElement(), element);
   }
 
