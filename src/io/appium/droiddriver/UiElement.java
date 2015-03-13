@@ -145,19 +145,15 @@ public interface UiElement {
   boolean perform(Action action);
 
   /**
-   * Sets the text of this element. The implementation may not work on all
-   * UiElements if the underlying view is not EditText.
-   * <p>
-   * If this element already has text, it is cleared first if the device has API 11 or higher.
-   * <p>
-   * TODO: Support this behavior on older devices.
-   * <p>
-   * If the {@code text} ends with {@code '\n'}, the IME may be closed automatically after this
-   * call. If the IME is open after this call, you can call
-   * <pre>
-   * perform(SingleKeyAction.BACK);
-   * </pre>
-   * to close the IME.
+   * Sets the text of this element. The implementation may not work on all UiElements if the
+   * underlying view is not EditText. <p> If this element already has text, it is cleared first if
+   * the device has API 11 or higher. <p> TODO: Support this behavior on older devices. <p> The IME
+   * (soft keyboard) may be shown after this call. If the {@code text} ends with {@code '\n'}, the
+   * IME may be closed automatically. If the IME is open, you can call {@link UiDevice#pressBack()}
+   * to close it. <p> If you are using {@link io.appium.droiddriver.instrumentation.InstrumentationDriver},
+   * you may use {@link io.appium.droiddriver.actions.view.CloseKeyboardAction} to close it. The
+   * advantage of {@code CloseKeyboardAction} is that it is a no-op if the IME is hidden. This is
+   * useful when the state of the IME cannot be determined.
    *
    * @param text the text to enter
    */
