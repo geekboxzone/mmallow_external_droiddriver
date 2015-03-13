@@ -17,6 +17,7 @@
 package io.appium.droiddriver.util;
 
 import android.app.Instrumentation;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -71,6 +72,10 @@ public class InstrumentationUtils {
   public static Instrumentation getInstrumentation() {
     checkInitialized();
     return instrumentation;
+  }
+
+  public static Context getTargetContext() {
+    return getInstrumentation().getTargetContext();
   }
 
   /**

@@ -29,7 +29,7 @@ public abstract class EventAction extends BaseAction {
   }
 
   @Override
-  public boolean perform(UiElement element) {
+  public final boolean perform(UiElement element) {
     return perform(element.getInjector(), element);
   }
 
