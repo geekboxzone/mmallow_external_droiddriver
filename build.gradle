@@ -4,8 +4,9 @@
 
 // Gradle >= 2.1 required
 buildscript {
-    ext.bintrayEnabled = project.hasProperty('bintrayUser') &&
-                         project.hasProperty('bintrayKey')
+    ext.bintrayUser    = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
+    ext.bintrayKey     = project.hasProperty('bintrayKey')  ? project.bintrayKey  : System.getenv('BINTRAY_KEY')
+    ext.bintrayEnabled = project.bintrayUser && project.bintrayKey
 
     repositories {
         jcenter()
