@@ -3,11 +3,12 @@ apply plugin: 'com.github.dcendents.android-maven'
 project.ext.innerPom = { // used by mavenInstaller
     project {
         packaging 'aar'
-        version = ddVersion
-        groupId = ddGroup
-        artifactId = ddArtifactId
+        version ddVersion
+        groupId ddGroup
+        artifactId ddArtifactId
 
-        description = ddDescription
+        name ddArtifactId
+        description ddDescription
         url ddWebsite
 
         licenses {
@@ -17,9 +18,17 @@ project.ext.innerPom = { // used by mavenInstaller
             }
         }
 
+        developers {
+            developer {
+                name 'Kevin Jin'
+                organizationUrl 'https://github.com/ddkjin'
+            }
+        }
+
+        // http://central.sonatype.org/pages/requirements.html
         scm {
-            connection ddGit
-            developerConnection ddGit
+            connection "scm:git:${ddGit}"
+            developerConnection "scm:git:${ddGit}"
             url ddWebsite
         }
 
