@@ -19,8 +19,8 @@ package io.appium.droiddriver.android_support_test;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.test.internal.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.AndroidJUnitRunner;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
 
